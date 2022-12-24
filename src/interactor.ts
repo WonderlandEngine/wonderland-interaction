@@ -1,13 +1,12 @@
-import { Grabbable } from './grabbable.js';
-// @ts-ignore
 import { Component } from '@wonderlandengine/api';
+import { Interactable } from './interactable.js';
 
 /**
  * Hello, I am a grabber!
  */
-export class Grabber extends Component {
+export class Interactor extends Component {
 
-  static TypeName = 'grabber';
+  static TypeName = 'interactor';
   static Properties = {};
 
   /**
@@ -17,9 +16,7 @@ export class Grabber extends Component {
   /** Collision component of this object */
   private _collision: any = null;
 
-  private _grabbed: Grabbable | null = null;
-
-  private object!: any;
+  private _interactable: Interactable | null = null;
 
   /**
    * Set the collision component needed to perform
@@ -30,7 +27,7 @@ export class Grabber extends Component {
    * @returns This instance, for chaining
    */
   public start() {
-    this._collision = this.object.getComponent('collision');
+    this._collision = this.object.getComponent('collision', 0);
     if(!this._collision)
       throw new Error('grabber.start(): No collision component found');
 
@@ -44,23 +41,22 @@ export class Grabber extends Component {
     }
   }
 
-  public update() {}
+  public update() {
+  }
 
   public grab() {
     const overlaps = this._collision.queryOverlaps();
-    console.log(overlaps);
     for (const overlap of overlaps) {
-      const grabbable = overlap.object.getComponent(Grabbable) as Grabbable;
-      if (!grabbable) {
-        continue;
+      const interactable = overlap.object.getComponent(Interactable) as Interactable;
+      if (interactable) {
+        this._interactable = interactable;
+        interactable.onSelectStart.notify(this);
       }
-      this._grabbed = grabbable;
-      grabbable.enterGrab();
     }
   }
 
   public release() {
-    this._grabbed?.exitGrab();
+    this._interactable?.onSelectEnd.notify(this);
   }
 
   private _setup(session: XRSession) {
@@ -68,7 +64,7 @@ export class Grabber extends Component {
         this.grab();
     });
     session.addEventListener('selectend', () => {
-        this.grab();
+        this.release();
     });
   }
 }
