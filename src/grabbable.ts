@@ -1,4 +1,4 @@
-import { vec3 } from 'gl-matrix';
+import { vec3, mat4, quat } from 'gl-matrix';
 
 import { Component, Object, Type } from '@wonderlandengine/api';
 
@@ -32,7 +32,8 @@ export class Grabbable extends Component {
   private _startObserver: Observer<Interactor> = new Observer(this._onInteractionStart.bind(this));
   private _stopObserver: Observer<Interactor> = new Observer(this._onInteractionStop.bind(this));
 
-  private _offsetHandle: Float32Array = new Float32Array(3);
+  private _offsetHandle: vec3 = vec3.create();
+  private _offsetRot: quat = quat.create();
   private _interactor: Interactor | null = null;
 
   public start(): void {
@@ -57,22 +58,39 @@ export class Grabbable extends Component {
 
   public update(): void {
     if(!this._interactor) return;
-    this._interactor.object.getTranslationWorld(vectorA);
 
-    const rotation = this._interactor.object.rotationWorld;
-    this.object.setTranslationWorld(vectorA);
-    this.object.translateWorld(this._offsetHandle);
+    const handRot = this._interactor.object.rotationWorld;
+
+    const rotation = quat.create();
+    quat.multiply(rotation, handRot, this._offsetRot);
+
+    this.object.resetRotation();
     this.object.rotationWorld = rotation;
+
+    const world = this._interactor.object.getTranslationWorld(vec3.create());
+    this.object.setTranslationWorld(world);
+    this.object.translateObject(this._offsetHandle);
   }
 
   private _onInteractionStart(interactor: Interactor): void {
+    const local = this._interactable.object.getTranslationLocal(vec3.create());
+    vec3.scale(this._offsetHandle, local, -1);
+
+    const interactorRot = interactor.object.rotationWorld;
+    const grabRot = this.object.rotationWorld;
+
+    // Detla = to * inverse(from).
+    quat.multiply(this._offsetRot, quat.invert(interactorRot, interactorRot), grabRot);
+    quat.normalize(this._offsetRot, this._offsetRot);
+
     this._interactor = interactor;
-    const a = this.object.getTranslationWorld(vectorA);
-    const b = this._interactable.object.getTranslationWorld(this._offsetHandle);
-    vec3.subtract(this._offsetHandle, a, b);
   }
 
   private _onInteractionStop(interactor: Interactor): void {
     this._interactor = null;
   }
+}
+
+function logQuat(msg: string, q: quat) {
+  console.log(`${msg} = ${q[0]} ${q[1]} ${q[2]} ${q[3]}`);
 }
