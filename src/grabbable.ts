@@ -1,21 +1,26 @@
 import { vec3, mat4, quat } from 'gl-matrix';
 
-import { Component, Object, Type } from '@wonderlandengine/api';
+import { Component, Object, PhysXComponent, Type } from '@wonderlandengine/api';
 
 import { Interactor } from './interactor.js';
 import { Interactable } from './interactable.js';
 import { Observer } from './utils/observer.js';
-
-/**
- * Globals
- */
-
-const vectorA = new Float32Array(3);
+import { HistoryTracker } from './history-tracker.js';
 
 export class Grabbable extends Component {
+  /** @override */
   static TypeName = 'grabbable';
+  /** @override */
   static Properties = {
-    handle: { type: Type.Object, default: null, values: []}
+    handle: { type: Type.Object, default: null, values: []},
+
+    /**
+     * Whether the object can be thrown with physics or not. For more information,
+     * lease have a look at {@link Grabbable.canThrow}.
+     */
+    canThrow: { type: Type.Bool, default: true, values: []},
+
+    throwLinearIntensity: { type: Type.Float, default: 1.0 },
   };
 
   /**
@@ -25,16 +30,30 @@ export class Grabbable extends Component {
   public handle: Object = null!;
 
   /**
+   * Whether the object can be thrown with physics or not.
+   *
+   * When the interactor releases this grabbable, it will be thrown based on
+   * the velocity the interactor had.
+   */
+  public canThrow: boolean = true;
+
+  public throwLinearIntensity: number = 1.0;
+
+  /**
    * Private Attributes.
    */
 
   private _interactable: Interactable = null!;
+  private _physx: PhysXComponent | null = null;
+
   private _startObserver: Observer<Interactor> = new Observer(this._onInteractionStart.bind(this));
   private _stopObserver: Observer<Interactor> = new Observer(this._onInteractionStop.bind(this));
 
   private _offsetHandle: vec3 = vec3.create();
   private _offsetRot: quat = quat.create();
   private _interactor: Interactor | null = null;
+
+  private _history: HistoryTracker = new HistoryTracker();
 
   public start(): void {
     if(!this.handle) {
@@ -44,6 +63,7 @@ export class Grabbable extends Component {
     if(!this._interactable) {
       throw new Error('Grabbable.start(): `handle` must have an `Interactable` component.');
     }
+    this._physx = this.object.getComponent('physx');
   }
 
   public onActivate(): void {
@@ -56,7 +76,7 @@ export class Grabbable extends Component {
     this._interactable.onSelectEnd.unobserve(this._stopObserver);
   }
 
-  public update(): void {
+  public update(dt: number): void {
     if(!this._interactor) return;
 
     const handRot = this._interactor.object.rotationWorld;
@@ -70,6 +90,20 @@ export class Grabbable extends Component {
     const world = this._interactor.object.getTranslationWorld(vec3.create());
     this.object.setTranslationWorld(world);
     this.object.translateObject(this._offsetHandle);
+
+    this._history.update(this.object, dt);
+
+    const velocity = this._history.velocity(vec3.create());
+    vec3.scale(velocity, velocity, this.throwLinearIntensity);
+    console.log(vec3.sqrLen(velocity));
+  }
+
+  public throw(): void {
+    if(!this._physx) return;
+    const velocity = this._history.velocity(vec3.create());
+    vec3.scale(velocity, velocity, this.throwLinearIntensity);
+    this._physx.active = true;
+    this._physx.linearVelocity = velocity;
   }
 
   private _onInteractionStart(interactor: Interactor): void {
@@ -84,9 +118,14 @@ export class Grabbable extends Component {
     quat.normalize(this._offsetRot, this._offsetRot);
 
     this._interactor = interactor;
+    this._history.reset(this.object);
+    if(this._physx) this._physx.active = false;
   }
 
   private _onInteractionStop(interactor: Interactor): void {
+    if(this.canThrow) {
+      this.throw();
+    }
     this._interactor = null;
   }
 }

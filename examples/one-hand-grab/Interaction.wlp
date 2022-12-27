@@ -43,6 +43,21 @@
                         },
                         "groups": 4
                     }
+                },
+                {
+                    "type": "physx",
+                    "physx": {
+                        "static": true,
+                        "simulate": true,
+                        "shape": "box",
+                        "box": {
+                            "extents": [
+                                4.0,
+                                4.0999999,
+                                0.1
+                            ]
+                        }
+                    }
                 }
             ],
             "translation": [
@@ -953,6 +968,12 @@
                     "mesh": {
                         "skin": "133"
                     }
+                },
+                {
+                    "type": "physx",
+                    "physx": {
+                        "static": true
+                    }
                 }
             ],
             "translation": [
@@ -1502,20 +1523,20 @@
                 }
             ],
             "translation": [
-                -2.5,
-                1.2,
-                0.0
+                -3.0487885,
+                2.0127172,
+                0.7916163
             ],
             "rotation": [
-                0.5002117,
-                0.0,
-                0.0,
-                0.8659031
+                0.4624138,
+                0.3302023,
+                -0.1907499,
+                0.8004713
             ],
             "scale": [
-                0.25,
-                0.1249998,
-                0.2499998
+                0.2499996,
+                0.1249995,
+                0.2499991
             ]
         },
         "196": {
@@ -1574,7 +1595,8 @@
                     "type": "button",
                     "button": {
                         "buttonMeshObject": "196",
-                        "hoverMaterial": "203"
+                        "hoverMaterial": "203",
+                        "toReset": "233"
                     }
                 }
             ],
@@ -1734,8 +1756,26 @@
                 {
                     "type": "grabbable",
                     "grabbable": {
-                        "handle": "238"
+                        "handle": "238",
+                        "throwLinearIntensity": 1.0
                     }
+                },
+                {
+                    "type": "physx",
+                    "physx": {
+                        "shape": "box",
+                        "box": {
+                            "extents": [
+                                0.4,
+                                0.05,
+                                0.05
+                            ]
+                        },
+                        "simulate": true,
+                        "kinematic": false,
+                        "groups": 255
+                    },
+                    "active": false
                 }
             ],
             "parent": null,
@@ -1756,44 +1796,13 @@
                 0.9999995
             ]
         },
-        "237": {
-            "name": "GrabLeft",
-            "parent": "233",
-            "translation": [
-                -0.3978415,
-                0.0004575,
-                -0.0002286
-            ],
-            "rotation": [
-                0.0,
-                0.0,
-                0.0,
-                1.0
-            ],
-            "scale": [
-                1.0,
-                1.0,
-                1.0
-            ],
-            "components": [
-                {
-                    "type": "collision",
-                    "active": true,
-                    "collision": {
-                        "sphere": {
-                            "radius": 0.0799999
-                        }
-                    }
-                }
-            ]
-        },
         "238": {
             "name": "GrabRight",
             "parent": "233",
             "translation": [
-                0.4006682,
-                0.0011709,
-                -0.0002286
+                0.4385524,
+                0.001188,
+                -0.0002285
             ],
             "rotation": [
                 0.0,
@@ -1812,7 +1821,7 @@
                     "active": true,
                     "collision": {
                         "sphere": {
-                            "radius": 0.0799999
+                            "radius": 0.1
                         }
                     }
                 },
@@ -1826,7 +1835,7 @@
             "parent": "233",
             "translation": [
                 0.0,
-                0.0004652,
+                0.0004649,
                 0.0
             ],
             "rotation": [
@@ -1836,7 +1845,7 @@
                 1.0
             ],
             "scale": [
-                0.4396482,
+                0.34,
                 0.05,
                 0.05
             ],
@@ -1846,6 +1855,35 @@
                     "mesh": {
                         "mesh": "8",
                         "material": "22"
+                    }
+                }
+            ]
+        },
+        "240": {
+            "name": "WeaponHandle",
+            "parent": "233",
+            "translation": [
+                0.4319591,
+                0.0000283,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scale": [
+                0.1,
+                0.0199999,
+                0.0199999
+            ],
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "mesh": "8",
+                        "material": "26"
                     }
                 }
             ]
@@ -2457,7 +2495,8 @@
             "sourcePaths": [
                 "/js/editor-components-bundle.js",
                 "js/",
-                "dist/"
+                "dist/",
+                "../../lib"
             ],
             "useInternalBundler": false
         },

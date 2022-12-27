@@ -1,6 +1,9 @@
+import { vec3 } from 'gl-matrix';
+
 WL.registerComponent('button', {
     buttonMeshObject: {type: WL.Type.Object},
     hoverMaterial: {type: WL.Type.Material},
+    toReset: {type: WL.Type.Object}
 }, {
     start: function() {
         this.mesh = this.buttonMeshObject.getComponent('mesh');
@@ -14,6 +17,10 @@ WL.registerComponent('button', {
 
         this.soundClick = this.object.addComponent('howler-audio-source', {src: 'sfx/click.wav', spatial: true});
         this.soundUnClick = this.object.addComponent('howler-audio-source', {src: 'sfx/unclick.wav', spatial: true});
+
+        if(this.toReset) {
+            this._savedTransform = this.toReset.getTranslationWorld(vec3.create());
+        }
     },
 
     onHover: function(_, cursor) {
@@ -29,6 +36,11 @@ WL.registerComponent('button', {
         this.soundClick.play();
         this.buttonMeshObject.translate([0.0, -0.1, 0.0]);
         this.hapticFeedback(cursor.object, 1.0, 20);
+
+        if(this.toReset) {
+            this.toReset.getComponent('physx').active = false;
+            this.toReset.setTranslationWorld(this._savedTransform);
+        }
     },
 
     onUp: function(_, cursor) {

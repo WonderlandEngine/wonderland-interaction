@@ -1,4 +1,5 @@
 import { Component, CollisionComponent, Type } from '@wonderlandengine/api';
+import { boolean } from '@wonderlandengine/api/decorators';
 
 import { Interactor } from './interactor.js';
 import { Observable } from './utils/observer.js';
@@ -25,7 +26,7 @@ export class Interactable extends Component {
   private readonly _onSelectEnd: Observable<Interactor> = new Observable();
 
   public start(): void {
-    this._collision = this.object.getComponent('collision', 0) as CollisionComponent;
+    this._collision = this.object.getComponent('collision', 0)!;
     if(!this._collision) {
       throw new Error('Interactable.start(): No collision component found on the handle.');
     }
