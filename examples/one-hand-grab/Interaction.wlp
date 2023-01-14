@@ -91,7 +91,7 @@
                     "type": "cursor",
                     "cursor": {
                         "collisionGroup": 0,
-                        "handedness": "none"
+                        "handedness": "right"
                     }
                 }
             ],
@@ -898,6 +898,20 @@
                 {
                     "type": "vr-mode-active-switch",
                     "active": true
+                },
+                {
+                    "type": "interactor",
+                    "interactor": {
+                        "handedness": "left"
+                    }
+                },
+                {
+                    "type": "collision",
+                    "collision": {
+                        "sphere": {
+                            "radius": 0.05
+                        }
+                    }
                 }
             ],
             "translation": [
@@ -1782,7 +1796,7 @@
             "translation": [
                 -2.5165293,
                 2.184478,
-                0.383066
+                0.5353916
             ],
             "rotation": [
                 0.0,
@@ -1791,8 +1805,8 @@
                 0.7071067
             ],
             "scale": [
-                0.999971,
-                0.9999715,
+                0.9999677,
+                0.9999682,
                 0.9999995
             ]
         },
@@ -2495,8 +2509,7 @@
             "sourcePaths": [
                 "/js/editor-components-bundle.js",
                 "js/",
-                "dist/",
-                "../../lib"
+                "dist/"
             ],
             "useInternalBundler": false
         },

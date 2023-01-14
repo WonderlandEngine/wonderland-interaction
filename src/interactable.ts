@@ -1,5 +1,4 @@
 import { Component, CollisionComponent, Type } from '@wonderlandengine/api';
-import { boolean } from '@wonderlandengine/api/decorators';
 
 import { Interactor } from './interactor.js';
 import { Observable } from './utils/observer.js';

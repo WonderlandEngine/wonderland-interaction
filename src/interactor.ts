@@ -1,5 +1,11 @@
-import { Component } from '@wonderlandengine/api';
+import { Component, Type } from '@wonderlandengine/api';
 import { Interactable } from './interactable.js';
+
+export enum Handedness {
+  Right = 'right',
+  Left = 'left',
+}
+export const HandednessValues = Object.values(Handedness);
 
 /**
  * Hello, I am a grabber!
@@ -7,7 +13,15 @@ import { Interactable } from './interactable.js';
 export class Interactor extends Component {
 
   static TypeName = 'interactor';
-  static Properties = {};
+  static Properties = {
+    handedness: { type: Type.Enum, default: Handedness.Right, values: HandednessValues }
+  };
+
+  /**
+   * Public Attributes.
+   */
+
+  public handedness!: number;
 
   /**
    * Private Attributes.
@@ -60,11 +74,17 @@ export class Interactor extends Component {
   }
 
   private _setup(session: XRSession) {
-    session.addEventListener('selectstart', () => {
+    session.addEventListener('selectstart', (event: XRInputSourceEvent) => {
+      const handedness = HandednessValues[this.handedness];
+      if(handedness === event.inputSource.handedness) {
         this.grab();
+      }
     });
-    session.addEventListener('selectend', () => {
+    session.addEventListener('selectend', (event: XRInputSourceEvent) => {
+      const handedness = HandednessValues[this.handedness];
+      if(handedness === event.inputSource.handedness) {
         this.release();
+      }
     });
   }
 }

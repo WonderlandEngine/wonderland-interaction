@@ -95,7 +95,6 @@ export class Grabbable extends Component {
 
     const velocity = this._history.velocity(vec3.create());
     vec3.scale(velocity, velocity, this.throwLinearIntensity);
-    console.log(vec3.sqrLen(velocity));
   }
 
   public throw(): void {
@@ -107,6 +106,8 @@ export class Grabbable extends Component {
   }
 
   private _onInteractionStart(interactor: Interactor): void {
+    if(this._interactor) return;
+
     const local = this._interactable.object.getTranslationLocal(vec3.create());
     vec3.scale(this._offsetHandle, local, -1);
 
