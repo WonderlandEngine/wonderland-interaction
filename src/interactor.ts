@@ -32,6 +32,12 @@ export class Interactor extends Component {
 
   private _interactable: Interactable | null = null;
 
+  /** @hidden */
+  #xrInputSource: XRInputSource | null = null;
+
+  /** @hidden */
+  #referenceSpace: XRReferenceSpace | XRBoundedReferenceSpace | null = null;
+
   /**
    * Set the collision component needed to perform
    * grab interaction
@@ -58,7 +64,7 @@ export class Interactor extends Component {
   public update() {
   }
 
-  public grab() {
+  public startInteratction() {
     const overlaps = this._collision.queryOverlaps();
     for (const overlap of overlaps) {
       const interactable = overlap.object.getComponent(Interactable) as Interactable;
@@ -69,21 +75,46 @@ export class Interactor extends Component {
     }
   }
 
-  public release() {
+  public stopInteraction() {
     this._interactable?.onSelectEnd.notify(this);
   }
 
+  public get referenceSpace(): XRReferenceSpace | XRBoundedReferenceSpace | null {
+    return this.#referenceSpace;
+  }
+
   private _setup(session: XRSession) {
-    session.addEventListener('selectstart', (event: XRInputSourceEvent) => {
+    session.requestReferenceSpace('local')
+      .then((space) => this.#referenceSpace = space)
+      .catch();
+
+    session.addEventListener('inputsourceschange', (event: XRInputSourceChangeEvent) => {
+      for(const item of event.removed) {
+        if(item === this.#xrInputSource) {
+          this.#xrInputSource = null;
+          break;
+        }
+      }
       const handedness = HandednessValues[this.handedness];
-      if(handedness === event.inputSource.handedness) {
-        this.grab();
+      for(const item of event.added) {
+        this.#xrInputSource = item.handedness === handedness ? item : null;
+      }
+    });
+
+    session.addEventListener('end', () => {
+      this.#referenceSpace = null;
+      this.#xrInputSource = null;
+      this.stopInteraction();
+    });
+
+    session.addEventListener('selectstart', (event: XRInputSourceEvent) => {
+      if(this.#xrInputSource === event.inputSource) {
+        this.startInteratction();
       }
     });
     session.addEventListener('selectend', (event: XRInputSourceEvent) => {
-      const handedness = HandednessValues[this.handedness];
-      if(handedness === event.inputSource.handedness) {
-        this.release();
+      if(this.#xrInputSource === event.inputSource) {
+        this.stopInteraction();
       }
     });
   }

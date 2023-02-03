@@ -1,14 +1,19 @@
-import '@wonderlandengine/components/cursor-target.js';
-import '@wonderlandengine/components/howler-audio-listener.js';
-import '@wonderlandengine/components/howler-audio-source.js';
-import '@wonderlandengine/components/hand-tracking.js';
-import '@wonderlandengine/components/vr-mode-active-switch.js';
-
+/**
+ * /!\ This file is auto-generated.
+ *
+ * This is the entry point of your standalone application.
+ *
+ * You should register the component you need here, e.g,
+ *
+ * ```
+ * import { MyComponent } from './my-component.js';
+ *
+ * WL.registerComponent(MyComponent);
+ * ```
+ */
 import { Grabbable, Interactable, Interactor } from 'wle-interaction';
-
-import './button';
-
-WL.registerComponent(Interactable);
-WL.registerComponent(Interactor);
-WL.registerComponent(Grabbable);
-
+WL.registerComponent(Grabbable, Interactable, Interactor);
+import './../../../../../engine/js/editor-components-bundle.js';
+import './button.js';
+import { DebugComponent } from './debug.js';
+WL.registerComponent(DebugComponent);

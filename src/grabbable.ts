@@ -124,13 +124,10 @@ export class Grabbable extends Component {
   }
 
   private _onInteractionStop(interactor: Interactor): void {
+    if(interactor != this._interactor) return;
     if(this.canThrow) {
       this.throw();
     }
     this._interactor = null;
   }
-}
-
-function logQuat(msg: string, q: quat) {
-  console.log(`${msg} = ${q[0]} ${q[1]} ${q[2]} ${q[3]}`);
 }
