@@ -43,8 +43,6 @@ export class HistoryTracker {
     const angularOutput = this._angular[this._curr];
     this._updateLinear(linearOutput, target, delta);
     this._updateAngular(angularOutput, target, delta);
-
-    console.log(linearOutput);
   }
 
   updateFromPose(xrPose: XRPose, target: Object, delta: number): void {
@@ -71,11 +69,11 @@ export class HistoryTracker {
     } else {
       this._updateAngular(angularOutput, target, delta);
     }
-
-    console.log(linearOutput);
   }
 
   reset(target: Object): void {
+    for(const v of this._stack) vec3.zero(v);
+    for(const v of this._angular) vec3.zero(v);
     this._curr = -1;
     const position = target.getTranslationWorld(vectorA);
     vec3.copy(this._previousPosition, position);
@@ -86,6 +84,16 @@ export class HistoryTracker {
     const count = this._stack.length;
     for(let i = 0; i < count; ++i) {
       vec3.add(out, out, this._stack[i]);
+    }
+    vec3.scale(out, out, 1.0 / count);
+    return out;
+  }
+
+  angular(out: vec3): vec3 {
+    vec3.zero(out);
+    const count = this._angular.length;
+    for(let i = 0; i < count; ++i) {
+      vec3.add(out, out, this._angular[i]);
     }
     vec3.scale(out, out, 1.0 / count);
     return out;

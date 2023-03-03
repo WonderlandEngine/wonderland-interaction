@@ -37,7 +37,7 @@ export class Grabbable extends Component {
    */
   public canThrow: boolean = true;
 
-  public throwLinearIntensity: number = 1.0;
+  public throwLinearIntensity: number = 0.5;
 
   /**
    * Private Attributes.
@@ -93,11 +93,10 @@ export class Grabbable extends Component {
 
     const xrPose = this._interactor.xrPose;
     if(xrPose) {
-      // this._history.updateFromPose(xrPose, this.object, dt);
+      this._history.updateFromPose(xrPose, this.object, dt);
     } else {
       this._history.update(this.object, dt);
     }
-    this._history.update(this.object, dt);
 
     const velocity = this._history.velocity(vec3.create());
     vec3.scale(velocity, velocity, this.throwLinearIntensity);
@@ -106,9 +105,11 @@ export class Grabbable extends Component {
   public throw(): void {
     if(!this._physx) return;
     const velocity = this._history.velocity(vec3.create());
+    const angular = this._history.angular(vec3.create());
     vec3.scale(velocity, velocity, this.throwLinearIntensity);
     this._physx.active = true;
     this._physx.linearVelocity = velocity;
+    this._physx.angularVelocity = angular;
   }
 
   private _onInteractionStart(interactor: Interactor): void {
