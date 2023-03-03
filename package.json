@@ -7,7 +7,7 @@
   "module": "lib/index.js",
   "types": "lib/index.d.ts",
   "license": "MIT",
-  "wonderland": {},
+  "wonderlandengine": {},
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@types/webxr": "^0.5.0",
-    "@wonderlandengine/api": "file:../../engine/js/api",
+    "@wonderlandengine/api": "^0.9.7",
     "gl-matrix": "^3.4.3"
   }
 }
