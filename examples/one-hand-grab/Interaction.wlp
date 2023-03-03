@@ -4,7 +4,7 @@
             "name": "Player",
             "translation": [
                 -2.5,
-                2.0647816,
+                0.0,
                 1.1224122
             ],
             "rotation": [
@@ -504,7 +504,23 @@
                 "name": "trigger<xr_standard_trigger_pressed_value<root",
                 "file": "models\\oculus-touch-v2-left.glb"
             },
-            "parent": "78"
+            "parent": "78",
+            "translation": [
+                -0.0112457,
+                0.0147492,
+                0.0245228
+            ],
+            "rotation": [
+                0.3420201,
+                0.0,
+                0.0,
+                0.9396926
+            ],
+            "scaling": [
+                1.0099999,
+                1.0099999,
+                1.0099999
+            ]
         },
         "80": {
             "link": {
@@ -673,7 +689,23 @@
                 "name": "squeeze<xr_standard_squeeze_pressed_value<root",
                 "file": "models\\oculus-touch-v2-right.glb"
             },
-            "parent": "110"
+            "parent": "110",
+            "translation": [
+                -0.0029884,
+                -0.0316506,
+                0.015142
+            ],
+            "rotation": [
+                0.3440659,
+                0.0,
+                0.0,
+                0.9389454
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ]
         },
         "112": {
             "link": {
@@ -1208,9 +1240,9 @@
             ],
             "parent": null,
             "translation": [
-                -2.5165293,
-                2.184478,
-                0.5353916
+                -2.5165193,
+                1.4431321,
+                0.5353915
             ],
             "rotation": [
                 0.0,
@@ -1219,8 +1251,8 @@
                 0.7071067
             ],
             "scaling": [
-                0.9999676,
-                0.9999681,
+                0.9999589,
+                0.9999594,
                 0.9999995
             ]
         },
@@ -1249,7 +1281,8 @@
                     }
                 },
                 {
-                    "type": "interactable"
+                    "type": "interactable",
+                    "active": true
                 }
             ],
             "scaling": [
@@ -1921,11 +1954,13 @@
         },
         "scripting": {
             "sourcePaths": [
-                "/js/editor-components-bundle.js",
                 "js/"
             ],
             "autoManageEntryPoint": true,
-            "bundlingType": "npm"
+            "bundlingType": "esbuild",
+            "libraryPaths": [
+                "/js/lib/"
+            ]
         },
         "runtime": {
             "visualizeColliders": true,

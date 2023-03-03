@@ -91,6 +91,12 @@ export class Grabbable extends Component {
     this.object.setTranslationWorld(world);
     this.object.translateObject(this._offsetHandle);
 
+    const xrPose = this._interactor.xrPose;
+    if(xrPose) {
+      // this._history.updateFromPose(xrPose, this.object, dt);
+    } else {
+      this._history.update(this.object, dt);
+    }
     this._history.update(this.object, dt);
 
     const velocity = this._history.velocity(vec3.create());
