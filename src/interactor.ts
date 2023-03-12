@@ -83,7 +83,7 @@ export class Interactor extends Component {
     this._onSceneLoaded();
   }
 
-  public startInteratction() {
+  public startInteraction() {
     const overlaps = this._collision.queryOverlaps();
     for (const overlap of overlaps) {
       const interactable = overlap.object.getComponent(Interactable);
@@ -119,6 +119,7 @@ export class Interactor extends Component {
       .catch();
 
     session.addEventListener('inputsourceschange', (event: XRInputSourceChangeEvent) => {
+      console.log(this.handedness);
       for(const item of event.removed) {
         if(item === this.#xrInputSource) {
           this.#xrInputSource = null;
@@ -127,7 +128,10 @@ export class Interactor extends Component {
       }
       const handedness = HandednessValues[this.handedness];
       for(const item of event.added) {
-        this.#xrInputSource = item.handedness === handedness ? item : null;
+        if(item.handedness === handedness) {
+          this.#xrInputSource = item;
+          break;
+        }
       }
     });
 
@@ -138,8 +142,9 @@ export class Interactor extends Component {
     });
 
     session.addEventListener('selectstart', (event: XRInputSourceEvent) => {
+      console.log();
       if(this.#xrInputSource === event.inputSource) {
-        this.startInteratction();
+        this.startInteraction();
       }
     });
     session.addEventListener('selectend', (event: XRInputSourceEvent) => {

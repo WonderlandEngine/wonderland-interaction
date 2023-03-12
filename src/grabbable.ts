@@ -104,15 +104,26 @@ export class Grabbable extends Component {
 
   public throw(): void {
     if(!this._physx) return;
-    const velocity = this._history.velocity(vec3.create());
     const angular = this._history.angular(vec3.create());
+
+    const radius = vec3.create();
+    vec3.subtract(radius,
+      this.object.getTranslationWorld(vec3.create()),
+      this._interactable.object.getTranslationWorld(vec3.create())
+    );
+
+    const velocity = this._history.velocity(vec3.create());
+    vec3.add(velocity, velocity, vec3.cross(vec3.create(), angular, radius));
     vec3.scale(velocity, velocity, this.throwLinearIntensity);
+
     this._physx.active = true;
     this._physx.linearVelocity = velocity;
     this._physx.angularVelocity = angular;
   }
 
   private _onInteractionStart(interactor: Interactor): void {
+    console.log('Start');
+
     if(this._interactor) return;
 
     const local = this._interactable.object.getTranslationLocal(vec3.create());

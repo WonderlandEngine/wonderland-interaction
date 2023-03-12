@@ -936,10 +936,6 @@
                     }
                 },
                 {
-                    "type": "vr-mode-active-switch",
-                    "active": true
-                },
-                {
                     "type": "interactor",
                     "interactor": {
                         "handedness": "left"
@@ -1139,13 +1135,14 @@
             "parent": "14",
             "components": [
                 {
-                    "type": "player-height"
+                    "type": "player-height",
+                    "active": true
                 }
             ],
             "translation": [
                 0.0,
-                1.75,
-                0.0
+                2.5945396,
+                0.000042
             ],
             "rotation": [
                 0.0,
@@ -1226,23 +1223,25 @@
                         "shape": "box",
                         "box": {
                             "extents": [
-                                0.4,
+                                0.3499999,
                                 0.05,
                                 0.05
                             ]
                         },
                         "simulate": true,
                         "kinematic": false,
-                        "groups": 255
+                        "groups": 255,
+                        "mass": 5.0,
+                        "linearDamping": 1.0
                     },
                     "active": false
                 }
             ],
             "parent": null,
             "translation": [
-                -2.5165193,
-                1.4431321,
-                0.5353915
+                -2.5165145,
+                0.6495848,
+                0.5353914
             ],
             "rotation": [
                 0.0,
@@ -1251,8 +1250,8 @@
                 0.7071067
             ],
             "scaling": [
-                0.9999589,
-                0.9999594,
+                0.9999505,
+                0.999951,
                 0.9999995
             ]
         },
@@ -1331,7 +1330,7 @@
             "rotation": [
                 0.0,
                 0.0,
-                0.0,
+                -0.0,
                 1.0
             ],
             "components": [
@@ -1960,7 +1959,8 @@
             "bundlingType": "esbuild",
             "libraryPaths": [
                 "/js/lib/"
-            ]
+            ],
+            "esbuildFlags": ""
         },
         "runtime": {
             "visualizeColliders": true,
@@ -2116,5 +2116,6 @@
                 "file": "default"
             }
         }
-    }
+    },
+    "languages": {}
 }

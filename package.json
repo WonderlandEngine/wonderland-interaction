@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@types/webxr": "^0.5.0",
-    "@wonderlandengine/api": "^0.9.7",
+    "@wonderlandengine/api": "^0.9.8",
     "gl-matrix": "^3.4.3"
   }
 }
