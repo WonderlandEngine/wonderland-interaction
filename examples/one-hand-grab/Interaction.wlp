@@ -3,9 +3,9 @@
         "14": {
             "name": "Player",
             "translation": [
-                -2.5,
+                0.0442795,
                 0.0,
-                1.1224122
+                1.1589469
             ],
             "rotation": [
                 0.0,
@@ -237,62 +237,6 @@
                 1.0,
                 1.0,
                 1.0
-            ]
-        },
-        "24": {
-            "name": "Cone",
-            "components": [
-                {
-                    "type": "mesh",
-                    "mesh": {
-                        "mesh": "10",
-                        "material": "25"
-                    }
-                }
-            ],
-            "translation": [
-                1.5,
-                1.0,
-                0.014122
-            ],
-            "rotation": [
-                0.0,
-                0.0,
-                0.0,
-                1.0
-            ],
-            "scaling": [
-                1.0,
-                1.0,
-                1.0
-            ]
-        },
-        "27": {
-            "name": "Sphere",
-            "components": [
-                {
-                    "type": "mesh",
-                    "mesh": {
-                        "mesh": "9",
-                        "material": "26"
-                    }
-                }
-            ],
-            "translation": [
-                0.4999999,
-                0.75,
-                -1.25
-            ],
-            "rotation": [
-                0.0,
-                0.0,
-                0.0,
-                1.0
-            ],
-            "scaling": [
-                0.75,
-                0.75,
-                0.75
             ]
         },
         "53": {
@@ -967,169 +911,6 @@
                 1.0
             ]
         },
-        "194": {
-            "name": "Panel",
-            "components": [
-                {
-                    "type": "mesh",
-                    "mesh": {
-                        "mesh": "195",
-                        "material": "202"
-                    }
-                }
-            ],
-            "translation": [
-                -3.0487885,
-                2.0127172,
-                0.7916163
-            ],
-            "rotation": [
-                0.4624138,
-                0.3302023,
-                -0.1907499,
-                0.8004713
-            ],
-            "scaling": [
-                0.2499995,
-                0.1249995,
-                0.2499991
-            ]
-        },
-        "196": {
-            "link": {
-                "name": "Cube",
-                "file": "models\\button.glb"
-            },
-            "parent": "197",
-            "components": [
-                {
-                    "mesh": {
-                        "material": "26"
-                    }
-                }
-            ],
-            "name": "ButtonMesh",
-            "translation": [
-                -0.0000094,
-                0.3244419,
-                -0.0000676
-            ],
-            "rotation": [
-                6.000006465001206e-7,
-                0.0,
-                0.0,
-                1.0
-            ],
-            "scaling": [
-                1.0,
-                0.9999989,
-                0.9999989
-            ]
-        },
-        "197": {
-            "name": "Button",
-            "parent": "194",
-            "components": [
-                {
-                    "type": "collision",
-                    "collision": {
-                        "collider": "box",
-                        "box": {
-                            "extents": [
-                                0.0974999,
-                                0.025,
-                                0.045
-                            ]
-                        },
-                        "groups": 251
-                    }
-                },
-                {
-                    "type": "cursor-target"
-                },
-                {
-                    "type": "button",
-                    "button": {
-                        "buttonMeshObject": "196",
-                        "hoverMaterial": "203",
-                        "toReset": "233"
-                    }
-                }
-            ],
-            "translation": [
-                0.0,
-                0.057682,
-                0.175434
-            ],
-            "rotation": [
-                -0.0,
-                0.0,
-                0.0,
-                1.0
-            ],
-            "scaling": [
-                0.4,
-                0.4999999,
-                0.3
-            ]
-        },
-        "198": {
-            "name": "ButtonLabel",
-            "parent": "196",
-            "components": [
-                {
-                    "type": "text",
-                    "text": {
-                        "text": "Thanks!"
-                    }
-                }
-            ],
-            "translation": [
-                -0.0001563,
-                0.1084579,
-                0.0000046
-            ],
-            "rotation": [
-                -0.7068095,
-                0.0,
-                0.0,
-                0.7074038
-            ],
-            "scaling": [
-                2.5,
-                3.7999999,
-                4.8000063
-            ]
-        },
-        "200": {
-            "name": "Title",
-            "parent": "194",
-            "components": [
-                {
-                    "type": "text",
-                    "text": {
-                        "text": "Welcome to\nWonderland",
-                        "material": "201"
-                    }
-                }
-            ],
-            "translation": [
-                -0.0000023,
-                0.1554993,
-                -0.303415
-            ],
-            "rotation": [
-                -0.7068591,
-                0.0,
-                0.0,
-                0.7073543
-            ],
-            "scaling": [
-                1.5,
-                3.0000002,
-                1.5000001
-            ]
-        },
         "205": {
             "name": "TrackedSpace",
             "parent": "14",
@@ -1141,8 +922,8 @@
             ],
             "translation": [
                 0.0,
-                2.5945396,
-                0.000042
+                1.75,
+                0.0000419
             ],
             "rotation": [
                 0.0,
@@ -1232,27 +1013,29 @@
                         "kinematic": false,
                         "groups": 255,
                         "mass": 5.0,
-                        "linearDamping": 1.0
+                        "linearDamping": 1.0,
+                        "bounciness": 0.0,
+                        "angularDamping": 1.0
                     },
                     "active": false
                 }
             ],
             "parent": null,
             "translation": [
-                -2.5165145,
-                0.6495848,
-                0.5353914
+                0.5057916,
+                1.086884,
+                0.1044654
             ],
             "rotation": [
-                0.0,
-                0.0,
-                0.7071068,
-                0.7071067
+                0.5001502,
+                -0.5001487,
+                0.4998511,
+                0.4998498
             ],
             "scaling": [
-                0.9999505,
-                0.999951,
-                0.9999995
+                0.9999405,
+                0.9999409,
+                0.9999994
             ]
         },
         "238": {
@@ -1295,7 +1078,7 @@
             "parent": "233",
             "translation": [
                 0.0,
-                0.0004648,
+                0.0004647,
                 0.0
             ],
             "rotation": [
@@ -1346,6 +1129,53 @@
                 0.1,
                 0.0199999,
                 0.0199999
+            ]
+        },
+        "241": {
+            "name": "Environment"
+        },
+        "242": {
+            "name": "Table",
+            "parent": "241",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "mesh": "8",
+                        "material": "25"
+                    }
+                },
+                {
+                    "type": "physx",
+                    "physx": {
+                        "static": true,
+                        "shape": "box",
+                        "box": {
+                            "extents": [
+                                2.0,
+                                0.5,
+                                0.75
+                            ]
+                        }
+                    },
+                    "active": true
+                }
+            ],
+            "translation": [
+                0.0,
+                0.5,
+                0.0034009
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                2.0692665,
+                0.5,
+                0.75
             ]
         }
     },

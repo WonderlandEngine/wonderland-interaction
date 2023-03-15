@@ -1,11 +1,11 @@
 import { vec3, mat4, quat } from 'gl-matrix';
-
 import { Component, Object, PhysXComponent, Type } from '@wonderlandengine/api';
 
 import { Interactor } from './interactor.js';
 import { Interactable } from './interactable.js';
 import { Observer } from './utils/observer.js';
 import { HistoryTracker } from './history-tracker.js';
+import { EPSILON } from './constants.js';
 
 export class Grabbable extends Component {
   /** @override */
@@ -37,7 +37,8 @@ export class Grabbable extends Component {
    */
   public canThrow: boolean = true;
 
-  public throwLinearIntensity: number = 0.5;
+  public throwLinearIntensity: number = 1.0;
+  public throwAngularIntensity: number = 1.0;
 
   /**
    * Private Attributes.
@@ -104,7 +105,9 @@ export class Grabbable extends Component {
 
   public throw(): void {
     if(!this._physx) return;
+
     const angular = this._history.angular(vec3.create());
+    vec3.scale(angular, angular, this.throwAngularIntensity);
 
     const radius = vec3.create();
     vec3.subtract(radius,
