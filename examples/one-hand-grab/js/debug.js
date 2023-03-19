@@ -1,11 +1,11 @@
 import { Component, Type } from '@wonderlandengine/api';
 
-
 export class DebugComponent extends Component {
     static TypeName = 'debug-component';
 
     static Properties = {
-        target: { type: Type.Object }
+        target1: { type: Type.Object },
+        target2: { type: Type.Object },
     };
 
     start() {
@@ -18,15 +18,18 @@ export class DebugComponent extends Component {
             WL.onXRSessionStart.push(this._setup.bind(this));
         }
         // Original transformation.
-        this._transform = [ ...this.target.transformWorld ];
+        this._transform1 = [ ...this.target1.transformWorld ];
+        this._transform2 = [ ...this.target2.transformWorld ];
     }
 
     _setup(session) {
         session.addEventListener('squeezestart', (event) => {
-            const physx = this.target.getComponent('physx');
-            physx.active = false;
-            this.target.transformWorld = this._transform;
-            console.log('Squeeze starts.');
+            for(let i = 1; i <= 2; ++i) {
+                const target = this[`target${i}`];
+                const physx = target.getComponent('physx');
+                physx.active = false;
+                target.transformWorld = this[`_transform${i}`];
+            }
         });
     }
 }

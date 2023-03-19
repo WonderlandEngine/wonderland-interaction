@@ -22,7 +22,9 @@
                 {
                     "type": "debug-component",
                     "debug-component": {
-                        "target": "233"
+                        "target": "233",
+                        "target1": "233",
+                        "target2": "243"
                     }
                 }
             ]
@@ -1097,7 +1099,7 @@
                 }
             ],
             "scaling": [
-                0.34,
+                0.3399999,
                 0.05,
                 0.05
             ]
@@ -1202,6 +1204,20 @@
                     "grabbable": {
                         "handle": "245",
                         "handleSecondary": "246"
+                    }
+                },
+                {
+                    "type": "physx",
+                    "active": true,
+                    "physx": {
+                        "shape": "box",
+                        "box": {
+                            "extents": [
+                                0.1,
+                                0.05,
+                                0.25
+                            ]
+                        }
                     }
                 }
             ]
