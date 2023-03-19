@@ -1,5 +1,6 @@
 import { Component, Type } from '@wonderlandengine/api';
 
+
 export class DebugComponent extends Component {
     static TypeName = 'debug-component';
 

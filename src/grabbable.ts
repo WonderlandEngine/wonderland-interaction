@@ -1,34 +1,37 @@
-import { vec3, mat4, quat } from 'gl-matrix';
-import { Component, Object, PhysXComponent, Type } from '@wonderlandengine/api';
+import { vec3, quat } from 'gl-matrix';
+import { Component, Object, PhysXComponent, WonderlandEngine } from '@wonderlandengine/api';
+
+import { type, Type } from './decorators.js';
 
 import { Interactor } from './interactor.js';
 import { Interactable } from './interactable.js';
 import { Observer } from './utils/observer.js';
 import { HistoryTracker } from './history-tracker.js';
-import { EPSILON } from './constants.js';
 
+export interface GrabData {
+  interactor: Interactor;
+  offsetTrans: vec3;
+  offsetRot: quat;
+}
+
+/**
+ * Grabbable object.
+ */
 export class Grabbable extends Component {
   /** @override */
   static TypeName = 'grabbable';
-  /** @override */
-  static Properties = {
-    handle: { type: Type.Object, default: null, values: []},
-
-    /**
-     * Whether the object can be thrown with physics or not. For more information,
-     * lease have a look at {@link Grabbable.canThrow}.
-     */
-    canThrow: { type: Type.Bool, default: true, values: []},
-
-    throwLinearIntensity: { type: Type.Float, default: 1.0 },
-  };
 
   /**
    * Public Attributes.
    */
 
+  @type(Type.Object())
   public handle: Object = null!;
 
+  @type(Type.Object())
+  public handleSecondary: Object = null!;
+
+  @type(Type.Bool(true))
   /**
    * Whether the object can be thrown with physics or not.
    *
@@ -37,6 +40,7 @@ export class Grabbable extends Component {
    */
   public canThrow: boolean = true;
 
+  @type(Type.Float(1.0))
   public throwLinearIntensity: number = 1.0;
   public throwAngularIntensity: number = 1.0;
 
@@ -44,66 +48,80 @@ export class Grabbable extends Component {
    * Private Attributes.
    */
 
-  private _interactable: Interactable = null!;
-  private _physx: PhysXComponent | null = null;
+  private _interactable: Interactable[] = new Array(2);
+  private _grabData: (GrabData | null)[] = new Array(2);
+  private _maxDistance: number | null = null;
 
-  private _startObserver: Observer<Interactor> = new Observer(this._onInteractionStart.bind(this));
-  private _stopObserver: Observer<Interactor> = new Observer(this._onInteractionStop.bind(this));
-
-  private _offsetHandle: vec3 = vec3.create();
-  private _offsetRot: quat = quat.create();
-  private _interactor: Interactor | null = null;
+  private _startObservers: Observer<Interactor>[] = new Array(2);
+  private _stopObservers: Observer<Interactor>[] = new Array(2);
 
   private _history: HistoryTracker = new HistoryTracker();
 
-  public start(): void {
+  private _physx: PhysXComponent | null = null;
+
+  constructor(engine: WonderlandEngine) {
+    super(engine);
+
+    for(let i = 0; i < 2; ++i) {
+      this._grabData[i] = null;
+      ((index: number) => {
+        this._startObservers[i] = new Observer((interactor: Interactor) => this._onInteractionStart(interactor, index));
+        this._stopObservers[i] = new Observer((interactor: Interactor) => this._onInteractionStop(interactor, index));
+      })(i);
+    }
+  }
+
+  start(): void {
     if(!this.handle) {
       throw new Error('Grabbable.start(): `handle` property must be set.');
     }
-    this._interactable = this.handle.getComponent(Interactable, 0)!;
-    if(!this._interactable) {
-      throw new Error('Grabbable.start(): `handle` must have an `Interactable` component.');
+
+    this._interactable[0] = this.handle.getComponent(Interactable)!;
+    if(!this._interactable[0]) {
+      throw new Error(`Grabbable.start(): 'handle' must have an Interactable component.`);
+    }
+
+    /* The second handle is optional. */
+    if(this.handleSecondary) {
+      this._interactable[1] = this.handleSecondary.getComponent(Interactable)!;
+      if(!this._interactable[1]) {
+        throw new Error(`Grabbable.start(): 'handleSecondary' must have an Interactable component.`);
+      }
     }
     this._physx = this.object.getComponent('physx');
   }
 
-  public onActivate(): void {
-    this._interactable.onSelectStart.observe(this._startObserver);
-    this._interactable.onSelectEnd.observe(this._stopObserver);
-  }
-
-  public onDeactivate(): void {
-    this._interactable.onSelectStart.unobserve(this._startObserver);
-    this._interactable.onSelectEnd.unobserve(this._stopObserver);
-  }
-
-  public update(dt: number): void {
-    if(!this._interactor) return;
-
-    const handRot = this._interactor.object.rotationWorld;
-
-    const rotation = quat.create();
-    quat.multiply(rotation, handRot, this._offsetRot);
-
-    this.object.resetRotation();
-    this.object.rotationWorld = rotation;
-
-    const world = this._interactor.object.getTranslationWorld(vec3.create());
-    this.object.setTranslationWorld(world);
-    this.object.translateObject(this._offsetHandle);
-
-    const xrPose = this._interactor.xrPose;
-    if(xrPose) {
-      this._history.updateFromPose(xrPose, this.object, dt);
-    } else {
-      this._history.update(this.object, dt);
+  onActivate(): void {
+    for(let i = 0; i < 2; ++i) {
+      const interactable = this._interactable[i];
+      if(interactable) {
+        interactable.onSelectStart.observe(this._startObservers[i]);
+        interactable.onSelectEnd.observe(this._stopObservers[i]);
+      }
     }
-
-    const velocity = this._history.velocity(vec3.create());
-    vec3.scale(velocity, velocity, this.throwLinearIntensity);
   }
 
-  public throw(): void {
+  onDeactivate(): void {
+    for(let i = 0; i < 2; ++i) {
+      const interactable = this._interactable[i];
+      if(interactable) {
+        interactable.onSelectStart.unobserve(this._startObservers[i]);
+        interactable.onSelectEnd.unobserve(this._stopObservers[i]);
+      }
+    }
+  }
+
+  update(dt: number): void {
+    const grabPrimary = this._grabData[0];
+    const grabSecondary = this._grabData[1];
+    if(grabPrimary !== null && grabSecondary !== null) {
+      this._updateTransformDoubleHand(this._grabData as GrabData[], dt);
+    } else {
+      this._updateTransformSingleHand(grabPrimary ?? grabSecondary as GrabData, dt);
+    }
+  }
+
+  throw(): void {
     if(!this._physx) return;
 
     const angular = this._history.angular(vec3.create());
@@ -112,7 +130,8 @@ export class Grabbable extends Component {
     const radius = vec3.create();
     vec3.subtract(radius,
       this.object.getTranslationWorld(vec3.create()),
-      this._interactable.object.getTranslationWorld(vec3.create())
+      // @todo: How to deal with that for 2 hands?
+      this._interactable[0].object.getTranslationWorld(vec3.create())
     );
 
     const velocity = this._history.velocity(vec3.create());
@@ -124,31 +143,100 @@ export class Grabbable extends Component {
     this._physx.angularVelocity = angular;
   }
 
-  private _onInteractionStart(interactor: Interactor): void {
+  get isGrabbed() {
+    return this.primaryGrab || this.secondaryGrab;
+  }
+
+  get primaryGrab(): GrabData | null {
+    return this._grabData[0];
+  }
+
+  get secondaryGrab(): GrabData | null {
+    return this._grabData[1];
+  }
+
+  private _onInteractionStart(interactor: Interactor, index: number): void {
     console.log('Start');
 
-    if(this._interactor) return;
+    if(this._grabData[index]) return;
 
-    const local = this._interactable.object.getTranslationLocal(vec3.create());
-    vec3.scale(this._offsetHandle, local, -1);
+    const grab: GrabData = {interactor, offsetTrans: vec3.create(), offsetRot: quat.create()};
+
+    const interactable = this._interactable[index];
+    const local = interactable.object.getTranslationLocal(vec3.create());
+    vec3.scale(grab.offsetTrans, local, -1);
 
     const interactorRot = interactor.object.rotationWorld;
     const grabRot = this.object.rotationWorld;
 
     // Detla = to * inverse(from).
-    quat.multiply(this._offsetRot, quat.invert(interactorRot, interactorRot), grabRot);
-    quat.normalize(this._offsetRot, this._offsetRot);
+    quat.multiply(grab.offsetRot, quat.invert(interactorRot, interactorRot), grabRot);
+    quat.normalize(grab.offsetRot, grab.offsetRot);
 
-    this._interactor = interactor;
+    this._grabData[index] = grab;
     this._history.reset(this.object);
     if(this._physx) this._physx.active = false;
+
+    if(this.primaryGrab && this.secondaryGrab) {
+      this._maxDistance = vec3.distance(
+        this.primaryGrab.interactor.object.getTranslationWorld(vec3.create()),
+        this.secondaryGrab.interactor.object.getTranslationWorld(vec3.create()),
+      );
+    }
   }
 
-  private _onInteractionStop(interactor: Interactor): void {
-    if(interactor != this._interactor) return;
-    if(this.canThrow) {
+  private _onInteractionStop(interactor: Interactor, index: number): void {
+    const grab = this._grabData[index];
+    if(!grab || interactor !== grab.interactor) return;
+
+    this._grabData[index] = null;
+    this._maxDistance = null;
+
+    if(this.canThrow && !this.isGrabbed) {
       this.throw();
     }
-    this._interactor = null;
+  }
+
+  private _updateTransformSingleHand(grab: GrabData, dt: number) {
+    const interactor = grab.interactor;
+    const handRot = interactor.object.rotationWorld;
+
+    const rotation = quat.create();
+    quat.multiply(rotation, handRot, grab.offsetRot);
+
+    this.object.resetRotation();
+    this.object.rotationWorld = rotation;
+
+    const world = interactor.object.getTranslationWorld(vec3.create());
+    this.object.setTranslationWorld(world);
+    this.object.translateObject(grab.offsetTrans);
+
+    const xrPose = interactor.xrPose;
+    if(xrPose) {
+      this._history.updateFromPose(xrPose, this.object, dt);
+    } else {
+      this._history.update(this.object, dt);
+    }
+
+    const velocity = this._history.velocity(vec3.create());
+    vec3.scale(velocity, velocity, this.throwLinearIntensity);
+  }
+
+  private _updateTransformDoubleHand(grab: GrabData[], dt: number) {
+    const primaryInteractor = grab[0].interactor;
+    const secondaryInteractor = grab[1].interactor;
+
+    const primaryWorld = primaryInteractor.object.getTranslationWorld(vec3.create());
+
+    this.object.setTranslationWorld(primaryWorld);
+    this.object.translateObject(grab[0].offsetTrans);
+
+    const dir = vec3.subtract(vec3.create(), secondaryInteractor.object.getTranslationWorld(vec3.create()), primaryWorld);
+    vec3.normalize(dir, dir);
+    vec3.scale(dir, dir, 100.0);
+
+    console.log(dir);
+
+    this.object.lookAt(vec3.add(vec3.create(), primaryWorld, dir));
   }
 }

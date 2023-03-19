@@ -3,9 +3,9 @@
         "14": {
             "name": "Player",
             "translation": [
-                0.0442795,
+                -0.0822798,
                 0.0,
-                1.1589469
+                0.7510876
             ],
             "rotation": [
                 0.0,
@@ -945,7 +945,7 @@
             "translation": [
                 0.0,
                 0.0099999,
-                1.3311299
+                1.156635
             ],
             "rotation": [
                 0.0,
@@ -954,7 +954,7 @@
                 1.0
             ],
             "scaling": [
-                1.0,
+                1.0000001,
                 1.0,
                 1.0
             ]
@@ -1022,20 +1022,20 @@
             ],
             "parent": null,
             "translation": [
-                0.5057916,
-                1.086884,
-                0.1044654
+                -0.2381033,
+                0.672035,
+                0.1044664
             ],
             "rotation": [
-                0.5001502,
-                -0.5001487,
-                0.4998511,
-                0.4998498
+                -0.5001489,
+                0.50015,
+                -0.4998522,
+                -0.4998486
             ],
             "scaling": [
-                0.9999405,
-                0.9999409,
-                0.9999994
+                0.9999407,
+                0.9999424,
+                0.9999988
             ]
         },
         "238": {
@@ -1078,7 +1078,7 @@
             "parent": "233",
             "translation": [
                 0.0,
-                0.0004647,
+                0.0004646,
                 0.0
             ],
             "rotation": [
@@ -1113,7 +1113,7 @@
             "rotation": [
                 0.0,
                 0.0,
-                -0.0,
+                0.0,
                 1.0
             ],
             "components": [
@@ -1163,8 +1163,8 @@
             ],
             "translation": [
                 0.0,
-                0.5,
-                0.0034009
+                0.2991079,
+                0.0034008
             ],
             "rotation": [
                 0.0,
@@ -1173,9 +1173,146 @@
                 1.0
             ],
             "scaling": [
-                2.0692665,
-                0.5,
+                2.0690922,
+                0.2675207,
                 0.75
+            ]
+        },
+        "243": {
+            "name": "Weapon Double Hand",
+            "translation": [
+                0.2825269,
+                0.6537165,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.7071066,
+                0.7071068
+            ],
+            "scaling": [
+                0.9999756,
+                0.9999756,
+                1.0
+            ],
+            "components": [
+                {
+                    "type": "grabbable",
+                    "grabbable": {
+                        "handle": "245",
+                        "handleSecondary": "246"
+                    }
+                }
+            ]
+        },
+        "244": {
+            "name": "Base",
+            "parent": "243",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "mesh": "8",
+                        "material": "22"
+                    }
+                }
+            ],
+            "scaling": [
+                0.05,
+                0.05,
+                0.25
+            ],
+            "translation": [
+                0.0,
+                0.0,
+                0.1662375
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ]
+        },
+        "245": {
+            "name": "GrabBack",
+            "parent": "243",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "mesh": "8",
+                        "material": "26"
+                    }
+                },
+                {
+                    "type": "collision",
+                    "collision": {
+                        "sphere": {
+                            "radius": 0.05
+                        }
+                    }
+                },
+                {
+                    "type": "interactable"
+                }
+            ],
+            "scaling": [
+                0.025,
+                0.05,
+                0.025
+            ],
+            "translation": [
+                0.0,
+                -0.0928831,
+                0.387712
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ]
+        },
+        "246": {
+            "name": "GrabFront",
+            "parent": "243",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "mesh": "8",
+                        "material": "26"
+                    }
+                },
+                {
+                    "type": "collision",
+                    "collision": {
+                        "sphere": {
+                            "radius": 0.05
+                        }
+                    }
+                },
+                {
+                    "type": "interactable"
+                }
+            ],
+            "scaling": [
+                0.025,
+                0.05,
+                0.025
+            ],
+            "translation": [
+                0.000003,
+                -0.0928846,
+                0.1234496
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
             ]
         }
     },
@@ -1789,8 +1926,7 @@
             "bundlingType": "esbuild",
             "libraryPaths": [
                 "/js/lib/"
-            ],
-            "esbuildFlags": ""
+            ]
         },
         "runtime": {
             "visualizeColliders": true,
