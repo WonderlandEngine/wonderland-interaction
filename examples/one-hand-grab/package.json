@@ -4,8 +4,8 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "@wonderlandengine/api": "^0.9.8",
-    "@wonderlandengine/components": "^1.0.0-rc.1",
+    "@wonderlandengine/api": "^1.0.0-rc.3",
+    "@wonderlandengine/components": "^1.0.0-rc.2",
     "wle-interaction": "file:../.."
   },
   "scripts": {

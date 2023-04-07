@@ -11,14 +11,18 @@
  *     - `wle:auto-benchmark:start` and `wle:auto-benchmark:end`: Append the benchmarking code
  */
 
-import {loadRuntime} from '@wonderlandengine/api';
-import * as API from '@wonderlandengine/api'; // Deprecated: Backward compatibility.
-
 /* wle:auto-imports:start */
-import {ARCamera8thwall, Cursor, CursorTarget, DebugObject, DeviceOrientationLook, FingerCursor, FixedFoveation, HandTracking, HitTestLocation, HowlerAudioListener, HowlerAudioSource, ImageTexture, MouseLookComponent, PlayerHeight, TargetFramerate, TeleportComponent, Trail, TwoJointIkSolver, VideoTexture, VrModeActiveSwitch, Vrm, WasdControlsComponent} from '@wonderlandengine/components';
-import {Grabbable, Interactable, Interactor} from 'wle-interaction';
+import {Cursor} from '@wonderlandengine/components';
 import {DebugComponent} from './debug.js';
+import {Grabbable} from 'wle-interaction';
+import {HowlerAudioListener} from '@wonderlandengine/components';
+import {Interactable} from 'wle-interaction';
+import {Interactor} from 'wle-interaction';
+import {MouseLookComponent} from '@wonderlandengine/components';
+import {PlayerHeight} from '@wonderlandengine/components';
 /* wle:auto-imports:end */
+import * as API from '@wonderlandengine/api'; // Deprecated: Backward compatibility.
+import {loadRuntime} from '@wonderlandengine/api';
 
 /* wle:auto-constants:start */
 const ProjectName = 'Interaction';
@@ -49,9 +53,14 @@ if(vrButton) {
 }
 
 /* wle:auto-register:start */
-engine.registerComponent(ARCamera8thwall, Cursor, CursorTarget, DebugObject, DeviceOrientationLook, FingerCursor, FixedFoveation, HandTracking, HitTestLocation, HowlerAudioListener, HowlerAudioSource, ImageTexture, MouseLookComponent, PlayerHeight, TargetFramerate, TeleportComponent, Trail, TwoJointIkSolver, VideoTexture, VrModeActiveSwitch, Vrm, WasdControlsComponent);
-engine.registerComponent(Grabbable, Interactable, Interactor);
+engine.registerComponent(Cursor);
 engine.registerComponent(DebugComponent);
+engine.registerComponent(Grabbable);
+engine.registerComponent(HowlerAudioListener);
+engine.registerComponent(Interactable);
+engine.registerComponent(Interactor);
+engine.registerComponent(MouseLookComponent);
+engine.registerComponent(PlayerHeight);
 /* wle:auto-register:end */
 
 engine.scene.load(`${ProjectName}.bin`);

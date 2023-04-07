@@ -1,19 +1,18 @@
-import { Component, CollisionComponent, Type } from '@wonderlandengine/api';
+import { Component, CollisionComponent } from '@wonderlandengine/api';
+import { property } from '@wonderlandengine/api/decorators.js';
 
 import { Interactor } from './interactor.js';
 import { Observable } from './utils/observer.js';
 
 export class Interactable extends Component {
   static TypeName = 'interactable';
-  static Properties = {
-    useIntersectionPoint: { type: Type.Bool, default: false, values: [] }
-  };
 
   /**
    * Properties.
    */
 
-  public useIntersectionPoint: boolean = false;
+  @property.bool(true)
+  public snap: boolean = true;
 
   /**
    * Private Attributes.

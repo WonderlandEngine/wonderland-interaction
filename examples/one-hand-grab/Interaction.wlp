@@ -4,7 +4,7 @@
             "name": "Player",
             "translation": [
                 -0.0822798,
-                0.0,
+                -1.533245,
                 0.7510876
             ],
             "rotation": [
@@ -352,7 +352,23 @@
                 "name": "squeeze<xr_standard_squeeze_pressed_value<root",
                 "file": "models\\oculus-touch-v2-left.glb"
             },
-            "parent": "64"
+            "parent": "64",
+            "translation": [
+                0.0022123,
+                -0.0316186,
+                0.015126
+            ],
+            "rotation": [
+                0.3420201,
+                0.0,
+                0.0,
+                0.9396926
+            ],
+            "scaling": [
+                1.0199999,
+                1.0199999,
+                1.0199999
+            ]
         },
         "66": {
             "link": {
@@ -1041,7 +1057,7 @@
             ]
         },
         "238": {
-            "name": "GrabRight",
+            "name": "Grab",
             "parent": "233",
             "translation": [
                 0.4385524,
@@ -1066,7 +1082,10 @@
                 },
                 {
                     "type": "interactable",
-                    "active": true
+                    "active": true,
+                    "interactable": {
+                        "snap": false
+                    }
                 }
             ],
             "scaling": [
@@ -1155,7 +1174,7 @@
                         "box": {
                             "extents": [
                                 2.0,
-                                0.5,
+                                0.25,
                                 0.75
                             ]
                         }
@@ -1217,7 +1236,8 @@
                                 0.05,
                                 0.25
                             ]
-                        }
+                        },
+                        "bounciness": 0.0
                     }
                 }
             ]
@@ -1271,24 +1291,27 @@
                     }
                 },
                 {
-                    "type": "interactable"
+                    "type": "interactable",
+                    "interactable": {
+                        "snap": true
+                    }
                 }
             ],
             "scaling": [
-                0.025,
+                0.0249999,
                 0.05,
-                0.025
+                0.0249999
             ],
             "translation": [
-                0.0,
+                -1.4901161193847656e-8,
                 -0.0928831,
                 0.387712
             ],
             "rotation": [
                 0.0,
+                -0.7071068,
                 0.0,
-                0.0,
-                1.0
+                0.7071067
             ]
         },
         "246": {
@@ -1311,7 +1334,10 @@
                     }
                 },
                 {
-                    "type": "interactable"
+                    "type": "interactable",
+                    "interactable": {
+                        "snap": true
+                    }
                 }
             ],
             "scaling": [
@@ -1925,9 +1951,10 @@
         "project": {
             "name": "Interaction",
             "version": [
+                1,
                 0,
-                9,
-                5
+                0,
+                1
             ]
         },
         "vr": {

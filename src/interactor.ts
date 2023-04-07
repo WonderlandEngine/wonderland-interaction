@@ -1,4 +1,6 @@
 import { Component, Scene, Type } from '@wonderlandengine/api';
+import { property } from '@wonderlandengine/api/decorators.js';
+
 import { Interactable } from './interactable.js';
 
 export enum Handedness {
@@ -11,16 +13,13 @@ export const HandednessValues = Object.values(Handedness);
  * Hello, I am a grabber!
  */
 export class Interactor extends Component {
-
   static TypeName = 'interactor';
-  static Properties = {
-    handedness: { type: Type.Enum, default: Handedness.Right, values: HandednessValues }
-  };
 
   /**
    * Public Attributes.
    */
 
+  @property.enum(HandednessValues, Handedness.Right)
   public handedness!: number;
 
   /**
@@ -40,13 +39,11 @@ export class Interactor extends Component {
   private _onSceneLoaded = () => {
     const scene = this.engine.scene;
     if(this._previousScene) {
-      let index = scene.onPostRender.indexOf(this._onPostRender);
-      if(index >= 0) scene.onPostRender.splice(index, 1);
-      index = this.engine.onSceneLoaded.indexOf(this._onSceneLoaded);
-      if(index >= 0) this.engine.onSceneLoaded.splice(index, 1);
+      scene.onPostRender.remove(this._onPostRender);
+      this.engine.onSceneLoaded.remove(this._onSceneLoaded);
     }
-    this.engine.onSceneLoaded.push(this._onSceneLoaded);
-    scene.onPostRender.push(this._onPostRender);
+    this.engine.onSceneLoaded.add(this._onSceneLoaded);
+    scene.onPostRender.add(this._onPostRender);
     this._previousScene = this.engine.scene;
   };
 
