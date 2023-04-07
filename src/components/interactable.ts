@@ -1,8 +1,7 @@
-import { Component, CollisionComponent } from '@wonderlandengine/api';
+import { Component, CollisionComponent, Emitter } from '@wonderlandengine/api';
 import { property } from '@wonderlandengine/api/decorators.js';
 
 import { Interactor } from './interactor.js';
-import { Observable } from './utils/observer.js';
 
 export class Interactable extends Component {
   static TypeName = 'interactable';
@@ -20,8 +19,9 @@ export class Interactable extends Component {
 
   private _collision: CollisionComponent = null!;
 
-  private readonly _onSelectStart: Observable<Interactor> = new Observable();
-  private readonly _onSelectEnd: Observable<Interactor> = new Observable();
+  private readonly _onSelectStart: Emitter<[Interactor]> = new Emitter();
+  private readonly _onSelectEnd: Emitter<[Interactor]> = new Emitter();
+  private readonly _onDistanceSelect: Emitter<[Interactor]> = new Emitter();
 
   public start(): void {
     this._collision = this.object.getComponent('collision', 0)!;
@@ -30,11 +30,15 @@ export class Interactable extends Component {
     }
   }
 
-  public get onSelectStart(): Observable<Interactor> {
+  public get onSelectStart(): Emitter<[Interactor]> {
     return this._onSelectStart;
   }
 
-  public get onSelectEnd(): Observable<Interactor> {
+  public get onSelectEnd(): Emitter<[Interactor]> {
     return this._onSelectEnd;
+  }
+
+  public get onDistanceSelect(): Emitter<[Interactor]> {
+    return this._onDistanceSelect;
   }
 }

@@ -1,4 +1,6 @@
-import { Component, Scene, Type } from '@wonderlandengine/api';
+import {vec3} from 'gl-matrix';
+
+import { CollisionComponent, Component, ComponentConstructor, Object3D, Scene, Type } from '@wonderlandengine/api';
 import { property } from '@wonderlandengine/api/decorators.js';
 
 import { Interactable } from './interactable.js';
@@ -15,6 +17,8 @@ export const HandednessValues = Object.values(Handedness);
 export class Interactor extends Component {
   static TypeName = 'interactor';
 
+  static Dependencies = [Interactable];
+
   /**
    * Public Attributes.
    */
@@ -22,12 +26,16 @@ export class Interactor extends Component {
   @property.enum(HandednessValues, Handedness.Right)
   public handedness!: number;
 
+  @property.object()
+  public ray: Object3D | null = null;
+
   /**
    * Private Attributes.
    */
 
   /** Collision component of this object */
-  private _collision: any = null;
+  private _collision: CollisionComponent = null!;
+  private _rayCollision: CollisionComponent | null = null!;
 
   private _interactable: Interactable | null = null;
 
@@ -66,8 +74,8 @@ export class Interactor extends Component {
    *
    * @returns This instance, for chaining
    */
-  public start() {
-    this._collision = this.object.getComponent('collision', 0);
+  start() {
+    this._collision = this.object.getComponent('collision', 0)!;
     if(!this._collision)
       throw new Error('grabber.start(): No collision component found');
 
@@ -78,6 +86,36 @@ export class Interactor extends Component {
     }
 
     this._onSceneLoaded();
+  }
+
+  onActivate(): void {
+    this._rayCollision = this.ray?.getComponent(CollisionComponent) ?? null;
+  }
+
+  update() {
+      if (!this._rayCollision) return;
+
+      // @todo: Add delay to only check every few frames
+      const overlaps = this._rayCollision.queryOverlapsFast();
+      let closestInteractable = null;
+      let closestDistance = Number.MAX_VALUE;
+
+      const position = this.object.getTranslationWorld(vec3.create());
+
+      for (let i = 0; i < overlaps.count; ++i) {
+          const interactable = overlaps.data[i].object.getComponent(Interactable);
+          if(!interactable) continue;
+          const interactableWorld = interactable.object.getTranslationWorld(vec3.create());
+          const dist = vec3.squaredDistance(position, interactableWorld);
+          if(dist < closestDistance) {
+            closestInteractable = interactable;
+            closestDistance = dist;
+          }
+      }
+
+      if(closestInteractable) {
+        closestInteractable.onDistanceSelect.notify(this);
+      }
   }
 
   public startInteraction() {
@@ -116,7 +154,6 @@ export class Interactor extends Component {
       .catch();
 
     session.addEventListener('inputsourceschange', (event: XRInputSourceChangeEvent) => {
-      console.log(this.handedness);
       for(const item of event.removed) {
         if(item === this.#xrInputSource) {
           this.#xrInputSource = null;

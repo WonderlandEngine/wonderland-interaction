@@ -1,11 +1,10 @@
 import { vec3, quat } from 'gl-matrix';
-import { Component, Object, PhysXComponent, WonderlandEngine } from '@wonderlandengine/api';
+import { Component, Object, Emitter, PhysXComponent, WonderlandEngine } from '@wonderlandengine/api';
 import { property } from '@wonderlandengine/api/decorators.js';
 
 import { Interactor } from './interactor.js';
 import { Interactable } from './interactable.js';
-import { Observer } from './utils/observer.js';
-import { HistoryTracker } from './history-tracker.js';
+import { HistoryTracker } from '../history-tracker.js';
 
 export interface GrabData {
   interactor: Interactor;
@@ -20,6 +19,8 @@ function setupRotationOffset(data: GrabData, target: Object) {
   quat.multiply(data.offsetRot, quat.invert(srcRot, srcRot), targetRot);
   quat.normalize(data.offsetRot, data.offsetRot);
 }
+
+type InteractorCb = (interactable: Interactor) => void;
 
 /**
  * Grabbable object.
@@ -59,8 +60,9 @@ export class Grabbable extends Component {
   private _grabData: (GrabData | null)[] = new Array(2);
   private _maxSqDistance: number | null = null;
 
-  private _startObservers: Observer<Interactor>[] = new Array(2);
-  private _stopObservers: Observer<Interactor>[] = new Array(2);
+  private _startObservers: InteractorCb[] = new Array(2);
+  private _distanceObservers: InteractorCb[] = new Array(2);
+  private _stopObservers: InteractorCb[] = new Array(2);
 
   private _history: HistoryTracker = new HistoryTracker();
 
@@ -72,8 +74,9 @@ export class Grabbable extends Component {
     for(let i = 0; i < 2; ++i) {
       this._grabData[i] = null;
       ((index: number) => {
-        this._startObservers[i] = new Observer((interactor: Interactor) => this._onInteractionStart(interactor, index));
-        this._stopObservers[i] = new Observer((interactor: Interactor) => this._onInteractionStop(interactor, index));
+        this._startObservers[i] = (interactor: Interactor) => this._onInteractionStart(interactor, index);
+        this._distanceObservers[i] = (interactor: Interactor) => this._onDistanceGrab(interactor, index);
+        this._stopObservers[i] = (interactor: Interactor) => this._onInteractionStop(interactor, index);
       })(i);
     }
   }
@@ -102,8 +105,9 @@ export class Grabbable extends Component {
     for(let i = 0; i < 2; ++i) {
       const interactable = this._interactable[i];
       if(interactable) {
-        interactable.onSelectStart.observe(this._startObservers[i]);
-        interactable.onSelectEnd.observe(this._stopObservers[i]);
+        interactable.onSelectStart.add(this._startObservers[i]);
+        interactable.onSelectEnd.add(this._stopObservers[i]);
+        interactable.onDistanceSelect.add(this._distanceObservers[i]);
       }
     }
   }
@@ -112,8 +116,9 @@ export class Grabbable extends Component {
     for(let i = 0; i < 2; ++i) {
       const interactable = this._interactable[i];
       if(interactable) {
-        interactable.onSelectStart.unobserve(this._startObservers[i]);
-        interactable.onSelectEnd.unobserve(this._stopObservers[i]);
+        interactable.onSelectStart.remove(this._startObservers[i]);
+        interactable.onSelectEnd.remove(this._stopObservers[i]);
+        interactable.onDistanceSelect.remove(this._distanceObservers[i]);
       }
     }
   }
@@ -218,6 +223,10 @@ export class Grabbable extends Component {
     if(this.canThrow && !this.isGrabbed) {
       this.throw();
     }
+  }
+
+  private _onDistanceGrab(interactor: Interactor, index: number): void {
+    console.log('CALLLED');
   }
 
   private _updateTransformSingleHand(index: number) {

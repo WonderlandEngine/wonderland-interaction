@@ -41,20 +41,6 @@
                     "active": true
                 },
                 {
-                    "type": "collision",
-                    "collision": {
-                        "collider": "aabb",
-                        "aabb": {
-                            "extents": [
-                                4.0,
-                                0.05,
-                                4.0
-                            ]
-                        },
-                        "groups": 4
-                    }
-                },
-                {
                     "type": "physx",
                     "physx": {
                         "static": true,
@@ -63,10 +49,13 @@
                         "box": {
                             "extents": [
                                 4.0,
-                                4.0999999,
-                                0.1
+                                4.0,
+                                0.025
                             ]
-                        }
+                        },
+                        "bounciness": 0.0,
+                        "staticFriction": 2.0,
+                        "dynamicFriction": 2.0
                     }
                 }
             ],
@@ -837,11 +826,16 @@
                     "collision": {
                         "sphere": {
                             "radius": 0.05
-                        }
+                        },
+                        "groups": 127
                     }
                 },
                 {
-                    "type": "interactor"
+                    "type": "interactor",
+                    "interactor": {
+                        "distance": 5.0,
+                        "ray": "248"
+                    }
                 }
             ],
             "translation": [
@@ -900,7 +894,9 @@
                 {
                     "type": "interactor",
                     "interactor": {
-                        "handedness": "left"
+                        "handedness": "left",
+                        "distance": 1.0,
+                        "ray": "247"
                     }
                 },
                 {
@@ -908,7 +904,8 @@
                     "collision": {
                         "sphere": {
                             "radius": 0.05
-                        }
+                        },
+                        "groups": 127
                     }
                 }
             ],
@@ -1077,6 +1074,14 @@
                     "collision": {
                         "sphere": {
                             "radius": 0.1
+                        },
+                        "collider": "aabb",
+                        "aabb": {
+                            "extents": [
+                                0.0199999,
+                                0.0199999,
+                                0.1
+                            ]
                         }
                     }
                 },
@@ -1099,7 +1104,7 @@
             "parent": "233",
             "translation": [
                 0.0,
-                0.0004646,
+                0.0004645,
                 0.0
             ],
             "rotation": [
@@ -1177,7 +1182,8 @@
                                 0.25,
                                 0.75
                             ]
-                        }
+                        },
+                        "bounciness": 0.0
                     },
                     "active": true
                 }
@@ -1204,17 +1210,17 @@
             "translation": [
                 0.2825269,
                 0.6537165,
-                0.0
+                0.3617784
             ],
             "rotation": [
                 0.0,
                 0.0,
-                0.7071066,
-                0.7071068
+                0.7071065,
+                0.7071069
             ],
             "scaling": [
-                0.9999756,
-                0.9999756,
+                0.999964,
+                0.999964,
                 1.0
             ],
             "components": [
@@ -1232,12 +1238,17 @@
                         "shape": "box",
                         "box": {
                             "extents": [
-                                0.1,
+                                0.05,
                                 0.05,
                                 0.25
                             ]
                         },
-                        "bounciness": 0.0
+                        "bounciness": 0.0,
+                        "mass": 15.0,
+                        "dynamicFriction": 1.0,
+                        "linearDamping": 1.0,
+                        "staticFriction": 1.0,
+                        "angularDamping": 1.0
                     }
                 }
             ]
@@ -1262,7 +1273,7 @@
             "translation": [
                 0.0,
                 0.0,
-                0.1662375
+                0.0
             ],
             "rotation": [
                 0.0,
@@ -1298,20 +1309,20 @@
                 }
             ],
             "scaling": [
-                0.0249999,
+                0.0249996,
                 0.05,
-                0.0249999
+                0.0249996
             ],
             "translation": [
-                -1.4901161193847656e-8,
-                -0.0928831,
-                0.387712
+                2.2351741790771484e-8,
+                -0.0928863,
+                0.2157722
             ],
             "rotation": [
                 0.0,
-                -0.7071068,
                 0.0,
-                0.7071067
+                0.0000021,
+                1.0
             ]
         },
         "246": {
@@ -1347,13 +1358,92 @@
             ],
             "translation": [
                 0.000003,
-                -0.0928846,
-                0.1234496
+                -0.092888,
+                -0.0484889
             ],
             "rotation": [
                 0.0,
                 0.0,
                 0.0,
+                1.0
+            ]
+        },
+        "247": {
+            "name": "DistanceRayLeft",
+            "parent": "130",
+            "components": [
+                {
+                    "type": "mesh"
+                },
+                {
+                    "type": "collision",
+                    "collision": {
+                        "collider": "box",
+                        "box": {
+                            "extents": [
+                                0.2,
+                                0.2,
+                                1.0
+                            ]
+                        },
+                        "groups": 128
+                    }
+                }
+            ],
+            "translation": [
+                0.0,
+                0.0,
+                -1.0499999
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "248": {
+            "name": "DistanceRayRight",
+            "parent": "129",
+            "components": [
+                {
+                    "type": "mesh"
+                },
+                {
+                    "type": "collision",
+                    "collision": {
+                        "collider": "box",
+                        "box": {
+                            "extents": [
+                                0.2,
+                                0.2,
+                                1.0
+                            ]
+                        },
+                        "groups": 128
+                    },
+                    "active": true
+                }
+            ],
+            "translation": [
+                0.0,
+                0.0,
+                -1.0499997
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.0,
+                1.0,
                 1.0
             ]
         }
@@ -1965,7 +2055,6 @@
             "sourcePaths": [
                 "js/"
             ],
-            "autoManageEntryPoint": true,
             "bundlingType": "esbuild",
             "libraryPaths": [
                 "/js/lib/"
@@ -1977,10 +2066,13 @@
                 "optionalFeatures": {
                     "local-floor": true
                 }
-            }
+            },
+            "visualizePhysX": true
         },
         "physx": {
-            "enable": true
+            "enable": true,
+            "restOffset": 0.0,
+            "contactOffset": 1.0
         },
         "rendering": {
             "sky": {

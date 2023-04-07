@@ -1,5 +1,3 @@
-export { Observer, Observable } from './utils/observer.js';
-
-export { Grabbable } from './grabbable.js';
-export { Interactor } from './interactor.js';
-export { Interactable } from './interactable.js';
+export { Grabbable } from './components/grabbable.js';
+export { Interactor } from './components/interactor.js';
+export { Interactable } from './components/interactable.js';
