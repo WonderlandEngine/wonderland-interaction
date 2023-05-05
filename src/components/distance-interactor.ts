@@ -23,26 +23,28 @@ enum InteractionType {
  * @param collision The collision to query from.
  * @returns The closest grabbable, or `null` if none is found.
  */
-function search(target: Object3D, collision: CollisionComponent | null): Grabbable | null {
-    if (!collision) return null;
-    // @todo: Add delay to only check every few frames
-    const overlaps = collision.queryOverlaps();
-    let closestDistance = Number.MAX_VALUE;
-    let closestGrabbable: Grabbable | null = null;
+const search = (function() {
+    const temp = vec3.create();
+    return function(target: vec3, collision: CollisionComponent | null) {
+        if (!collision) return null;
+        // @todo: Add delay to only check every few frames
+        const overlaps = collision.queryOverlaps();
+        let closestDistance = Number.MAX_VALUE;
+        let closestGrabbable: Grabbable | null = null;
 
-    const position = target.getPositionWorld(vec3.create());
-    for (let i = 0; i < overlaps.length; ++i) {
-        const grabbable = overlaps[i].object.getComponent(Grabbable);
-        if (!grabbable) continue;
-        const interactableWorld = grabbable.object.getPositionWorld(vec3.create());
-        const dist = vec3.squaredDistance(position, interactableWorld);
-        if (dist < closestDistance) {
-            closestGrabbable = grabbable;
-            closestDistance = dist;
+        for (let i = 0; i < overlaps.length; ++i) {
+            const grabbable = overlaps[i].object.getComponent(Grabbable);
+            if (!grabbable) continue;
+            const world = grabbable.object.getPositionWorld(temp);
+            const dist = vec3.squaredDistance(target, world);
+            if (dist < closestDistance) {
+                closestGrabbable = grabbable;
+                closestDistance = dist;
+            }
         }
+        return closestGrabbable;
     }
-    return closestGrabbable;
-}
+}());
 
 /**
  * Reset the marker mesh to a position outside of the view.
@@ -53,6 +55,12 @@ function resetMarker(marker: Object3D | null | undefined) {
     // @todo: Find a better way to hide the mesh.
     marker?.setPositionWorld([-100, -100, -100]);
 }
+
+/** Temporaries. */
+
+const _pointA = vec3.create();
+const _pointB = vec3.create();
+const _vectorA = vec3.create();
 
 /**
  * Grabs from a given distance.
@@ -116,7 +124,7 @@ export class DistanceInteractor extends Component {
     private _onGripEnd = () => {
         if (this._interaction == InteractionType.Fetching && this._targetGrab) {
             this._targetGrab.enablePhysx();
-            this._targetGrab.distanceMarker?.setPositionWorld([-100, -100, -100]);
+            this._targetGrab.distanceMarker?.setPositionWorld(vec3.set(_pointA, -100, -100, -100));
         }
         this._interaction = InteractionType.Searching;
     };
@@ -151,19 +159,21 @@ export class DistanceInteractor extends Component {
     update(dt: number) {
         if (this._interaction === InteractionType.None) return;
 
-        const interactorPos = this._interactor.object.getPositionWorld();
+        const interactorPos = this._interactor.object.getPositionWorld(_pointA);
 
         if (this._interaction === InteractionType.Fetching) {
-            const from = this._targetInteract!.object.getPositionWorld();
+            const speed = this.speed * dt * 10.0;
+            const from = this._targetInteract!.object.getPositionWorld(_pointB);
+            const toInteractor = vec3.subtract(_vectorA, interactorPos, from);
+            const distSqrt = vec3.squaredLength(toInteractor) - speed;
 
-            const grabToInteractor = vec3.create();
-            vec3.subtract(grabToInteractor, interactorPos, from);
-            vec3.normalize(grabToInteractor, grabToInteractor);
-            vec3.scale(grabToInteractor, grabToInteractor, this.speed * dt * 10.0); // `10` for base speed.
-            this._targetGrab!.object.translateWorld(grabToInteractor);
+            vec3.normalize(toInteractor, toInteractor);
+            // `10` for base speed.
+            vec3.scale(toInteractor, toInteractor, speed);
 
-            vec3.subtract(grabToInteractor, from, interactorPos);
-            if (vec3.squaredLength(grabToInteractor) < 0.01) {
+            this._targetGrab!.object.translateWorld(toInteractor);
+
+            if (distSqrt < 0.01) {
                 this._interaction = InteractionType.None;
                 const interactable = this._targetInteract!;
                 this._targetGrab = null;
@@ -173,9 +183,9 @@ export class DistanceInteractor extends Component {
             return;
         }
 
-        const grabbable = search(this._interactor.object, this._ray);
+        const grabbable = search(interactorPos, this._ray);
         if (grabbable?.distanceMarker) {
-            const scale = radiusHierarchy(vec4.create(), grabbable.object);
+            const scale = radiusHierarchy(grabbable.object);
             grabbable.distanceMarker.setPositionWorld(grabbable.object.getPositionWorld());
             grabbable.distanceMarker.setScalingWorld([scale, scale, scale]);
         } else if (this._targetGrab && !grabbable) {
