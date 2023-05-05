@@ -9,12 +9,20 @@ import {Grabbable} from './grabbable.js';
 import {Interactable} from './interactable.js';
 import {Interactor} from './interactor.js';
 
+/** Different interaction type. */
 enum InteractionType {
     None,
     Searching,
     Fetching,
 }
 
+/**
+ * Find the closest grabbable enclosed by the given collision shape.
+ *
+ * @param target Origin position.
+ * @param collision The collision to query from.
+ * @returns The closest grabbable, or `null` if none is found.
+ */
 function search(target: Object3D, collision: CollisionComponent | null): Grabbable | null {
     if (!collision) return null;
     // @todo: Add delay to only check every few frames
@@ -36,55 +44,63 @@ function search(target: Object3D, collision: CollisionComponent | null): Grabbab
     return closestGrabbable;
 }
 
-function distanceFetch(
-    target: Object3D,
-    from: Object3D,
-    to: Object3D,
-    speed: number
-): boolean {
-    const grabToInteractor = vec3.create();
-    vec3.subtract(grabToInteractor, to.getPositionWorld(), from.getPositionWorld());
-
-    vec3.normalize(grabToInteractor, grabToInteractor);
-    vec3.scale(grabToInteractor, grabToInteractor, speed * 10.0); // `10` for base speed.
-    target.translateWorld(grabToInteractor);
-
-    vec3.subtract(grabToInteractor, from.getPositionWorld(), to.getPositionWorld());
-    return vec3.squaredLength(grabToInteractor) < 0.01;
-}
-
-function resetMarker(target: Object3D | null | undefined) {
-    target?.setPositionWorld([-100, -100, -100]);
+/**
+ * Reset the marker mesh to a position outside of the view.
+ *
+ * @param marker The marker.
+ */
+function resetMarker(marker: Object3D | null | undefined) {
+    // @todo: Find a better way to hide the mesh.
+    marker?.setPositionWorld([-100, -100, -100]);
 }
 
 /**
- * Hello, I am a grabber!
+ * Grabs from a given distance.
+ *
+ * This component must be used together with {@link Interactor}.
+ *
+ * In order for this component to work, you should:
+ *     - Add a rough collision box on grabbable (not interactable)
+ *     - Prefer to use a unique mask value for ray collision / grabbable.
  */
 export class DistanceInteractor extends Component {
+    /** @overload */
     static TypeName = typename('distance-interactor');
 
-    /**
-     * Public Attributes.
-     */
+    /** Public Attributes. */
 
+    /** Main interactor. If `null`, interactor must be a sibling. */
     @property.object()
     interactor: Object3D | null = null;
 
+    /**
+     * Object with the ray collision. If `null`, interactor must be a sibling.
+     *
+     * The shape of the collision is used as a ray to find grabbable.
+     */
     @property.object()
     ray: Object3D | null = null;
+
+    /** Index of the collision component on the {@link ray} object. */
     @property.int(0)
     rayCollision: number = 0;
 
+    /** Distance grabbing speed. */
     @property.float(1.0)
     speed: number = 1.0;
 
+    /** Main interactor. @hidden */
     private _interactor: Interactor = null!;
+    /** Ray collision component. @hidden */
     private _ray: CollisionComponent = null!;
+    /** Current interaction type. @hidden */
     private _interaction: InteractionType = InteractionType.Searching;
-
+    /** Currently focused grabbable (fetching or looking at). @hidden */
     private _targetGrab: Grabbable | null = null;
+    /** Currently fetching interactable. @hidden */
     private _targetInteract: Interactable | null = null;
 
+    /** @hidden */
     private _onGripStart = () => {
         if (this._interaction !== InteractionType.Searching || !this._targetGrab) return;
 
@@ -96,6 +112,7 @@ export class DistanceInteractor extends Component {
         this._targetGrab.disablePhysx();
     };
 
+    /** @hidden */
     private _onGripEnd = () => {
         if (this._interaction == InteractionType.Fetching && this._targetGrab) {
             this._targetGrab.enablePhysx();
@@ -104,6 +121,7 @@ export class DistanceInteractor extends Component {
         this._interaction = InteractionType.Searching;
     };
 
+    /** @overload */
     onActivate(): void {
         const interactor = (this.interactor ?? this.object).getComponent(Interactor);
         if (!interactor) {
@@ -123,27 +141,34 @@ export class DistanceInteractor extends Component {
         this._interactor.onGripEnd.add(this._onGripEnd);
     }
 
+    /** @overload */
     onDeactivate(): void {
         this._interactor.onGripStart.remove(this._onGripStart);
         this._interactor.onGripStart.remove(this._onGripEnd);
     }
 
+    /** @overload */
     update(dt: number) {
         if (this._interaction === InteractionType.None) return;
 
+        const interactorPos = this._interactor.object.getPositionWorld();
+
         if (this._interaction === InteractionType.Fetching) {
-            if (
-                distanceFetch(
-                    this._targetGrab!.object,
-                    this._targetInteract!.object,
-                    this._interactor.object,
-                    this.speed * dt
-                )
-            ) {
+            const from = this._targetInteract!.object.getPositionWorld();
+
+            const grabToInteractor = vec3.create();
+            vec3.subtract(grabToInteractor, interactorPos, from);
+            vec3.normalize(grabToInteractor, grabToInteractor);
+            vec3.scale(grabToInteractor, grabToInteractor, this.speed * dt * 10.0); // `10` for base speed.
+            this._targetGrab!.object.translateWorld(grabToInteractor);
+
+            vec3.subtract(grabToInteractor, from, interactorPos);
+            if (vec3.squaredLength(grabToInteractor) < 0.01) {
                 this._interaction = InteractionType.None;
-                this._interactor.startInteraction(this._targetInteract!);
+                const interactable = this._targetInteract!;
                 this._targetGrab = null;
                 this._targetInteract = null;
+                this._interactor.startInteraction(interactable);
             }
             return;
         }
