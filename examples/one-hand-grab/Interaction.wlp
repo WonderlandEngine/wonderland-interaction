@@ -4,8 +4,8 @@
             "name": "Player",
             "translation": [
                 -0.0822798,
-                -1.533245,
-                0.7510876
+                0.0,
+                2.6579689
             ],
             "rotation": [
                 0.0,
@@ -182,7 +182,7 @@
                 {
                     "type": "light",
                     "light": {
-                        "attenuation": 0.1
+                        "intensity": 3.3329999
                     }
                 }
             ],
@@ -209,7 +209,7 @@
                 {
                     "type": "light",
                     "light": {
-                        "attenuation": 0.1
+                        "intensity": 3.3329999
                     }
                 }
             ],
@@ -897,7 +897,8 @@
                         "handedness": "left",
                         "distance": 1.0,
                         "ray": "247"
-                    }
+                    },
+                    "active": false
                 },
                 {
                     "type": "collision",
@@ -906,7 +907,8 @@
                             "radius": 0.05
                         },
                         "groups": 127
-                    }
+                    },
+                    "active": false
                 }
             ],
             "translation": [
@@ -1082,7 +1084,8 @@
                                 0.0199999,
                                 0.1
                             ]
-                        }
+                        },
+                        "groups": 127
                     }
                 },
                 {
@@ -1250,6 +1253,30 @@
                         "staticFriction": 1.0,
                         "angularDamping": 1.0
                     }
+                },
+                {
+                    "type": "collision",
+                    "collision": {
+                        "sphere": {
+                            "radius": 0.2
+                        },
+                        "collider": "box",
+                        "aabb": {
+                            "extents": [
+                                0.1,
+                                0.1,
+                                0.3
+                            ]
+                        },
+                        "groups": 128,
+                        "box": {
+                            "extents": [
+                                0.1,
+                                0.1,
+                                0.3
+                            ]
+                        }
+                    }
                 }
             ]
         },
@@ -1298,7 +1325,8 @@
                     "collision": {
                         "sphere": {
                             "radius": 0.05
-                        }
+                        },
+                        "groups": 127
                     }
                 },
                 {
@@ -1341,7 +1369,8 @@
                     "collision": {
                         "sphere": {
                             "radius": 0.05
-                        }
+                        },
+                        "groups": 127
                     }
                 },
                 {
@@ -1422,7 +1451,7 @@
                             "extents": [
                                 0.2,
                                 0.2,
-                                1.0
+                                2.0
                             ]
                         },
                         "groups": 128
@@ -1433,7 +1462,7 @@
             "translation": [
                 0.0,
                 0.0,
-                -1.0499997
+                -2.0999999
             ],
             "rotation": [
                 0.0,
@@ -1685,7 +1714,25 @@
                     9.999999974752427e-7,
                     1.0
                 ],
-                "shininess": 1
+                "shininess": 1,
+                "emissiveColor": [
+                    0.2,
+                    0.2,
+                    0.2,
+                    1.0
+                ],
+                "ambientColor": [
+                    0.05,
+                    0.05,
+                    0.05,
+                    1.0
+                ],
+                "diffuseColor": [
+                    0.5,
+                    0.5,
+                    0.5,
+                    1.0
+                ]
             }
         },
         "22": {
@@ -1705,9 +1752,15 @@
                 ],
                 "shininess": 10,
                 "ambientColor": [
+                    0.05,
+                    0.05,
+                    0.05,
+                    1.0
+                ],
+                "emissiveColor": [
                     0.317647,
                     0.0,
-                    0.2165777,
+                    0.2165776,
                     1.0
                 ]
             }
@@ -1728,6 +1781,12 @@
                     1.0
                 ],
                 "ambientColor": [
+                    0.05,
+                    0.05,
+                    0.05,
+                    1.0
+                ],
+                "emissiveColor": [
                     0.3843137,
                     0.3089579,
                     0.0,
@@ -1751,9 +1810,15 @@
                     1.0
                 ],
                 "ambientColor": [
+                    0.05,
+                    0.05,
+                    0.05,
+                    1.0
+                ],
+                "emissiveColor": [
                     0.0,
                     0.2352941,
-                    0.1437908,
+                    0.1437907,
                     1.0
                 ]
             }
@@ -1763,14 +1828,42 @@
                 "name": "skel_controller_materials_controllerMTL1",
                 "file": "models\\oculus-touch-v2-left.glb"
             },
-            "name": "ControllerLeft"
+            "name": "ControllerLeft",
+            "Phong": {
+                "ambientColor": [
+                    0.05,
+                    0.05,
+                    0.05,
+                    1.0
+                ],
+                "diffuseColor": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            }
         },
         "88": {
             "link": {
                 "name": "skel_controller_materials_controllerMTL",
                 "file": "models\\oculus-touch-v2-right.glb"
             },
-            "name": "ControllerRight"
+            "name": "ControllerRight",
+            "Phong": {
+                "ambientColor": [
+                    0.05,
+                    0.05,
+                    0.05,
+                    1.0
+                ],
+                "diffuseColor": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            }
         },
         "128": {
             "name": "Cursor",
@@ -1791,14 +1884,30 @@
                 "name": "Default_Material",
                 "file": "models\\hand-left.glb"
             },
-            "name": "HandLeft"
+            "name": "HandLeft",
+            "Phong": {
+                "ambientColor": [
+                    0.05,
+                    0.05,
+                    0.05,
+                    1.0
+                ]
+            }
         },
         "164": {
             "link": {
                 "name": "lambert2",
                 "file": "models\\hand-right.glb"
             },
-            "name": "HandRight"
+            "name": "HandRight",
+            "Phong": {
+                "ambientColor": [
+                    0.05,
+                    0.05,
+                    0.05,
+                    1.0
+                ]
+            }
         },
         "201": {
             "link": {
@@ -1834,9 +1943,15 @@
                     1.0
                 ],
                 "ambientColor": [
+                    0.05,
+                    0.05,
+                    0.05,
+                    1.0
+                ],
+                "emissiveColor": [
                     0.0274509,
-                    0.0274507,
-                    0.0274507,
+                    0.0274506,
+                    0.0274506,
                     1.0
                 ]
             }
@@ -1857,8 +1972,14 @@
                     1.0
                 ],
                 "ambientColor": [
+                    0.05,
+                    0.05,
+                    0.05,
+                    1.0
+                ],
+                "emissiveColor": [
                     0.0,
-                    0.3294117,
+                    0.3294116,
                     0.2013071,
                     1.0
                 ]
@@ -2043,8 +2164,7 @@
             "version": [
                 1,
                 0,
-                0,
-                1
+                0
             ]
         },
         "vr": {
@@ -2132,6 +2252,10 @@
             "link": {
                 "name": "Phong Opaque",
                 "file": "default"
+            },
+            "features": {
+                "DEPRECATED_LIGHT_ATTENUATION": true,
+                "WITH_EMISSIVE": true
             }
         },
         "38": {
@@ -2140,13 +2264,17 @@
                 "file": "default"
             },
             "features": {
-                "ALPHA_MASKED": true
+                "ALPHA_MASKED": true,
+                "DEPRECATED_LIGHT_ATTENUATION": true
             }
         },
         "39": {
             "link": {
                 "name": "Foliage",
                 "file": "default"
+            },
+            "features": {
+                "DEPRECATED_LIGHT_ATTENUATION": true
             }
         },
         "40": {
@@ -2192,12 +2320,18 @@
             "link": {
                 "name": "Phong Normalmapped",
                 "file": "default"
+            },
+            "features": {
+                "DEPRECATED_LIGHT_ATTENUATION": true
             }
         },
         "231": {
             "link": {
                 "name": "Phong Lightmapped",
                 "file": "default"
+            },
+            "features": {
+                "DEPRECATED_LIGHT_ATTENUATION": true
             }
         }
     },
@@ -2207,8 +2341,7 @@
         "models/hand-left.glb",
         "models/hand-right.glb",
         "models/button.glb",
-        "models/teleport-indicator.glb",
-        "textures/skybox.png"
+        "models/teleport-indicator.glb"
     ],
     "fonts": {
         "232": {

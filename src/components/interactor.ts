@@ -1,15 +1,56 @@
 import {vec3} from 'gl-matrix';
 
-import { CollisionComponent, Component, ComponentConstructor, Object3D, Scene, Type } from '@wonderlandengine/api';
+import { CollisionComponent, Component, Object3D, Scene, Type } from '@wonderlandengine/api';
 import { property } from '@wonderlandengine/api/decorators.js';
 
 import { Interactable } from './interactable.js';
+import { Grabbable } from './grabbable.js';
 
 export enum Handedness {
   Right = 'right',
   Left = 'left',
 }
 export const HandednessValues = Object.values(Handedness);
+
+enum InteractionType {
+  None = 0,
+  InteractNearby,
+  InteractDistance,
+  Searching,
+}
+
+function search(target: Object3D, collision: CollisionComponent | null): Grabbable | null {
+  if(!collision) return null;
+  // @todo: Add delay to only check every few frames
+  const overlaps = collision.queryOverlaps();
+  let closestDistance = Number.MAX_VALUE;
+  let closestGrabbable: Grabbable | null = null;
+
+  const position = target.getPositionWorld(vec3.create());
+  for (let i = 0; i < overlaps.length; ++i) {
+      const grabbable = overlaps[i].object.getComponent(Grabbable);
+      if(!grabbable) continue;
+      const interactableWorld = grabbable.object.getPositionWorld(vec3.create());
+      const dist = vec3.squaredDistance(position, interactableWorld);
+      if(dist < closestDistance) {
+        closestGrabbable = grabbable;
+        closestDistance = dist;
+      }
+  }
+  return closestGrabbable;
+}
+
+function distanceFetch(target: Object3D, from: Object3D, to: Object3D, speed: number): boolean {
+  const grabToInteractor = vec3.create();
+  vec3.subtract(grabToInteractor, to.getPositionWorld(), from.getPositionWorld());
+
+  vec3.normalize(grabToInteractor, grabToInteractor);
+  vec3.scale(grabToInteractor, grabToInteractor, speed * 10.0); // `10` for base speed.
+  target.translateWorld(grabToInteractor);
+
+  vec3.subtract(grabToInteractor, from.getPositionWorld(), to.getPositionWorld());
+  return vec3.squaredLength(grabToInteractor) < 0.01;
+}
 
 /**
  * Hello, I am a grabber!
@@ -38,6 +79,7 @@ export class Interactor extends Component {
   private _rayCollision: CollisionComponent | null = null!;
 
   private _interactable: Interactable | null = null;
+  private _grabbable: Grabbable | null = null;
 
   private _currentFrame: number = 0;
 
@@ -56,6 +98,8 @@ export class Interactor extends Component {
   };
 
   private _previousScene: Scene | null = null;
+
+  private _interaction: InteractionType = InteractionType.None;
 
   /** @hidden */
   #xrInputSource: XRInputSource | null = null;
@@ -90,31 +134,25 @@ export class Interactor extends Component {
 
   onActivate(): void {
     this._rayCollision = this.ray?.getComponent(CollisionComponent) ?? null;
+    this._interaction = InteractionType.Searching;
   }
 
-  update() {
-      if (!this._rayCollision) return;
+  onDeactivate(): void {
+    this._interaction = InteractionType.None;
+  }
 
-      // @todo: Add delay to only check every few frames
-      const overlaps = this._rayCollision.queryOverlapsFast();
-      let closestInteractable = null;
-      let closestDistance = Number.MAX_VALUE;
-
-      const position = this.object.getTranslationWorld(vec3.create());
-
-      for (let i = 0; i < overlaps.count; ++i) {
-          const interactable = overlaps.data[i].object.getComponent(Interactable);
-          if(!interactable) continue;
-          const interactableWorld = interactable.object.getTranslationWorld(vec3.create());
-          const dist = vec3.squaredDistance(position, interactableWorld);
-          if(dist < closestDistance) {
-            closestInteractable = interactable;
-            closestDistance = dist;
+  update(dt: number) {
+      switch(this._interaction) {
+        case InteractionType.Searching:
+          this._grabbable = search(this.object, this._rayCollision);
+          break;
+        case InteractionType.InteractDistance:
+          if(distanceFetch(this._grabbable!.object, this._interactable!.object, this.object, this._grabbable!.distanceSpeed * dt)) {
+            this._interaction = InteractionType.InteractNearby;
+            this._grabbable = null;
+            this._startInteractNearby(this._interactable!);
           }
-      }
-
-      if(closestInteractable) {
-        closestInteractable.onDistanceSelect.notify(this);
+          break;
       }
   }
 
@@ -123,14 +161,28 @@ export class Interactor extends Component {
     for (const overlap of overlaps) {
       const interactable = overlap.object.getComponent(Interactable);
       if (interactable) {
-        this._interactable = interactable;
-        interactable.onSelectStart.notify(this);
+        this._startInteractNearby(interactable);
+        return;
       }
+    }
+
+    if(this._interaction === InteractionType.Searching && this._grabbable) {
+      this._interactable = this._grabbable.getInteractable(this._grabbable.distanceHandle);
+      this._interaction = InteractionType.InteractDistance;
+      this._grabbable.disablePhysx();
     }
   }
 
   public stopInteraction() {
-    this._interactable?.onSelectEnd.notify(this);
+    switch(this._interaction) {
+      case InteractionType.InteractNearby:
+        this._interactable!.onSelectEnd.notify(this);
+        break;
+      case InteractionType.InteractDistance:
+        this._grabbable!.enablePhysx();
+        break;
+    }
+    this._interaction = InteractionType.Searching;
   }
 
   public get xrPose(): XRPose | null {
@@ -146,6 +198,12 @@ export class Interactor extends Component {
     const pose = frame.getPose(this.#xrInputSource.gripSpace, this.#referenceSpace);
     this.#xrPose = pose !== undefined ? pose : null;
     return this.#xrPose;
+  }
+
+  private _startInteractNearby(interactable: Interactable) {
+    this._interactable = interactable;
+    this._interaction = InteractionType.InteractNearby;
+    interactable.onSelectStart.notify(this);
   }
 
   private _setup(session: XRSession) {
@@ -176,7 +234,6 @@ export class Interactor extends Component {
     });
 
     session.addEventListener('selectstart', (event: XRInputSourceEvent) => {
-      console.log();
       if(this.#xrInputSource === event.inputSource) {
         this.startInteraction();
       }
@@ -187,4 +244,5 @@ export class Interactor extends Component {
       }
     });
   }
+
 }

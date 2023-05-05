@@ -13,57 +13,82 @@
 
 /* wle:auto-imports:start */
 import {Cursor} from '@wonderlandengine/components';
-import {DebugComponent} from './debug.js';
-import {Grabbable} from 'wle-interaction';
 import {HowlerAudioListener} from '@wonderlandengine/components';
-import {Interactable} from 'wle-interaction';
-import {Interactor} from 'wle-interaction';
 import {MouseLookComponent} from '@wonderlandengine/components';
 import {PlayerHeight} from '@wonderlandengine/components';
+import {Grabbable} from 'wle-interaction';
+import {Interactable} from 'wle-interaction';
+import {Interactor} from 'wle-interaction';
+import {DebugComponent} from './debug.js';
 /* wle:auto-imports:end */
-import * as API from '@wonderlandengine/api'; // Deprecated: Backward compatibility.
+
 import {loadRuntime} from '@wonderlandengine/api';
+import * as API from '@wonderlandengine/api'; // Deprecated: Backward compatibility.
 
 /* wle:auto-constants:start */
-const ProjectName = 'Interaction';
-const RuntimeBaseName = 'WonderlandRuntime';
-const WithPhysX = true;
-const WithLoader = false;
+const RuntimeOptions = {
+    physx: true,
+    loader: false,
+    xrFramebufferScaleFactor: 1,
+    canvas: 'canvas',
+};
+const Constants = {
+    ProjectName: 'Interaction',
+    RuntimeBaseName: 'WonderlandRuntime',
+    WebXRRequiredFeatures: ['local',],
+    WebXROptionalFeatures: ['local','local-floor','hand-tracking','hit-test',],
+};
 /* wle:auto-constants:end */
 
-const engine = await loadRuntime(RuntimeBaseName, {
-  physx: WithPhysX,
-  loader: WithLoader
-});
+const engine = await loadRuntime(Constants.RuntimeBaseName, RuntimeOptions);
 Object.assign(engine, API); // Deprecated: Backward compatibility.
 window.WL = engine; // Deprecated: Backward compatibility.
 
-engine.onSceneLoaded.push(() => {
+engine.onSceneLoaded.once(() => {
     const el = document.getElementById('version');
-    if(el) setTimeout(() => el.remove(), 2000);
+    if (el) setTimeout(() => el.remove(), 2000);
 });
 
-const arButton = document.getElementById('ar-button');
-if(arButton) {
-    arButton.dataset.supported = engine.arSupported;
+/* WebXR setup. */
+
+function requestSession(mode) {
+    engine
+        .requestXRSession(mode, Constants.WebXRRequiredFeatures, Constants.WebXROptionalFeatures)
+        .catch((e) => console.error(e));
 }
-const vrButton = document.getElementById('vr-button');
-if(vrButton) {
-    vrButton.dataset.supported = engine.vrSupported;
+
+function setupButtonsXR() {
+    /* Setup AR / VR buttons */
+    const arButton = document.getElementById('ar-button');
+    if (arButton) {
+        arButton.dataset.supported = engine.arSupported;
+        arButton.addEventListener('click', () => requestSession('immersive-ar'));
+    }
+    const vrButton = document.getElementById('vr-button');
+    if (vrButton) {
+        vrButton.dataset.supported = engine.vrSupported;
+        vrButton.addEventListener('click', () => requestSession('immersive-vr'));
+    }
+}
+
+if (document.readyState === 'loading') {
+    window.addEventListener('load', setupButtonsXR);
+} else {
+    setupButtonsXR();
 }
 
 /* wle:auto-register:start */
 engine.registerComponent(Cursor);
-engine.registerComponent(DebugComponent);
-engine.registerComponent(Grabbable);
 engine.registerComponent(HowlerAudioListener);
-engine.registerComponent(Interactable);
-engine.registerComponent(Interactor);
 engine.registerComponent(MouseLookComponent);
 engine.registerComponent(PlayerHeight);
+engine.registerComponent(Grabbable);
+engine.registerComponent(Interactable);
+engine.registerComponent(Interactor);
+engine.registerComponent(DebugComponent);
 /* wle:auto-register:end */
 
-engine.scene.load(`${ProjectName}.bin`);
+engine.scene.load(`${Constants.ProjectName}.bin`);
 
 /* wle:auto-benchmark:start */
 /* wle:auto-benchmark:end */

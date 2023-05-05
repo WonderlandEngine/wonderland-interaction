@@ -21,7 +21,6 @@ export class Interactable extends Component {
 
   private readonly _onSelectStart: Emitter<[Interactor]> = new Emitter();
   private readonly _onSelectEnd: Emitter<[Interactor]> = new Emitter();
-  private readonly _onDistanceSelect: Emitter<[Interactor]> = new Emitter();
 
   public start(): void {
     this._collision = this.object.getComponent('collision', 0)!;
@@ -36,9 +35,5 @@ export class Interactable extends Component {
 
   public get onSelectEnd(): Emitter<[Interactor]> {
     return this._onSelectEnd;
-  }
-
-  public get onDistanceSelect(): Emitter<[Interactor]> {
-    return this._onDistanceSelect;
   }
 }

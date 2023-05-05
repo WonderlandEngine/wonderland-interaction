@@ -1,5 +1,5 @@
 import { vec3, quat } from 'gl-matrix';
-import { Component, Object, Emitter, PhysXComponent, WonderlandEngine } from '@wonderlandengine/api';
+import { Component, Object, PhysXComponent, WonderlandEngine } from '@wonderlandengine/api';
 import { property } from '@wonderlandengine/api/decorators.js';
 
 import { Interactor } from './interactor.js';
@@ -52,6 +52,11 @@ export class Grabbable extends Component {
   public throwLinearIntensity: number = 1.0;
   public throwAngularIntensity: number = 1.0;
 
+  @property.int(0)
+  public distanceHandle: number = 0;
+  @property.float(1.0)
+  public distanceSpeed: number = 1.0;
+
   /**
    * Private Attributes.
    */
@@ -61,12 +66,13 @@ export class Grabbable extends Component {
   private _maxSqDistance: number | null = null;
 
   private _startObservers: InteractorCb[] = new Array(2);
-  private _distanceObservers: InteractorCb[] = new Array(2);
   private _stopObservers: InteractorCb[] = new Array(2);
 
   private _history: HistoryTracker = new HistoryTracker();
 
   private _physx: PhysXComponent | null = null;
+
+  private _enablePhysx: boolean = false;
 
   constructor(engine: WonderlandEngine) {
     super(engine);
@@ -74,8 +80,7 @@ export class Grabbable extends Component {
     for(let i = 0; i < 2; ++i) {
       this._grabData[i] = null;
       ((index: number) => {
-        this._startObservers[i] = (interactor: Interactor) => this._onInteractionStart(interactor, index);
-        this._distanceObservers[i] = (interactor: Interactor) => this._onDistanceGrab(interactor, index);
+        this._startObservers[i] = (interactor: Interactor) => this.onInteractionStart(interactor, index);
         this._stopObservers[i] = (interactor: Interactor) => this._onInteractionStop(interactor, index);
       })(i);
     }
@@ -107,9 +112,9 @@ export class Grabbable extends Component {
       if(interactable) {
         interactable.onSelectStart.add(this._startObservers[i]);
         interactable.onSelectEnd.add(this._stopObservers[i]);
-        interactable.onDistanceSelect.add(this._distanceObservers[i]);
       }
     }
+    this._enablePhysx = this._physx?.active ?? false;
   }
 
   onDeactivate(): void {
@@ -118,7 +123,6 @@ export class Grabbable extends Component {
       if(interactable) {
         interactable.onSelectStart.remove(this._startObservers[i]);
         interactable.onSelectEnd.remove(this._stopObservers[i]);
-        interactable.onDistanceSelect.remove(this._distanceObservers[i]);
       }
     }
   }
@@ -145,43 +149,7 @@ export class Grabbable extends Component {
     }
   }
 
-  throw(): void {
-    if(!this._physx) return;
-
-    const angular = this._history.angular(vec3.create());
-    vec3.scale(angular, angular, this.throwAngularIntensity);
-
-    const radius = vec3.create();
-    vec3.subtract(radius,
-      this.object.getTranslationWorld(vec3.create()),
-      // @todo: How to deal with that for 2 hands?
-      this._interactable[0].object.getTranslationWorld(vec3.create())
-    );
-
-    const velocity = this._history.velocity(vec3.create());
-    vec3.add(velocity, velocity, vec3.cross(vec3.create(), angular, radius));
-    vec3.scale(velocity, velocity, this.throwLinearIntensity);
-
-    this._physx.active = true;
-    this._physx.linearVelocity = velocity;
-    this._physx.angularVelocity = angular;
-  }
-
-  get isGrabbed(): boolean {
-    return !!this.primaryGrab || !!this.secondaryGrab;
-  }
-
-  get primaryGrab(): GrabData | null {
-    return this._grabData[0];
-  }
-
-  get secondaryGrab(): GrabData | null {
-    return this._grabData[1];
-  }
-
-  private _onInteractionStart(interactor: Interactor, index: number): void {
-    console.log('Start');
-
+  onInteractionStart(interactor: Interactor, index: number): void {
     if(this._grabData[index]) return;
 
     const grab: GrabData = {interactor, offsetTrans: vec3.create(), offsetRot: quat.create()};
@@ -206,6 +174,52 @@ export class Grabbable extends Component {
         this._interactable[1].object.getTranslationWorld(vec3.create()),
       );
     }
+  }
+
+  enablePhysx() {
+    if(this._physx) this._physx.active = this._enablePhysx;
+  }
+
+  disablePhysx() {
+    if(this._physx) this._physx.active = false;
+  }
+
+  throw(): void {
+    if(!this._physx) return;
+
+    const angular = this._history.angular(vec3.create());
+    vec3.scale(angular, angular, this.throwAngularIntensity);
+
+    const radius = vec3.create();
+    vec3.subtract(radius,
+      this.object.getTranslationWorld(vec3.create()),
+      // @todo: How to deal with that for 2 hands?
+      this._interactable[0].object.getTranslationWorld(vec3.create())
+    );
+
+    const velocity = this._history.velocity(vec3.create());
+    vec3.add(velocity, velocity, vec3.cross(vec3.create(), angular, radius));
+    vec3.scale(velocity, velocity, this.throwLinearIntensity);
+
+    this._physx.active = true;
+    this._physx.linearVelocity = velocity;
+    this._physx.angularVelocity = angular;
+  }
+
+  getInteractable(index: number): Interactable {
+    return this._interactable[index];
+  }
+
+  get isGrabbed(): boolean {
+    return !!this.primaryGrab || !!this.secondaryGrab;
+  }
+
+  get primaryGrab(): GrabData | null {
+    return this._grabData[0];
+  }
+
+  get secondaryGrab(): GrabData | null {
+    return this._grabData[1];
   }
 
   private _onInteractionStop(interactor: Interactor, index: number): void {
