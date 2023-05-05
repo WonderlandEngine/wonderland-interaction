@@ -1,10 +1,11 @@
-import {vec3} from 'gl-matrix';
+import {vec3, vec4} from 'gl-matrix';
 
 import { CollisionComponent, Component, Object3D, Scene, Type } from '@wonderlandengine/api';
 import { property } from '@wonderlandengine/api/decorators.js';
 
 import { Interactable } from './interactable.js';
 import { Grabbable } from './grabbable.js';
+import { radiusHierarchy } from '../utils/wle.js';
 
 export enum Handedness {
   Right = 'right',
@@ -50,6 +51,10 @@ function distanceFetch(target: Object3D, from: Object3D, to: Object3D, speed: nu
 
   vec3.subtract(grabToInteractor, from.getPositionWorld(), to.getPositionWorld());
   return vec3.squaredLength(grabToInteractor) < 0.01;
+}
+
+function resetMarker(target: Object3D | null | undefined) {
+  target?.setPositionWorld([-100, -100, -100]);
 }
 
 /**
@@ -144,7 +149,15 @@ export class Interactor extends Component {
   update(dt: number) {
       switch(this._interaction) {
         case InteractionType.Searching:
-          this._grabbable = search(this.object, this._rayCollision);
+          const grabbable = search(this.object, this._rayCollision);
+          if(grabbable?.distanceMarker) {
+            const scale = radiusHierarchy(vec4.create(), grabbable.object);
+            grabbable.distanceMarker.setPositionWorld(grabbable.object.getPositionWorld());
+            grabbable.distanceMarker.setScalingWorld([scale, scale, scale]);
+          } else if(this._grabbable && !grabbable) {
+            resetMarker(this._grabbable.distanceMarker);
+          }
+          this._grabbable = grabbable;
           break;
         case InteractionType.InteractDistance:
           if(distanceFetch(this._grabbable!.object, this._interactable!.object, this.object, this._grabbable!.distanceSpeed * dt)) {
@@ -169,6 +182,7 @@ export class Interactor extends Component {
     if(this._interaction === InteractionType.Searching && this._grabbable) {
       this._interactable = this._grabbable.getInteractable(this._grabbable.distanceHandle);
       this._interaction = InteractionType.InteractDistance;
+      resetMarker(this._grabbable.distanceMarker);
       this._grabbable.disablePhysx();
     }
   }
@@ -180,6 +194,7 @@ export class Interactor extends Component {
         break;
       case InteractionType.InteractDistance:
         this._grabbable!.enablePhysx();
+        this._grabbable!.distanceMarker?.setPositionWorld([-100, -100, -100]);
         break;
     }
     this._interaction = InteractionType.Searching;

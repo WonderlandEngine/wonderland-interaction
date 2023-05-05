@@ -1211,9 +1211,9 @@
         "243": {
             "name": "Weapon Double Hand",
             "translation": [
-                0.2825269,
-                0.6537165,
-                0.3617784
+                0.2825268,
+                0.6537163,
+                0.3617783
             ],
             "rotation": [
                 0.0,
@@ -1222,8 +1222,8 @@
                 0.7071069
             ],
             "scaling": [
-                0.999964,
-                0.999964,
+                0.9999639,
+                0.9999638,
                 1.0
             ],
             "components": [
@@ -1231,7 +1231,8 @@
                     "type": "grabbable",
                     "grabbable": {
                         "handle": "245",
-                        "handleSecondary": "246"
+                        "handleSecondary": "246",
+                        "distanceMarker": "249"
                     }
                 },
                 {
@@ -1475,6 +1476,34 @@
                 1.0,
                 1.0
             ]
+        },
+        "249": {
+            "name": "Marker",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "mesh": "250",
+                        "material": "252"
+                    }
+                }
+            ],
+            "translation": [
+                14.3931207,
+                1.0,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ]
         }
     },
     "meshes": {
@@ -1611,6 +1640,12 @@
             "link": {
                 "name": "TeleportIndicator",
                 "file": "models\\teleport-indicator.glb"
+            }
+        },
+        "250": {
+            "link": {
+                "name": "Circle",
+                "file": "models\\marker.glb"
             }
         }
     },
@@ -2034,6 +2069,30 @@
             "Sky": {
                 "texture": "236"
             }
+        },
+        "252": {
+            "link": {
+                "name": "TeleportIndicator",
+                "file": "models\\teleport-indicator.glb"
+            },
+            "Phong": {
+                "diffuseColor": [
+                    0.6862745,
+                    0.6862676,
+                    0.6862676,
+                    1.0
+                ]
+            },
+            "pipeline": "253",
+            "Flat": {
+                "color": [
+                    0.8392156,
+                    0.8392072,
+                    0.8392072,
+                    1.0
+                ]
+            },
+            "name": "GrabMarker"
         }
     },
     "shaders": {
@@ -2333,6 +2392,16 @@
             "features": {
                 "DEPRECATED_LIGHT_ATTENUATION": true
             }
+        },
+        "253": {
+            "link": {
+                "name": "Flat Opaque",
+                "file": "default"
+            },
+            "name": "Flat Transparent",
+            "depthTest": false,
+            "depthWrite": false,
+            "blending": true
         }
     },
     "files": [
@@ -2341,7 +2410,8 @@
         "models/hand-left.glb",
         "models/hand-right.glb",
         "models/button.glb",
-        "models/teleport-indicator.glb"
+        "models/teleport-indicator.glb",
+        "models/marker.glb"
     ],
     "fonts": {
         "232": {

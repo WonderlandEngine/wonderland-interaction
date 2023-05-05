@@ -1,5 +1,5 @@
 import { vec3, quat } from 'gl-matrix';
-import { Component, Object, PhysXComponent, WonderlandEngine } from '@wonderlandengine/api';
+import { Component, Object, Object3D, PhysXComponent, WonderlandEngine } from '@wonderlandengine/api';
 import { property } from '@wonderlandengine/api/decorators.js';
 
 import { Interactor } from './interactor.js';
@@ -52,6 +52,8 @@ export class Grabbable extends Component {
   public throwLinearIntensity: number = 1.0;
   public throwAngularIntensity: number = 1.0;
 
+  @property.object()
+  public distanceMarker: Object3D | null = null;
   @property.int(0)
   public distanceHandle: number = 0;
   @property.float(1.0)
