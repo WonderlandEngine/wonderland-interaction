@@ -836,6 +836,12 @@
                         "distance": 5.0,
                         "ray": "248"
                     }
+                },
+                {
+                    "type": "wlei:distance-interactor",
+                    "wlei:distance-interactor": {
+                        "ray": "248"
+                    }
                 }
             ],
             "translation": [
@@ -1437,46 +1443,6 @@
                 1.0
             ]
         },
-        "248": {
-            "name": "DistanceRayRight",
-            "parent": "129",
-            "components": [
-                {
-                    "type": "mesh"
-                },
-                {
-                    "type": "collision",
-                    "collision": {
-                        "collider": "box",
-                        "box": {
-                            "extents": [
-                                0.2,
-                                0.2,
-                                2.0
-                            ]
-                        },
-                        "groups": 128
-                    },
-                    "active": true
-                }
-            ],
-            "translation": [
-                0.0,
-                0.0,
-                -2.0999999
-            ],
-            "rotation": [
-                0.0,
-                0.0,
-                0.0,
-                1.0
-            ],
-            "scaling": [
-                1.0,
-                1.0,
-                1.0
-            ]
-        },
         "249": {
             "name": "Marker",
             "components": [
@@ -1503,6 +1469,43 @@
                 1.0,
                 1.0,
                 0.9999999
+            ]
+        },
+        "248": {
+            "name": "DistanceRayRight",
+            "parent": "129",
+            "translation": [
+                0.0,
+                0.0,
+                -2.0999999
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "components": [
+                {
+                    "type": "collision",
+                    "collision": {
+                        "collider": "box",
+                        "box": {
+                            "extents": [
+                                0.2,
+                                0.2,
+                                2.0
+                            ]
+                        },
+                        "groups": 128
+                    },
+                    "active": true
+                }
             ]
         }
     },

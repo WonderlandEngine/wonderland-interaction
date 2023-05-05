@@ -62,8 +62,6 @@ export class Grabbable extends Component {
     public distanceMarker: Object3D | null = null;
     @property.int(0)
     public distanceHandle: number = 0;
-    @property.float(1.0)
-    public distanceSpeed: number = 1.0;
 
     /**
      * Private Attributes.
