@@ -13,6 +13,7 @@ import {property} from '@wonderlandengine/api/decorators.js';
 import {Interactable} from './interactable.js';
 import {Grabbable} from './grabbable.js';
 
+/** Handedness for left / right hands. */
 export enum Handedness {
     Right = 'right',
     Left = 'left',
@@ -20,31 +21,29 @@ export enum Handedness {
 export const HandednessValues = Object.values(Handedness);
 
 /**
- * Hello, I am a grabber!
+ * An interactor represents a controller that can:
+ *     - Grip {@link Interactable}
+ *     - Trigger
+ *
+ * The interactor is most likely attached to the object onto which the
+ * mesh controller is, but this is not mandatory.
  */
 export class Interactor extends Component {
+    /** @overload */
     static TypeName = 'interactor';
 
-    /**
-     * Public Attributes.
-     */
+    /** Properties. */
 
+    /** Handedness value. Compare against {@link Handedness}. */
     @property.enum(HandednessValues, Handedness.Right)
     public handedness!: number;
 
-    @property.object()
-    public ray: Object3D | null = null;
+    /** Private Attributes. */
 
-    /**
-     * Private Attributes.
-     */
-
-    /** Collision component of this object */
+    /** Collision component of this object. @hidden */
     private _collision: CollisionComponent = null!;
-    private _rayCollision: CollisionComponent | null = null!;
-
+    /** Cached interactable after it's gripped. @hidden */
     private _interactable: Interactable | null = null;
-    private _grabbable: Grabbable | null = null;
 
     private _currentFrame: number = 0;
 
@@ -76,6 +75,9 @@ export class Interactor extends Component {
     #onGripStart: Emitter = new Emitter();
     #onGripEnd: Emitter = new Emitter();
 
+    private _onSessionStart = this._startSession.bind(this);
+    private _onSessionEnd = this._endSession.bind(this);
+
     /**
      * Set the collision component needed to perform
      * grab interaction
@@ -89,13 +91,17 @@ export class Interactor extends Component {
         if (!this._collision)
             throw new Error('grabber.start(): No collision component found');
 
-        if (this.engine.xrSession) {
-            this._setup(this.engine.xrSession);
-        } else {
-            this.engine.onXRSessionStart.push(this._setup.bind(this));
-        }
-
         this._onSceneLoaded();
+    }
+
+    onActivate(): void {
+        this.engine.onXRSessionStart.add(this._onSessionStart);
+        this.engine.onXRSessionEnd.add(this._onSessionEnd);
+    }
+
+    onDeactivate(): void {
+        this.engine.onXRSessionStart.add(this._onSessionStart);
+        this.engine.onXRSessionEnd.add(this._onSessionEnd);
     }
 
     /**
@@ -150,11 +156,8 @@ export class Interactor extends Component {
         return this.#xrPose;
     }
 
-    private _setup(session: XRSession) {
-        session
-            .requestReferenceSpace('local')
-            .then((space) => (this.#referenceSpace = space))
-            .catch();
+    private _startSession(session: XRSession) {
+        this.#referenceSpace = this.engine.xr!.referenceSpaceForType('local');
 
         session.addEventListener(
             'inputsourceschange',
@@ -175,12 +178,6 @@ export class Interactor extends Component {
             }
         );
 
-        session.addEventListener('end', () => {
-            this.#referenceSpace = null;
-            this.#xrInputSource = null;
-            this.stopInteraction();
-        });
-
         session.addEventListener('selectstart', (event: XRInputSourceEvent) => {
             if (this.#xrInputSource === event.inputSource) {
                 this.checkForNearbyInteractables();
@@ -191,5 +188,11 @@ export class Interactor extends Component {
                 this.stopInteraction();
             }
         });
+    }
+
+    private _endSession() {
+        this.#referenceSpace = null;
+        this.#xrInputSource = null;
+        this.stopInteraction();
     }
 }
