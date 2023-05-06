@@ -1,9 +1,4 @@
-import {
-    CollisionComponent,
-    Component,
-    Emitter,
-    Scene,
-} from '@wonderlandengine/api';
+import {CollisionComponent, Component, Emitter, Scene} from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
 
 import {Interactable} from './interactable.js';
@@ -50,8 +45,16 @@ export class Interactor extends Component {
 
     /** @hidden */
     private readonly _onPreRender = () => {
-        if(this.engine.xr && this.#xrInputSource && this.#xrInputSource.gripSpace && this.#referenceSpace) {
-            const pose = this.engine.xr.frame.getPose(this.#xrInputSource.gripSpace, this.#referenceSpace);
+        if (
+            this.engine.xr &&
+            this.#xrInputSource &&
+            this.#xrInputSource.gripSpace &&
+            this.#referenceSpace
+        ) {
+            const pose = this.engine.xr.frame.getPose(
+                this.#xrInputSource.gripSpace,
+                this.#referenceSpace
+            );
             this.#xrPose = pose ?? null;
         }
     };

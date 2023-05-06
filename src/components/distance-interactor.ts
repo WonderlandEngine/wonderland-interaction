@@ -23,9 +23,9 @@ enum InteractionType {
  * @param collision The collision to query from.
  * @returns The closest grabbable, or `null` if none is found.
  */
-const search = (function() {
+const search = (function () {
     const temp = vec3.create();
-    return function(target: vec3, collision: CollisionComponent | null) {
+    return function (target: vec3, collision: CollisionComponent | null) {
         if (!collision) return null;
         // @todo: Add delay to only check every few frames
         const overlaps = collision.queryOverlaps();
@@ -43,8 +43,8 @@ const search = (function() {
             }
         }
         return closestGrabbable;
-    }
-}());
+    };
+})();
 
 /**
  * Reset the marker mesh to a position outside of the view.
@@ -124,7 +124,9 @@ export class DistanceInteractor extends Component {
     private _onGripEnd = () => {
         if (this._interaction == InteractionType.Fetching && this._targetGrab) {
             this._targetGrab.enablePhysx();
-            this._targetGrab.distanceMarker?.setPositionWorld(vec3.set(_pointA, -100, -100, -100));
+            this._targetGrab.distanceMarker?.setPositionWorld(
+                vec3.set(_pointA, -100, -100, -100)
+            );
         }
         this._interaction = InteractionType.Searching;
     };
