@@ -1,17 +1,12 @@
-import {vec3, vec4} from 'gl-matrix';
-
 import {
     CollisionComponent,
     Component,
     Emitter,
-    Object3D,
     Scene,
-    Type,
 } from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
 
 import {Interactable} from './interactable.js';
-import {Grabbable} from './grabbable.js';
 
 /** Handedness for left / right hands. */
 export enum Handedness {
@@ -45,38 +40,43 @@ export class Interactor extends Component {
     /** Cached interactable after it's gripped. @hidden */
     private _interactable: Interactable | null = null;
 
-    private _currentFrame: number = 0;
+    /** Previous loaded scene. @hidden */
+    private _previousScene: Scene | null = null;
 
-    private _xrPoseFlag: number = -1;
+    /** Grip start emitter. @hidden */
+    private _onGripStart: Emitter = new Emitter();
+    /** Grip end emitter. @hidden */
+    private _onGripEnd: Emitter = new Emitter();
 
-    private _onPostRender = () => ++this._currentFrame;
+    /** @hidden */
+    private _onPreRender = () => {
+        if(this.engine.xr && this.#xrInputSource && this.#xrInputSource.gripSpace && this.#referenceSpace) {
+            const pose = this.engine.xr.frame.getPose(this.#xrInputSource.gripSpace, this.#referenceSpace);
+            this.#xrPose = pose ?? null;
+        }
+    };
+    /** @hidden */
     private _onSceneLoaded = () => {
         const scene = this.engine.scene;
         if (this._previousScene) {
-            scene.onPostRender.remove(this._onPostRender);
+            scene.onPreRender.remove(this._onPreRender);
             this.engine.onSceneLoaded.remove(this._onSceneLoaded);
         }
         this.engine.onSceneLoaded.add(this._onSceneLoaded);
-        scene.onPostRender.add(this._onPostRender);
+        scene.onPreRender.add(this._onPreRender);
         this._previousScene = this.engine.scene;
     };
 
-    private _previousScene: Scene | null = null;
-
     /** @hidden */
     #xrInputSource: XRInputSource | null = null;
-
     /** @hidden */
     #referenceSpace: XRReferenceSpace | XRBoundedReferenceSpace | null = null;
-
     /** @hidden */
     #xrPose: XRPose | null = null;
-
-    #onGripStart: Emitter = new Emitter();
-    #onGripEnd: Emitter = new Emitter();
-
-    private _onSessionStart = this._startSession.bind(this);
-    private _onSessionEnd = this._endSession.bind(this);
+    /** @hidden */
+    #onSessionStart = this._startSession.bind(this);
+    /** @hidden */
+    #onSessionEnd = this._endSession.bind(this);
 
     /**
      * Set the collision component needed to perform
@@ -94,14 +94,16 @@ export class Interactor extends Component {
         this._onSceneLoaded();
     }
 
+    /** @overload */
     onActivate(): void {
-        this.engine.onXRSessionStart.add(this._onSessionStart);
-        this.engine.onXRSessionEnd.add(this._onSessionEnd);
+        this.engine.onXRSessionStart.add(this.#onSessionStart);
+        this.engine.onXRSessionEnd.add(this.#onSessionEnd);
     }
 
+    /** @overload */
     onDeactivate(): void {
-        this.engine.onXRSessionStart.add(this._onSessionStart);
-        this.engine.onXRSessionEnd.add(this._onSessionEnd);
+        this.engine.onXRSessionStart.add(this.#onSessionStart);
+        this.engine.onXRSessionEnd.add(this.#onSessionEnd);
     }
 
     /**
@@ -114,6 +116,10 @@ export class Interactor extends Component {
         interactable.onSelectStart.notify(this);
     }
 
+    /**
+     * Check for nearby interactable, and notifies one if this interactor
+     * interacts with it.
+     */
     public checkForNearbyInteractables() {
         const overlaps = this._collision.queryOverlaps();
         for (const overlap of overlaps) {
@@ -123,73 +129,73 @@ export class Interactor extends Component {
                 return;
             }
         }
-        this.#onGripStart.notify();
+        this._onGripStart.notify();
     }
 
+    /**
+     * Force this interactor to stop interacting with the
+     * currently bound interactable.
+     */
     public stopInteraction() {
         if (this._interactable) {
             this._interactable!.onSelectEnd.notify(this);
         }
-        this.#onGripEnd.notify();
+        this._onGripEnd.notify();
     }
 
+    /** Notified on a grip start. */
     get onGripStart(): Emitter {
-        return this.#onGripStart;
+        return this._onGripStart;
     }
 
+    /** Notified on a grip end. */
     get onGripEnd(): Emitter {
-        return this.#onGripEnd;
+        return this._onGripEnd;
     }
 
+    /**
+     * Current [XR pose](https://developer.mozilla.org/en-US/docs/Web/API/XRPose).
+     *
+     * @note This is only available when a session is started **and** during a frame, i.e.,
+     * during the update phase.
+     */
     get xrPose(): XRPose | null {
-        if (this._xrPoseFlag === this._currentFrame) return this.#xrPose;
-
-        this._xrPoseFlag = this._currentFrame;
-
-        this.#xrPose = null;
-        const frame = this.engine.wasm.webxr_frame;
-        if (!frame || !this.#xrInputSource || !this.#referenceSpace) return this.#xrPose;
-        if (!this.#xrInputSource.gripSpace) return this.#xrPose;
-
-        const pose = frame.getPose(this.#xrInputSource.gripSpace, this.#referenceSpace);
-        this.#xrPose = pose !== undefined ? pose : null;
         return this.#xrPose;
     }
 
+    /** @hidden */
     private _startSession(session: XRSession) {
         this.#referenceSpace = this.engine.xr!.referenceSpaceForType('local');
 
-        session.addEventListener(
-            'inputsourceschange',
-            (event: XRInputSourceChangeEvent) => {
-                for (const item of event.removed) {
-                    if (item === this.#xrInputSource) {
-                        this.#xrInputSource = null;
-                        break;
-                    }
-                }
-                const handedness = HandednessValues[this.handedness];
-                for (const item of event.added) {
-                    if (item.handedness === handedness) {
-                        this.#xrInputSource = item;
-                        break;
-                    }
+        session.addEventListener('inputsourceschange', (event) => {
+            for (const item of event.removed) {
+                if (item === this.#xrInputSource) {
+                    this.#xrInputSource = null;
+                    break;
                 }
             }
-        );
+            const handedness = HandednessValues[this.handedness];
+            for (const item of event.added) {
+                if (item.handedness === handedness) {
+                    this.#xrInputSource = item;
+                    break;
+                }
+            }
+        });
 
-        session.addEventListener('selectstart', (event: XRInputSourceEvent) => {
+        session.addEventListener('selectstart', (event) => {
             if (this.#xrInputSource === event.inputSource) {
                 this.checkForNearbyInteractables();
             }
         });
-        session.addEventListener('selectend', (event: XRInputSourceEvent) => {
+        session.addEventListener('selectend', (event) => {
             if (this.#xrInputSource === event.inputSource) {
                 this.stopInteraction();
             }
         });
     }
 
+    /** @hidden */
     private _endSession() {
         this.#referenceSpace = null;
         this.#xrInputSource = null;
