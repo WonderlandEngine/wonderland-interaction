@@ -44,19 +44,19 @@ export class Interactor extends Component {
     private _previousScene: Scene | null = null;
 
     /** Grip start emitter. @hidden */
-    private _onGripStart: Emitter = new Emitter();
+    private readonly _onGripStart: Emitter = new Emitter();
     /** Grip end emitter. @hidden */
-    private _onGripEnd: Emitter = new Emitter();
+    private readonly _onGripEnd: Emitter = new Emitter();
 
     /** @hidden */
-    private _onPreRender = () => {
+    private readonly _onPreRender = () => {
         if(this.engine.xr && this.#xrInputSource && this.#xrInputSource.gripSpace && this.#referenceSpace) {
             const pose = this.engine.xr.frame.getPose(this.#xrInputSource.gripSpace, this.#referenceSpace);
             this.#xrPose = pose ?? null;
         }
     };
     /** @hidden */
-    private _onSceneLoaded = () => {
+    private readonly _onSceneLoaded = () => {
         const scene = this.engine.scene;
         if (this._previousScene) {
             scene.onPreRender.remove(this._onPreRender);
