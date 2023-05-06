@@ -1,3 +1,5 @@
+![wonderland-engine-logo](screenshots/wle-logo-horizontal-reversed.png)
+
 # WE-IL: Wonderland Engine Interaction Library
 
 ## Features
@@ -27,3 +29,20 @@ Then, link it to your project:
 cd path/to/my/project
 npm i path/to/weil
 ```
+
+## Examples
+
+1. Download the repository
+2. Run `npm install` at the root
+3. Open any examples under `examples/*`
+
+#### Playground
+
+* Single-hand grabbing
+* Double-hand grabbing
+
+## ToDo List
+
+* [ ] Disable distance grabbing when a double-hand grabbable is only grabbed with one hand
+* [ ] Emulate angular velocity
+* [ ] Improve throwing speed uniformity between emulated and native

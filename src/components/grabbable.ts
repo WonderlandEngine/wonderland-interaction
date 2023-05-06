@@ -14,11 +14,12 @@ interface GrabData {
     offsetRot: quat;
 }
 
-function setupRotationOffset(data: GrabData, target: Object) {
-    const srcRot = quat.copy(quat.create(), data.interactor.object.getRotationWorld());
-    const targetRot = target.getRotationWorld();
-    quatDelta(data.offsetRot, srcRot, targetRot);
-}
+/** Temporaries. */
+const _pointA = vec3.create();
+const _pointB = vec3.create();
+const _vectorA = vec3.create();
+const _quatA = quat.create();
+const _quatB = quat.create();
 
 /**
  * Grabbable object.
@@ -89,6 +90,7 @@ export class Grabbable extends Component {
     private _interactable: Interactable[] = new Array(2);
     /** Cached currently grabbed data. @hidden */
     private _grabData: (GrabData | null)[] = new Array(2);
+    /** Squared distance between both handle cached when starting a double grab. */
     private _maxSqDistance: number | null = null;
 
     /** @private */
@@ -255,13 +257,19 @@ export class Grabbable extends Component {
             offsetRot: quat.create(),
         };
 
-        const local = interactable.object.getTranslationLocal(vec3.create());
-        vec3.scale(grab.offsetTrans, local, -1);
+        /** Compute the offset between the interactable and this grabbable. */
+        interactable.object.getPositionLocal(grab.offsetTrans);
+        vec3.scale(grab.offsetTrans, grab.offsetTrans, -1);
 
         if (interactable.snap) {
-            quat.copy(grab.offsetRot, interactable.object.rotationLocal);
+            interactable.object.getRotationLocal(grab.offsetRot);
         } else {
-            setupRotationOffset(grab, this.object);
+            /* Compute the delta rotation between the interactable and the grabbable. */
+            quatDelta(
+                grab.offsetRot,
+                grab.interactor.object.getRotationWorld(_quatA),
+                this.object.getRotationWorld(_quatB)
+            );
         }
 
         this._grabData[index] = grab;
@@ -269,9 +277,10 @@ export class Grabbable extends Component {
         if (this._physx) this._physx.active = false;
 
         if (this.primaryGrab && this.secondaryGrab) {
+            /* Cache the grabbing distance between both handles. */
             this._maxSqDistance = vec3.squaredDistance(
-                this._interactable[0].object.getPositionWorld(vec3.create()),
-                this._interactable[1].object.getPositionWorld(vec3.create())
+                this._interactable[0].object.getPositionWorld(_pointA),
+                this._interactable[1].object.getPositionWorld(_pointB)
             );
         }
     }
@@ -297,15 +306,18 @@ export class Grabbable extends Component {
 
         const secondaryGrab = index === 0 ? this._grabData[1] : this._grabData[0];
         if (secondaryGrab) {
-            setupRotationOffset(secondaryGrab, this.object);
+            /* Compute the delta rotation between the interactable and the grabbable. */
+            quatDelta(
+                secondaryGrab.offsetRot,
+                secondaryGrab.interactor.object.getRotationWorld(_quatA),
+                this.object.getRotationWorld(_quatB)
+            );
         }
 
         this._grabData[index] = null;
         this._maxSqDistance = null;
 
-        if (this.canThrow && !this.isGrabbed) {
-            this.throw();
-        }
+        if (this.canThrow && !this.isGrabbed) this.throw();
     }
 
     /**
@@ -342,13 +354,12 @@ export class Grabbable extends Component {
         const primaryInteractor = primaryGrab.interactor;
         const secondaryInteractor = this._grabData[1]!.interactor;
 
-        const primaryWorld = primaryInteractor.object.getPositionWorld(vec3.create());
-        const secondaryWorld = secondaryInteractor.object.getPositionWorld(vec3.create());
+        const primaryWorld = primaryInteractor.object.getPositionWorld(_pointA);
+        const secondaryWorld = secondaryInteractor.object.getPositionWorld(_pointB);
 
-        if (
-            vec3.squaredDistance(primaryWorld, secondaryWorld) >
-            this._maxSqDistance! * 2.0
-        ) {
+        const squaredDistance = vec3.squaredDistance(primaryWorld, secondaryWorld);
+        if (squaredDistance > this._maxSqDistance! * 2.0) {
+            /* Hands are too far apart, release the second handle. */
             this._onInteractionStop(secondaryInteractor, 1);
             return;
         }
@@ -356,10 +367,10 @@ export class Grabbable extends Component {
         this.object.setPositionWorld(primaryWorld);
         this.object.translateObject(primaryGrab.offsetTrans);
 
-        const dir = vec3.subtract(vec3.create(), secondaryWorld, primaryWorld);
+        /* Rotate the grabbable from first handle to secondary. */
+        const dir = vec3.subtract(_vectorA, secondaryWorld, primaryWorld);
         vec3.normalize(dir, dir);
         vec3.scale(dir, dir, 100.0);
-
-        this.object.lookAt(vec3.add(vec3.create(), primaryWorld, dir));
+        this.object.lookAt(vec3.add(primaryWorld, primaryWorld, dir));
     }
 }
