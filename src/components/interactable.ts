@@ -31,9 +31,9 @@ export class Interactable extends Component {
     /** Private Attributes. */
 
     /** Notified when an interactor selects this interactable. @hidden */
-    private readonly _onSelectStart: Emitter<[Interactor]> = new Emitter();
+    private readonly _onSelectStart: Emitter<[Interactor, this]> = new Emitter();
     /** Notified when an interactor stops selecting this interactable. @hidden */
-    private readonly _onSelectEnd: Emitter<[Interactor]> = new Emitter();
+    private readonly _onSelectEnd: Emitter<[Interactor, this]> = new Emitter();
 
     /** @overload */
     public start(): void {
@@ -43,12 +43,12 @@ export class Interactable extends Component {
     }
 
     /** Notified on a select start. */
-    public get onSelectStart(): Emitter<[Interactor]> {
+    public get onSelectStart(): Emitter<[Interactor, this]> {
         return this._onSelectStart;
     }
 
     /** Notified on a select end. */
-    public get onSelectEnd(): Emitter<[Interactor]> {
+    public get onSelectEnd(): Emitter<[Interactor, this]> {
         return this._onSelectEnd;
     }
 }

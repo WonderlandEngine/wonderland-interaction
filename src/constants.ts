@@ -10,4 +10,3 @@ export const EPSILON = 0.000001;
 export function typename(name: string) {
   return `wlei:${name}`;
 }
-

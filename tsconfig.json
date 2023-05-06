@@ -3,13 +3,13 @@
         "target": "ES2022",
         "module": "ESNext",
         "moduleResolution": "nodenext",
-        "outDir": "./lib",
+        "outDir": "./dist",
         "declaration": true,
         "allowJs": false,
         "newLine": "LF",
         "strict": true,
         "experimentalDecorators": true
     },
-    "include": [ "./src/types/global.d.ts", "./src" ],
+    "include": [ "./src" ],
     "exclude": [ "node_modules" ]
 }

@@ -79,7 +79,7 @@ howler@^2.2.1:
   integrity sha512-QM0FFkw0LRX1PR8pNzJVAY25JhIWvbKMBFM4gqk+QdV+kPXOhleWGCB6AiAF/goGjIHK2e/nIElplvjQwhr0jg==
 
 "wle-interaction@file:../..":
-  version "1.0.0"
+  version "1.0.0-alpha.0"
   resolved "file:../.."
   dependencies:
     "@types/webxr" "^0.5.0"

@@ -4,7 +4,6 @@ import {
     Object,
     Object3D,
     PhysXComponent,
-    WonderlandEngine,
 } from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
 
@@ -12,7 +11,8 @@ import {Interactor} from './interactor.js';
 import {Interactable} from './interactable.js';
 import {HistoryTracker} from '../history-tracker.js';
 
-export interface GrabData {
+/** Temporary info about grabbed target. */
+interface GrabData {
     interactor: Interactor;
     offsetTrans: vec3;
     offsetRot: quat;
@@ -26,8 +26,6 @@ function setupRotationOffset(data: GrabData, target: Object) {
     quat.normalize(data.offsetRot, data.offsetRot);
 }
 
-type InteractorCb = (interactable: Interactor) => void;
-
 /**
  * Grabbable object.
  */
@@ -35,65 +33,83 @@ export class Grabbable extends Component {
     /** @override */
     static TypeName = 'grabbable';
 
-    /**
-     * Public Attributes.
-     */
+    /** Properties. */
 
+    /**
+     * Main handle.
+     *
+     * This is an Object3D containing an {@link Interactable} component.
+     */
     @property.object()
     public handle: Object = null!;
 
+    /**
+     * Secondary handle.
+     *
+     * This handle is optional.
+     *
+     * This is an Object3D containing an {@link Interactable} component.
+     */
     @property.object()
     public handleSecondary: Object = null!;
 
-    @property.bool(true)
     /**
      * Whether the object can be thrown with physics or not.
      *
      * When the interactor releases this grabbable, it will be thrown based on
      * the velocity the interactor had.
      */
+    @property.bool(true)
     public canThrow: boolean = true;
 
+    /**
+     * Linear multiplier for the throwing speed.
+     *
+     * By default, throws at the controller speed.
+     */
     @property.float(1.0)
     public throwLinearIntensity: number = 1.0;
+
+    /**
+     * Linear multiplier for the throwing angular  speed.
+     *
+     * By default, throws at the controller speed.
+     */
+    @property.float(1.0)
     public throwAngularIntensity: number = 1.0;
 
     @property.object()
     public distanceMarker: Object3D | null = null;
+
+    /**
+     * The index of the handle to use when distance-grabbed.
+     *
+     * Use `0` for {@link handle} and `1` for {@link handleSecondary}.
+     */
     @property.int(0)
     public distanceHandle: number = 0;
 
-    /**
-     * Private Attributes.
-     */
+    /** Private Attributes. */
 
+    /** Cached interactables. @hidden */
     private _interactable: Interactable[] = new Array(2);
+    /** Cached currently grabbed data. @hidden */
     private _grabData: (GrabData | null)[] = new Array(2);
     private _maxSqDistance: number | null = null;
 
-    private _startObservers: InteractorCb[] = new Array(2);
-    private _stopObservers: InteractorCb[] = new Array(2);
-
+    /** @private */
     private _history: HistoryTracker = new HistoryTracker();
 
     private _physx: PhysXComponent | null = null;
 
     private _enablePhysx: boolean = false;
 
-    constructor(engine: WonderlandEngine) {
-        super(engine);
+    /** @hidden */
+    private _onGrabStart = this._onInteractionStart.bind(this);
+    /** @hidden */
+    private _onGrabStop = this._onInteractionStop.bind(this);
 
-        for (let i = 0; i < 2; ++i) {
-            this._grabData[i] = null;
-            ((index: number) => {
-                this._startObservers[i] = (interactor: Interactor) =>
-                    this.onInteractionStart(interactor, index);
-                this._stopObservers[i] = (interactor: Interactor) =>
-                    this._onInteractionStop(interactor, index);
-            })(i);
-        }
-    }
-
+    /** @hidden */
     start(): void {
         if (!this.handle) {
             throw new Error('Grabbable.start(): `handle` property must be set.');
@@ -118,27 +134,28 @@ export class Grabbable extends Component {
         this._physx = this.object.getComponent('physx');
     }
 
+    /** @overload */
     onActivate(): void {
         for (let i = 0; i < 2; ++i) {
             const interactable = this._interactable[i];
-            if (interactable) {
-                interactable.onSelectStart.add(this._startObservers[i]);
-                interactable.onSelectEnd.add(this._stopObservers[i]);
-            }
+            if(!interactable) continue;
+            interactable.onSelectStart.add(this._onGrabStart);
+            interactable.onSelectEnd.add(this._onGrabStop);
         }
         this._enablePhysx = this._physx?.active ?? false;
     }
 
+    /** @overload */
     onDeactivate(): void {
         for (let i = 0; i < 2; ++i) {
             const interactable = this._interactable[i];
-            if (interactable) {
-                interactable.onSelectStart.remove(this._startObservers[i]);
-                interactable.onSelectEnd.remove(this._stopObservers[i]);
-            }
+            if(!interactable) continue;
+            interactable.onSelectStart.remove(this._onGrabStart);
+            interactable.onSelectEnd.remove(this._onGrabStop);
         }
     }
 
+    /** @overload */
     update(dt: number): void {
         if (!this.isGrabbed) return;
 
@@ -161,37 +178,6 @@ export class Grabbable extends Component {
         }
     }
 
-    onInteractionStart(interactor: Interactor, index: number): void {
-        if (this._grabData[index]) return;
-
-        const grab: GrabData = {
-            interactor,
-            offsetTrans: vec3.create(),
-            offsetRot: quat.create(),
-        };
-
-        const interactable = this._interactable[index];
-        const local = interactable.object.getTranslationLocal(vec3.create());
-        vec3.scale(grab.offsetTrans, local, -1);
-
-        if (interactable.snap) {
-            quat.copy(grab.offsetRot, interactable.object.rotationLocal);
-        } else {
-            setupRotationOffset(grab, this.object);
-        }
-
-        this._grabData[index] = grab;
-        this._history.reset(this.object);
-        if (this._physx) this._physx.active = false;
-
-        if (this.primaryGrab && this.secondaryGrab) {
-            this._maxSqDistance = vec3.squaredDistance(
-                this._interactable[0].object.getTranslationWorld(vec3.create()),
-                this._interactable[1].object.getTranslationWorld(vec3.create())
-            );
-        }
-    }
-
     enablePhysx() {
         if (this._physx) this._physx.active = this._enablePhysx;
     }
@@ -200,6 +186,11 @@ export class Grabbable extends Component {
         if (this._physx) this._physx.active = false;
     }
 
+    /**
+     * Throws the grabbable.
+     *
+     * @returns
+     */
     throw(): void {
         if (!this._physx) return;
 
@@ -223,23 +214,84 @@ export class Grabbable extends Component {
         this._physx.angularVelocity = angular;
     }
 
+    /**
+     * Get the {@link Interactable} stored at the given index.
+     *
+     * Use `0` for {@link handle} and `1` for {@link handleSecondary}.
+     *
+     * @note This method returns `undefined` for anything outside the range [0; 1].
+     *
+     * @param index The index to retrieve
+     * @returns The interactable.
+     */
     getInteractable(index: number): Interactable {
         return this._interactable[index];
     }
 
+    /** `true` is any of the two handles is currently grabbed. */
     get isGrabbed(): boolean {
         return !!this.primaryGrab || !!this.secondaryGrab;
     }
 
+    /** `true` if the primary handle is grabbed, the object pointer by {@link handle}. */
     get primaryGrab(): GrabData | null {
         return this._grabData[0];
     }
 
+    /** `true` if the secondary handle is grabbed, the object pointer by {@link handleSecondary}. */
     get secondaryGrab(): GrabData | null {
         return this._grabData[1];
     }
 
-    private _onInteractionStop(interactor: Interactor, index: number): void {
+    /**
+     * Should be called when starting the interaction with the given handle.
+     *
+     * @param interactor The interactor initiating the grab
+     * @param interactable The interactable undergoing the interaction
+     *
+     * @hidden
+     */
+    private _onInteractionStart(interactor: Interactor, interactable: Interactable) {
+        const index = this._interactable.indexOf(interactable);
+        if (this._grabData[index]) return;
+
+        const grab: GrabData = {
+            interactor,
+            offsetTrans: vec3.create(),
+            offsetRot: quat.create(),
+        };
+
+        const local = interactable.object.getTranslationLocal(vec3.create());
+        vec3.scale(grab.offsetTrans, local, -1);
+
+        if (interactable.snap) {
+            quat.copy(grab.offsetRot, interactable.object.rotationLocal);
+        } else {
+            setupRotationOffset(grab, this.object);
+        }
+
+        this._grabData[index] = grab;
+        this._history.reset(this.object);
+        if (this._physx) this._physx.active = false;
+
+        if (this.primaryGrab && this.secondaryGrab) {
+            this._maxSqDistance = vec3.squaredDistance(
+                this._interactable[0].object.getTranslationWorld(vec3.create()),
+                this._interactable[1].object.getTranslationWorld(vec3.create())
+            );
+        }
+    }
+
+    /**
+     * Should be called when ending the interaction with the given handle.
+     *
+     * @param interactor The interactor ending the grab
+     * @param interactable The interactable
+     *
+     * @hidden
+     */
+    private _onInteractionStop(interactor: Interactor, interactable: Interactable | number): void {
+        const index = typeof interactable === 'number' ? interactable : this._interactable.indexOf(interactable);
         const grab = this._grabData[index];
         if (!grab || interactor !== grab.interactor) return;
 
@@ -256,10 +308,13 @@ export class Grabbable extends Component {
         }
     }
 
-    private _onDistanceGrab(interactor: Interactor, index: number): void {
-        console.log('CALLLED');
-    }
-
+    /**
+     * Compute the transform of this grabbable based on a single handle.
+     *
+     * @param index The index of the handle to update the transform from.
+     *
+     * @hidden
+     */
     private _updateTransformSingleHand(index: number) {
         const grab = this._grabData[index]!;
         const interactor = grab.interactor;
@@ -277,6 +332,11 @@ export class Grabbable extends Component {
         this.object.translateObject(grab.offsetTrans);
     }
 
+    /**
+     * Compute the transform of this grabbable based on both handles.
+     *
+     * @hidden
+     */
     private _updateTransformDoubleHand() {
         const primaryGrab = this._grabData[0] as GrabData;
         const primaryInteractor = primaryGrab.interactor;
@@ -291,7 +351,6 @@ export class Grabbable extends Component {
             vec3.squaredDistance(primaryWorld, secondaryWorld) >
             this._maxSqDistance! * 2.0
         ) {
-            /* Detach second hand when grabbing distance is too big. */
             this._onInteractionStop(secondaryInteractor, 1);
             return;
         }

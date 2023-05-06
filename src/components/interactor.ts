@@ -113,7 +113,7 @@ export class Interactor extends Component {
      */
     public startInteraction(interactable: Interactable) {
         this._interactable = interactable;
-        interactable.onSelectStart.notify(this);
+        interactable.onSelectStart.notify(this, interactable);
     }
 
     /**
@@ -138,7 +138,7 @@ export class Interactor extends Component {
      */
     public stopInteraction() {
         if (this._interactable) {
-            this._interactable!.onSelectEnd.notify(this);
+            this._interactable!.onSelectEnd.notify(this, this._interactable);
         }
         this._onGripEnd.notify();
     }
