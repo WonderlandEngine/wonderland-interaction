@@ -56,6 +56,9 @@ function radiusHierarchyRec(out: vec4, target: Object3D): vec4 {
 
 /**
  * Compute the World Space radius of an Object3D hierarchy.
+ *
+ * @param object The root to start computing from.
+ * @returns The world radius.
  */
 export const radiusHierarchy = (function () {
     const temp = vec4.create();

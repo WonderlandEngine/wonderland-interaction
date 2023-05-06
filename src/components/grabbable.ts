@@ -73,6 +73,20 @@ export class Grabbable extends Component {
     @property.float(1.0)
     public throwAngularIntensity: number = 1.0;
 
+    /**
+     * If `true`, the grabbable will be updated based on the controller
+     * velocity data, if available.
+     *
+     * When `false`, the linear and angular velocities will be emulated based on
+     * the grabbable previous orientation and position.
+     *
+     * For more information, please have a look at:
+     * - [linearVelocity](https://developer.mozilla.org/en-US/docs/Web/API/XRPose/linearVelocity)
+     * - [angularVelocity](https://developer.mozilla.org/en-US/docs/Web/API/XRPose/angularVelocity)
+     */
+    @property.bool(true)
+    public useControllerVelocityData: boolean = true;
+
     @property.object()
     public distanceMarker: Object3D | null = null;
 
@@ -167,7 +181,7 @@ export class Grabbable extends Component {
         }
 
         const xrPose = anyGrab!.interactor.xrPose;
-        if (xrPose) {
+        if (xrPose && this.useControllerVelocityData) {
             this._history.updateFromPose(xrPose, this.object, dt);
         } else {
             this._history.update(this.object, dt);
@@ -194,11 +208,11 @@ export class Grabbable extends Component {
         vec3.scale(angular, angular, this.throwAngularIntensity);
 
         const radius = vec3.create();
+        // @todo: How to deal with that for 2 hands?
         vec3.subtract(
             radius,
-            this.object.getPositionWorld(vec3.create()),
-            // @todo: How to deal with that for 2 hands?
-            this._interactable[0].object.getPositionWorld(vec3.create())
+            this.object.getPositionWorld(),
+            this._interactable[0].object.getPositionWorld()
         );
 
         const velocity = this._history.velocity(vec3.create());
