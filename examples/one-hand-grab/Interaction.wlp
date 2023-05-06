@@ -5,7 +5,7 @@
             "translation": [
                 -0.0822798,
                 0.0,
-                1.0640697
+                2.0159583
             ],
             "rotation": [
                 0.0,
@@ -262,7 +262,10 @@
             "parent": "53",
             "components": [
                 {
-                    "active": false
+                    "active": true,
+                    "mesh": {
+                        "mesh": "47"
+                    }
                 }
             ]
         },
@@ -589,7 +592,7 @@
             "parent": "95",
             "components": [
                 {
-                    "active": false
+                    "active": true
                 }
             ]
         },
@@ -1879,8 +1882,16 @@
                     1.0,
                     1.0,
                     1.0
+                ],
+                "diffuseTexture": "44",
+                "specularColor": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    0.004
                 ]
-            }
+            },
+            "pipeline": "38"
         },
         "88": {
             "link": {
@@ -2244,13 +2255,13 @@
             ]
         },
         "runtime": {
-            "visualizeColliders": true,
+            "visualizeColliders": false,
             "webxr": {
                 "optionalFeatures": {
                     "local-floor": true
                 }
             },
-            "visualizePhysX": true
+            "visualizePhysX": false
         },
         "physx": {
             "enable": true,
