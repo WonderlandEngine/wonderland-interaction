@@ -844,7 +844,7 @@
                     "type": "wlei:distance-interactor",
                     "wlei:distance-interactor": {
                         "ray": "248",
-                        "searchDelay": 1.0
+                        "searchDelay": 0.2
                     }
                 }
             ],
@@ -1022,7 +1022,8 @@
                     "type": "grabbable",
                     "grabbable": {
                         "handle": "238",
-                        "throwLinearIntensity": 1.0
+                        "throwLinearIntensity": 1.0,
+                        "useControllerVelocityData": true
                     }
                 },
                 {

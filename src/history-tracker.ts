@@ -1,11 +1,13 @@
 import { Object3D } from '@wonderlandengine/api';
-import { vec3 } from 'gl-matrix';
+import { quat, vec3 } from 'gl-matrix';
+import {quatDelta} from './utils/math.js';
 
 /** Constants. */
 const StackSize = 4;
 
 /** Temporaries. */
 const _vectorA = vec3.create();
+const _quatA = quat.create();
 
 /**
  * Angular and linear velocities history tracker.
@@ -25,6 +27,8 @@ export class HistoryTracker {
   private _curr: number = -1;
   /** previous world space position of the object. @hidden */
   private _previousPosition: vec3 = vec3.create();
+  /** previous world space rotation of the object. @hidden */
+  private _previousRotation: quat = quat.create();
 
   constructor() {
     for(let i = 0; i < StackSize; ++i) {
@@ -95,7 +99,7 @@ export class HistoryTracker {
     for(const v of this._linear) vec3.zero(v);
     for(const v of this._angular) vec3.zero(v);
     this._curr = -1;
-    const position = target.getTranslationWorld(_vectorA);
+    const position = target.getPositionWorld(_vectorA);
     vec3.copy(this._previousPosition, position);
   }
 
@@ -139,15 +143,18 @@ export class HistoryTracker {
 
   /** @hidden */
   private _updateLinear(out: vec3, target: Object3D, delta: number): void {
-    const position = target.getTranslationWorld(_vectorA);
+    const position = target.getPositionWorld(_vectorA);
     vec3.subtract(out, position, this._previousPosition);
     vec3.scale(out, out, 1.0 / delta);
     vec3.copy(this._previousPosition, position);
   }
 
   /** @hidden */
-  private _updateAngular(out: vec3, target: Object, delta: number): void {
+  private _updateAngular(out: vec3, target: Object3D, delta: number): void {
     /* @todo: Handle angular velocity. */
+
+    // const worldRot = target.getRotationWorld(quat.create());
+    // const deltaRot = quatDelta(quat.create(), this._previousRotation, worldRot);
   }
 
 }
