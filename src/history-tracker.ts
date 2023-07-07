@@ -143,8 +143,6 @@ export class HistoryTracker {
     vec3.subtract(out, position, this._previousPosition);
     vec3.scale(out, out, 1.0 / delta);
     vec3.copy(this._previousPosition, position);
-
-    console.log(out);
   }
 
   /** @hidden */

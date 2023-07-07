@@ -1,6 +1,8 @@
 import {vec3, vec4} from 'gl-matrix';
 import {MeshComponent, Object3D} from '@wonderlandengine/api';
 
+/* Temporaries */
+const _vectorA = vec3.create();
 const _boundingSphere = vec4.create();
 
 function joinBoundingSphere(out: vec4, other: vec4): vec4 {
@@ -12,7 +14,7 @@ function joinBoundingSphere(out: vec4, other: vec4): vec4 {
     }
 
     /* Vector from this sphere to the other, used to translate the center. */
-    const thisToOther = vec3.subtract(vec3.create(), other as vec3, out as vec3);
+    const thisToOther = vec3.subtract(_vectorA, other as vec3, out as vec3);
     const distSq = vec3.dot(thisToOther, thisToOther);
 
     /* Case 1: Spheres are fully overlapping. */

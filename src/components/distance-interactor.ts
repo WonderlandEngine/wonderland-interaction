@@ -97,6 +97,14 @@ export class DistanceInteractor extends Component {
     @property.float(1.0)
     speed: number = 1.0;
 
+    /**
+     * Delay, in **seconds**, before the next search.
+     *
+     * Higher delay improve performance, but decrease the reaction
+     */
+    @property.float(0.0)
+    searchDelay: number = 0.05;
+
     /** Main interactor. @hidden */
     private _interactor: Interactor = null!;
     /** Ray collision component. @hidden */
@@ -107,6 +115,9 @@ export class DistanceInteractor extends Component {
     private _targetGrab: Grabbable | null = null;
     /** Currently fetching interactable. @hidden */
     private _targetInteract: Interactable | null = null;
+
+    /** Elapsed time to last search. */
+    private _lastSearchElapsedTime = 0.0;
 
     /** @hidden */
     private _onGripStart = () => {
@@ -135,20 +146,28 @@ export class DistanceInteractor extends Component {
     onActivate(): void {
         const interactor = (this.interactor ?? this.object).getComponent(Interactor);
         if (!interactor) {
-            throw new Error();
+            throw new Error(
+                'No interactor found. Provide an object containing an Interactor component,' +
+                'or attach the component on this object'
+            );
         }
         const ray = (this.ray ?? this.object).getComponent(
             CollisionComponent,
             this.rayCollision
         );
         if (!ray) {
-            throw new Error();
+            throw new Error(
+                'No ray found. Provide an object containing a Collision component,' +
+                'or attach the Collision component on this object' +
+                'and specify the `rayCollision` parameter'
+            );
         }
         this._ray = ray;
         this._interaction = InteractionType.Searching;
         this._interactor = interactor;
         this._interactor.onGripStart.add(this._onGripStart);
         this._interactor.onGripEnd.add(this._onGripEnd);
+        this._lastSearchElapsedTime = 0.0;
     }
 
     /** @overload */
@@ -159,6 +178,9 @@ export class DistanceInteractor extends Component {
 
     /** @overload */
     update(dt: number) {
+        /* Interaction is ongoing, skip search. */
+        if (this._interactor.interactable) return;
+
         if (this._interaction === InteractionType.None) return;
 
         const interactorPos = this._interactor.object.getPositionWorld(_pointA);
@@ -185,6 +207,11 @@ export class DistanceInteractor extends Component {
             return;
         }
 
+        if(this._lastSearchElapsedTime < this.searchDelay) {
+            this._lastSearchElapsedTime += dt;
+            return;
+        }
+
         const grabbable = search(interactorPos, this._ray);
         if (grabbable?.distanceMarker) {
             const scale = radiusHierarchy(grabbable.object);
@@ -194,5 +221,6 @@ export class DistanceInteractor extends Component {
             resetMarker(this._targetGrab.distanceMarker);
         }
         this._targetGrab = grabbable;
+        this._lastSearchElapsedTime = 0.0;
     }
 }

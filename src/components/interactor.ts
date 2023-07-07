@@ -144,6 +144,7 @@ export class Interactor extends Component {
             this._interactable!.onSelectEnd.notify(this, this._interactable);
         }
         this._onGripEnd.notify();
+        this._interactable = null;
     }
 
     /** Notified on a grip start. */
@@ -164,6 +165,14 @@ export class Interactor extends Component {
      */
     get xrPose(): XRPose | null {
         return this.#xrPose;
+    }
+
+    /**
+     * Current interactable handled by this interactor. If no interaction is ongoing,
+     * this getter returns `null`.
+     */
+    get interactable(): Interactable | null {
+        return this._interactable;
     }
 
     /** @hidden */
