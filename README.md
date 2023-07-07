@@ -1,4 +1,8 @@
-![wonderland-engine-logo](screenshots/wle-logo-horizontal-reversed.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/WonderlandEngine/api/blob/master/img/wle-logo-horizontal-reversed-dark.png?raw=true">
+  <source media="(prefers-color-scheme: light)" srcset="https://github.com/WonderlandEngine/api/blob/master/img/wle-logo-horizontal-reversed-light.png?raw=true">
+  <img alt="Wonderland Engine Logo">
+</picture>
 
 # WE-IL: Wonderland Engine Interaction Library
 
@@ -6,14 +10,13 @@
 
 * Generic interactor / interactable
 * Single-hand grabbing
-* Double-hand grabbing (coming soon)
-* Event system (coming soon)
-* Throwing (coming soon)
+* Double-hand grabbing
+* Event system
+* Throwing
 
 ## Install
 
-The library is in development mode and not already available on `npm`. However, you
-can already use it locally either with [npm link](https://docs.npmjs.com/cli/v8/commands/npm-link), or using a local installation:
+The library is in development mode and not already available on `npm`. However, you can already use it locally either with [npm link](https://docs.npmjs.com/cli/v8/commands/npm-link), or using a local installation:
 
 First, install and build the library:
 
@@ -32,14 +35,19 @@ npm i path/to/weil
 
 ## Examples
 
-1. Download the repository
-2. Run `npm install` at the root
-3. Open any examples under `examples/*`
+1. Clone the repository
+2. Open any examples under `examples/*`
+
+![Wonderland Engine interaction example](img/example.png)
 
 #### Playground
 
 * Single-hand grabbing
 * Double-hand grabbing
+
+## Usage
+
+For more information about how to use the components, please refer to the [./DOC.md](documentation).
 
 ## ToDo List
 

@@ -5,7 +5,7 @@
             "translation": [
                 -0.0822798,
                 0.0,
-                2.0159583
+                1.2053258
             ],
             "rotation": [
                 0.0,
@@ -843,7 +843,8 @@
                 {
                     "type": "wlei:distance-interactor",
                     "wlei:distance-interactor": {
-                        "ray": "248"
+                        "ray": "248",
+                        "searchDelay": 1.0
                     }
                 }
             ],
@@ -2229,6 +2230,102 @@
                 "name": "TileFeedback.frag",
                 "file": "default"
             }
+        },
+        "254": {
+            "link": {
+                "name": "lib\\Color.glsl",
+                "file": "default"
+            }
+        },
+        "255": {
+            "link": {
+                "name": "lib\\Compatibility.frag",
+                "file": "default"
+            }
+        },
+        "256": {
+            "link": {
+                "name": "lib\\CoordinateSystems.glsl",
+                "file": "default"
+            }
+        },
+        "257": {
+            "link": {
+                "name": "lib\\GI.frag",
+                "file": "default"
+            }
+        },
+        "258": {
+            "link": {
+                "name": "lib\\Inputs.frag",
+                "file": "default"
+            }
+        },
+        "259": {
+            "link": {
+                "name": "lib\\Lights.frag",
+                "file": "default"
+            }
+        },
+        "260": {
+            "link": {
+                "name": "lib\\Materials.frag",
+                "file": "default"
+            }
+        },
+        "261": {
+            "link": {
+                "name": "lib\\Math.glsl",
+                "file": "default"
+            }
+        },
+        "262": {
+            "link": {
+                "name": "lib\\Packing.frag",
+                "file": "default"
+            }
+        },
+        "263": {
+            "link": {
+                "name": "lib\\Quaternion.glsl",
+                "file": "default"
+            }
+        },
+        "264": {
+            "link": {
+                "name": "lib\\ShaderType.glsl",
+                "file": "default"
+            }
+        },
+        "265": {
+            "link": {
+                "name": "lib\\Slug.frag",
+                "file": "default"
+            }
+        },
+        "266": {
+            "link": {
+                "name": "lib\\Slug.vert",
+                "file": "default"
+            }
+        },
+        "267": {
+            "link": {
+                "name": "lib\\Surface.frag",
+                "file": "default"
+            }
+        },
+        "268": {
+            "link": {
+                "name": "lib\\Textures.frag",
+                "file": "default"
+            }
+        },
+        "269": {
+            "link": {
+                "name": "lib\\Uniforms.glsl",
+                "file": "default"
+            }
         }
     },
     "settings": {
@@ -2237,8 +2334,7 @@
             "version": [
                 1,
                 0,
-                0,
-                2
+                4
             ]
         },
         "vr": {
@@ -2420,13 +2516,34 @@
         }
     },
     "files": [
-        "models/oculus-touch-v2-left.glb",
-        "models/oculus-touch-v2-right.glb",
-        "models/hand-left.glb",
-        "models/hand-right.glb",
-        "models/button.glb",
-        "models/teleport-indicator.glb",
-        "models/marker.glb"
+        {
+            "fileName": "models/oculus-touch-v2-left.glb",
+            "importerName": ""
+        },
+        {
+            "fileName": "models/oculus-touch-v2-right.glb",
+            "importerName": ""
+        },
+        {
+            "fileName": "models/hand-left.glb",
+            "importerName": ""
+        },
+        {
+            "fileName": "models/hand-right.glb",
+            "importerName": ""
+        },
+        {
+            "fileName": "models/button.glb",
+            "importerName": ""
+        },
+        {
+            "fileName": "models/teleport-indicator.glb",
+            "importerName": ""
+        },
+        {
+            "fileName": "models/marker.glb",
+            "importerName": ""
+        }
     ],
     "fonts": {
         "232": {
