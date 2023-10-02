@@ -24,6 +24,14 @@ export class Interactor extends Component {
 
     /** Properties. */
 
+    /**
+     * If `true`, automatically setup events from gamepad.
+     * Set this to `false` to use your own input mappings or
+     * gamepad library.
+     */
+    @property.bool(true)
+    public useDefaultInputs: boolean = true;
+
     /** Handedness value. Compare against {@link Handedness}. */
     @property.enum(HandednessValues, Handedness.Right)
     public handedness!: number;
@@ -39,9 +47,9 @@ export class Interactor extends Component {
     private _previousScene: Scene | null = null;
 
     /** Grip start emitter. @hidden */
-    private readonly _onGripStart: Emitter = new Emitter();
+    private readonly _onGripStart: Emitter<[Interactable]> = new Emitter();
     /** Grip end emitter. @hidden */
-    private readonly _onGripEnd: Emitter = new Emitter();
+    private readonly _onGripEnd: Emitter<[Interactable]> = new Emitter();
 
     /** @hidden */
     private readonly _onPreRender = () => {
@@ -117,6 +125,7 @@ export class Interactor extends Component {
     public startInteraction(interactable: Interactable) {
         this._interactable = interactable;
         interactable.onSelectStart.notify(this, interactable);
+        this._onGripStart.notify(interactable);
     }
 
     /**
@@ -132,7 +141,6 @@ export class Interactor extends Component {
                 return;
             }
         }
-        this._onGripStart.notify();
     }
 
     /**
@@ -142,18 +150,18 @@ export class Interactor extends Component {
     public stopInteraction() {
         if (this._interactable) {
             this._interactable!.onSelectEnd.notify(this, this._interactable);
+            this._onGripEnd.notify(this._interactable);
         }
-        this._onGripEnd.notify();
         this._interactable = null;
     }
 
     /** Notified on a grip start. */
-    get onGripStart(): Emitter {
+    get onGripStart(): Emitter<[Interactable]> {
         return this._onGripStart;
     }
 
     /** Notified on a grip end. */
-    get onGripEnd(): Emitter {
+    get onGripEnd(): Emitter<[Interactable]> {
         return this._onGripEnd;
     }
 
@@ -194,6 +202,8 @@ export class Interactor extends Component {
                 }
             }
         });
+
+        if (!this.useDefaultInputs) return;
 
         session.addEventListener('selectstart', (event) => {
             if (this.#xrInputSource === event.inputSource) {
