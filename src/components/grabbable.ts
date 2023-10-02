@@ -1,5 +1,5 @@
 import {vec3, quat} from 'gl-matrix';
-import {Component, Object, Object3D, PhysXComponent} from '@wonderlandengine/api';
+import {Component, Emitter, Object, Object3D, PhysXComponent} from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
 
 import {Interactor} from './interactor.js';
@@ -107,17 +107,20 @@ export class Grabbable extends Component {
     /** Squared distance between both handle cached when starting a double grab. */
     private _maxSqDistance: number | null = null;
 
-    /** @private */
+    /** @hidden */
     private _history: HistoryTracker = new HistoryTracker();
 
+    /** @hidden */
     private _physx: PhysXComponent | null = null;
 
+    /** @hidden */
     private _enablePhysx: boolean = false;
 
-    /** @hidden */
-    private _onGrabStart = this._onInteractionStart.bind(this);
-    /** @hidden */
-    private _onGrabStop = this._onInteractionStop.bind(this);
+    /** Notified when an interactable is grabbed. @hidden */
+    private readonly _onGrabStart: Emitter<[Interactor, Interactable, this]> =
+        new Emitter();
+    /** Notified when an interactable is released. @hidden */
+    private readonly _onGrabEnd: Emitter<[Interactor, Interactable, this]> = new Emitter();
 
     /** @hidden */
     start(): void {
@@ -149,8 +152,8 @@ export class Grabbable extends Component {
         for (let i = 0; i < 2; ++i) {
             const interactable = this._interactable[i];
             if (!interactable) continue;
-            interactable.onSelectStart.add(this._onGrabStart);
-            interactable.onSelectEnd.add(this._onGrabStop);
+            interactable.onSelectStart.add(this.grab);
+            interactable.onSelectEnd.add(this.release);
         }
         this._enablePhysx = this._physx?.active ?? false;
     }
@@ -160,8 +163,8 @@ export class Grabbable extends Component {
         for (let i = 0; i < 2; ++i) {
             const interactable = this._interactable[i];
             if (!interactable) continue;
-            interactable.onSelectStart.remove(this._onGrabStart);
-            interactable.onSelectEnd.remove(this._onGrabStop);
+            interactable.onSelectStart.remove(this.grab);
+            interactable.onSelectEnd.remove(this.release);
         }
     }
 
@@ -225,43 +228,19 @@ export class Grabbable extends Component {
     }
 
     /**
-     * Get the {@link Interactable} stored at the given index.
+     * Programmatically grab an interactable.
      *
-     * Use `0` for {@link handle} and `1` for {@link handleSecondary}.
+     * @note The interactable must be one of {@link Grabbable.handle}
+     * or {@link Grabbable.handleSecondary}.
      *
-     * @note This method returns `undefined` for anything outside the range [0; 1].
+     * @note This method is useful for grab emulation for non-VR applications.
+     * In general, you will not call this method but rather rely on collision
+     * checks between the {@link Interactor} and the {@link Interactable}.
      *
-     * @param index The index to retrieve
-     * @returns The interactable.
+     * @param interactor The interactor issuing the interaction.
+     * @param interactable The interactable undergoing the action.
      */
-    getInteractable(index: number): Interactable {
-        return this._interactable[index];
-    }
-
-    /** `true` is any of the two handles is currently grabbed. */
-    get isGrabbed(): boolean {
-        return !!this.primaryGrab || !!this.secondaryGrab;
-    }
-
-    /** `true` if the primary handle is grabbed, the object pointer by {@link handle}. */
-    get primaryGrab(): GrabData | null {
-        return this._grabData[0];
-    }
-
-    /** `true` if the secondary handle is grabbed, the object pointer by {@link handleSecondary}. */
-    get secondaryGrab(): GrabData | null {
-        return this._grabData[1];
-    }
-
-    /**
-     * Should be called when starting the interaction with the given handle.
-     *
-     * @param interactor The interactor initiating the grab
-     * @param interactable The interactable undergoing the interaction
-     *
-     * @hidden
-     */
-    private _onInteractionStart(interactor: Interactor, interactable: Interactable) {
+    grab = (interactor: Interactor, interactable: Interactable) => {
         const index = this._interactable.indexOf(interactable);
         if (this._grabData[index]) return;
 
@@ -297,20 +276,24 @@ export class Grabbable extends Component {
                 this._interactable[1].object.getPositionWorld(_pointB)
             );
         }
-    }
+
+        this._grabbed(interactor, interactable);
+    };
 
     /**
-     * Should be called when ending the interaction with the given handle.
+     * Programmatically release an interactable.
      *
-     * @param interactor The interactor ending the grab
-     * @param interactable The interactable
+     * @note The interactable must be one of {@link Grabbable.handle}
+     * or {@link Grabbable.handleSecondary}.
      *
-     * @hidden
+     * @note This method is useful for grab emulation for non-VR applications.
+     * In general, you will not call this method but rather rely on collision
+     * checks between the {@link Interactor} and the {@link Interactable}.
+     *
+     * @param interactor The interactor issuing the interaction.
+     * @param interactable The interactable undergoing the action.
      */
-    private _onInteractionStop(
-        interactor: Interactor,
-        interactable: Interactable | number
-    ): void {
+    release = (interactor: Interactor, interactable: Interactable | number) => {
         const index =
             typeof interactable === 'number'
                 ? interactable
@@ -332,6 +315,69 @@ export class Grabbable extends Component {
         this._maxSqDistance = null;
 
         if (this.canThrow && !this.isGrabbed) this.throw();
+
+        this._released(interactor, this._interactable[index]);
+    };
+
+    /**
+     * Get the {@link Interactable} stored at the given index.
+     *
+     * Use `0` for {@link handle} and `1` for {@link handleSecondary}.
+     *
+     * @note This method returns `undefined` for anything outside the range [0; 1].
+     *
+     * @param index The index to retrieve
+     * @returns The interactable.
+     */
+    getInteractable(index: number): Interactable {
+        return this._interactable[index];
+    }
+
+    /** `true` is any of the two handles is currently grabbed. */
+    get isGrabbed(): boolean {
+        return !!this.primaryGrab || !!this.secondaryGrab;
+    }
+
+    /** `true` if the primary handle is grabbed, the object pointer by {@link handle}. */
+    get primaryGrab(): GrabData | null {
+        return this._grabData[0];
+    }
+
+    /** `true` if the secondary handle is grabbed, the object pointer by {@link handleSecondary}. */
+    get secondaryGrab(): GrabData | null {
+        return this._grabData[1];
+    }
+
+    /** Notified on a select start. */
+    get onGrabStart(): Emitter<[Interactor, Interactable, this]> {
+        return this._onGrabStart;
+    }
+
+    /** Notified on a select end. */
+    get onGrabEnd(): Emitter<[Interactor, Interactable, this]> {
+        return this._onGrabEnd;
+    }
+
+    /**
+     * Called just after the interactable is grabbed.
+     *
+     * @param interactable The grabbed interactable.
+     *
+     * @hidden
+     */
+    protected _grabbed(interactor: Interactor, interactable: Interactable) {
+        this._onGrabStart.notify(interactor, interactable, this);
+    }
+
+    /**
+     * Called just after the interactable is released.
+     *
+     * @param interactable The released interactable.
+     *
+     * @hidden
+     */
+    protected _released(interactor: Interactor, interactable: Interactable) {
+        this._onGrabEnd.notify(interactor, interactable, this);
     }
 
     /**
@@ -374,7 +420,7 @@ export class Grabbable extends Component {
         const squaredDistance = vec3.squaredDistance(primaryWorld, secondaryWorld);
         if (squaredDistance > this._maxSqDistance! * 2.0) {
             /* Hands are too far apart, release the second handle. */
-            this._onInteractionStop(secondaryInteractor, 1);
+            this.release(secondaryInteractor, 1);
             return;
         }
 

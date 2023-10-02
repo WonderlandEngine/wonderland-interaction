@@ -148,7 +148,7 @@ export class DistanceInteractor extends Component {
         if (!interactor) {
             throw new Error(
                 'No interactor found. Provide an object containing an Interactor component,' +
-                'or attach the component on this object'
+                    'or attach the component on this object'
             );
         }
         const ray = (this.ray ?? this.object).getComponent(
@@ -158,8 +158,8 @@ export class DistanceInteractor extends Component {
         if (!ray) {
             throw new Error(
                 'No ray found. Provide an object containing a Collision component,' +
-                'or attach the Collision component on this object' +
-                'and specify the `rayCollision` parameter'
+                    'or attach the Collision component on this object' +
+                    'and specify the `rayCollision` parameter'
             );
         }
         this._ray = ray;
@@ -207,7 +207,7 @@ export class DistanceInteractor extends Component {
             return;
         }
 
-        if(this._lastSearchElapsedTime < this.searchDelay) {
+        if (this._lastSearchElapsedTime < this.searchDelay) {
             this._lastSearchElapsedTime += dt;
             return;
         }
