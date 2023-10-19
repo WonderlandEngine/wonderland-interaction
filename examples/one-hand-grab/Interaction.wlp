@@ -1,0 +1,2558 @@
+{
+    "objects": {
+        "14": {
+            "name": "Player",
+            "translation": [
+                -0.0822798,
+                0.0,
+                1.2053258
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                0.9999998,
+                1.0,
+                0.9999998
+            ],
+            "components": [
+                {
+                    "type": "debug-component",
+                    "debug-component": {
+                        "target": "233",
+                        "target1": "233",
+                        "target2": "243"
+                    }
+                }
+            ]
+        },
+        "15": {
+            "name": "FloorPlane",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "mesh": "7",
+                        "material": "20"
+                    },
+                    "active": true
+                },
+                {
+                    "type": "physx",
+                    "physx": {
+                        "static": true,
+                        "simulate": true,
+                        "shape": "box",
+                        "box": {
+                            "extents": [
+                                4.0,
+                                4.0,
+                                0.025
+                            ]
+                        },
+                        "bounciness": 0.0,
+                        "staticFriction": 2.0,
+                        "dynamicFriction": 2.0
+                    }
+                }
+            ],
+            "translation": [
+                0.0,
+                0.0,
+                1.1920928955078125e-7
+            ],
+            "rotation": [
+                -0.7072496,
+                0.0,
+                0.0,
+                0.7069638
+            ],
+            "scaling": [
+                4.0,
+                4.0,
+                4.0
+            ]
+        },
+        "17": {
+            "name": "NonVrCamera",
+            "parent": "205",
+            "components": [
+                {
+                    "type": "view"
+                },
+                {
+                    "type": "mouse-look"
+                },
+                {
+                    "type": "cursor",
+                    "cursor": {
+                        "collisionGroup": 0,
+                        "handedness": "right"
+                    }
+                }
+            ],
+            "translation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "18": {
+            "name": "EyeLeft",
+            "parent": "205",
+            "components": [
+                {
+                    "type": "view"
+                },
+                {
+                    "type": "input",
+                    "input": {
+                        "type": "eye left"
+                    }
+                },
+                {
+                    "type": "howler-audio-listener"
+                }
+            ],
+            "translation": [
+                0.0,
+                0.0,
+                -2.384185791015625e-7
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "19": {
+            "name": "EyeRight",
+            "parent": "205",
+            "components": [
+                {
+                    "type": "view"
+                },
+                {
+                    "type": "input",
+                    "input": {
+                        "type": "eye right"
+                    }
+                }
+            ],
+            "translation": [
+                0.0,
+                0.0,
+                -2.384185791015625e-7
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "21": {
+            "name": "Light",
+            "components": [
+                {
+                    "type": "light",
+                    "light": {
+                        "intensity": 3.3329999
+                    }
+                }
+            ],
+            "translation": [
+                0.0,
+                3.0,
+                2.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "23": {
+            "name": "Light.000",
+            "components": [
+                {
+                    "type": "light",
+                    "light": {
+                        "intensity": 3.3329999
+                    }
+                }
+            ],
+            "translation": [
+                -1.0,
+                3.0,
+                -1.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "53": {
+            "link": {
+                "name": "root",
+                "file": "models\\oculus-touch-v2-left.glb"
+            },
+            "parent": "130",
+            "name": "ControllerModelLeft",
+            "translation": [
+                -0.0117514,
+                0.0008869,
+                0.0161192
+            ],
+            "rotation": [
+                -0.0,
+                0.7316615,
+                0.6816681,
+                3.196286257889369e-8
+            ],
+            "scaling": [
+                0.9999998,
+                0.9999998,
+                0.9999997
+            ]
+        },
+        "54": {
+            "link": {
+                "name": "controller<root",
+                "file": "models\\oculus-touch-v2-left.glb"
+            },
+            "parent": "53",
+            "components": [
+                {
+                    "active": true,
+                    "mesh": {
+                        "mesh": "47"
+                    }
+                }
+            ]
+        },
+        "55": {
+            "link": {
+                "name": "thumbrest_pressed_max<root",
+                "file": "models\\oculus-touch-v2-left.glb"
+            },
+            "parent": "53"
+        },
+        "56": {
+            "link": {
+                "name": "thumbrest_pressed_min<root",
+                "file": "models\\oculus-touch-v2-left.glb"
+            },
+            "parent": "53"
+        },
+        "57": {
+            "link": {
+                "name": "thumbrest_pressed_value<root",
+                "file": "models\\oculus-touch-v2-left.glb"
+            },
+            "parent": "53"
+        },
+        "58": {
+            "link": {
+                "name": "x_button_pressed_max<root",
+                "file": "models\\oculus-touch-v2-left.glb"
+            },
+            "parent": "53"
+        },
+        "59": {
+            "link": {
+                "name": "x_button_pressed_min<root",
+                "file": "models\\oculus-touch-v2-left.glb"
+            },
+            "parent": "53"
+        },
+        "60": {
+            "link": {
+                "name": "x_button_pressed_value<root",
+                "file": "models\\oculus-touch-v2-left.glb"
+            },
+            "parent": "53"
+        },
+        "61": {
+            "link": {
+                "name": "x_button<x_button_pressed_value<root",
+                "file": "models\\oculus-touch-v2-left.glb"
+            },
+            "parent": "60"
+        },
+        "62": {
+            "link": {
+                "name": "xr_standard_squeeze_pressed_max<root",
+                "file": "models\\oculus-touch-v2-left.glb"
+            },
+            "parent": "53"
+        },
+        "63": {
+            "link": {
+                "name": "xr_standard_squeeze_pressed_min<root",
+                "file": "models\\oculus-touch-v2-left.glb"
+            },
+            "parent": "53"
+        },
+        "64": {
+            "link": {
+                "name": "xr_standard_squeeze_pressed_value<root",
+                "file": "models\\oculus-touch-v2-left.glb"
+            },
+            "parent": "53"
+        },
+        "65": {
+            "link": {
+                "name": "squeeze<xr_standard_squeeze_pressed_value<root",
+                "file": "models\\oculus-touch-v2-left.glb"
+            },
+            "parent": "64",
+            "translation": [
+                0.0022123,
+                -0.0316186,
+                0.015126
+            ],
+            "rotation": [
+                0.3420201,
+                0.0,
+                0.0,
+                0.9396926
+            ],
+            "scaling": [
+                1.0199999,
+                1.0199999,
+                1.0199999
+            ]
+        },
+        "66": {
+            "link": {
+                "name": "xr_standard_thumbstick_pressed_max<root",
+                "file": "models\\oculus-touch-v2-left.glb"
+            },
+            "parent": "53"
+        },
+        "67": {
+            "link": {
+                "name": "xr_standard_thumbstick_pressed_min<root",
+                "file": "models\\oculus-touch-v2-left.glb"
+            },
+            "parent": "53"
+        },
+        "68": {
+            "link": {
+                "name": "xr_standard_thumbstick_pressed_value<root",
+                "file": "models\\oculus-touch-v2-left.glb"
+            },
+            "parent": "53"
+        },
+        "69": {
+            "link": {
+                "name": "xr_standard_thumbstick_xaxis_pressed_max<xr_standard_thumbstick_pressed_value<root",
+                "file": "models\\oculus-touch-v2-left.glb"
+            },
+            "parent": "68"
+        },
+        "70": {
+            "link": {
+                "name": "xr_standard_thumbstick_xaxis_pressed_min<xr_standard_thumbstick_pressed_value<root",
+                "file": "models\\oculus-touch-v2-left.glb"
+            },
+            "parent": "68"
+        },
+        "71": {
+            "link": {
+                "name": "xr_standard_thumbstick_xaxis_pressed_value<xr_standard_thumbstick_pressed_value<root",
+                "file": "models\\oculus-touch-v2-left.glb"
+            },
+            "parent": "68"
+        },
+        "72": {
+            "link": {
+                "name": "xr_standard_thumbstick_yaxis_pressed_max<xr_standard_thumbstick_xaxis_pressed_value<xr_standard_thumbstick_pressed_value<root",
+                "file": "models\\oculus-touch-v2-left.glb"
+            },
+            "parent": "71"
+        },
+        "73": {
+            "link": {
+                "name": "xr_standard_thumbstick_yaxis_pressed_min<xr_standard_thumbstick_xaxis_pressed_value<xr_standard_thumbstick_pressed_value<root",
+                "file": "models\\oculus-touch-v2-left.glb"
+            },
+            "parent": "71"
+        },
+        "74": {
+            "link": {
+                "name": "xr_standard_thumbstick_yaxis_pressed_value<xr_standard_thumbstick_xaxis_pressed_value<xr_standard_thumbstick_pressed_value<root",
+                "file": "models\\oculus-touch-v2-left.glb"
+            },
+            "parent": "71"
+        },
+        "75": {
+            "link": {
+                "name": "thumbstick<xr_standard_thumbstick_yaxis_pressed_value<xr_standard_thumbstick_xaxis_pressed_value<xr_standard_thumbstick_pressed_value<root",
+                "file": "models\\oculus-touch-v2-left.glb"
+            },
+            "parent": "74"
+        },
+        "76": {
+            "link": {
+                "name": "xr_standard_trigger_pressed_max<root",
+                "file": "models\\oculus-touch-v2-left.glb"
+            },
+            "parent": "53"
+        },
+        "77": {
+            "link": {
+                "name": "xr_standard_trigger_pressed_min<root",
+                "file": "models\\oculus-touch-v2-left.glb"
+            },
+            "parent": "53"
+        },
+        "78": {
+            "link": {
+                "name": "xr_standard_trigger_pressed_value<root",
+                "file": "models\\oculus-touch-v2-left.glb"
+            },
+            "parent": "53"
+        },
+        "79": {
+            "link": {
+                "name": "trigger<xr_standard_trigger_pressed_value<root",
+                "file": "models\\oculus-touch-v2-left.glb"
+            },
+            "parent": "78",
+            "translation": [
+                -0.0112457,
+                0.0147492,
+                0.0245228
+            ],
+            "rotation": [
+                0.3420201,
+                0.0,
+                0.0,
+                0.9396926
+            ],
+            "scaling": [
+                1.0099999,
+                1.0099999,
+                1.0099999
+            ]
+        },
+        "80": {
+            "link": {
+                "name": "y_button_pressed_max<root",
+                "file": "models\\oculus-touch-v2-left.glb"
+            },
+            "parent": "53"
+        },
+        "81": {
+            "link": {
+                "name": "y_button_pressed_min<root",
+                "file": "models\\oculus-touch-v2-left.glb"
+            },
+            "parent": "53"
+        },
+        "82": {
+            "link": {
+                "name": "y_button_pressed_value<root",
+                "file": "models\\oculus-touch-v2-left.glb"
+            },
+            "parent": "53"
+        },
+        "83": {
+            "link": {
+                "name": "y_button<y_button_pressed_value<root",
+                "file": "models\\oculus-touch-v2-left.glb"
+            },
+            "parent": "82"
+        },
+        "95": {
+            "link": {
+                "name": "root",
+                "file": "models\\oculus-touch-v2-right.glb"
+            },
+            "parent": "129",
+            "name": "ControllerModelRight",
+            "translation": [
+                0.0097994,
+                -0.0006203,
+                0.0177838
+            ],
+            "rotation": [
+                -0.0,
+                0.999921,
+                -0.0125658,
+                -4.174509058429976e-7
+            ],
+            "scaling": [
+                0.9993978,
+                0.9993963,
+                1.0000015
+            ]
+        },
+        "96": {
+            "link": {
+                "name": "a_button_pressed_max<root",
+                "file": "models\\oculus-touch-v2-right.glb"
+            },
+            "parent": "95"
+        },
+        "97": {
+            "link": {
+                "name": "a_button_pressed_min<root",
+                "file": "models\\oculus-touch-v2-right.glb"
+            },
+            "parent": "95"
+        },
+        "98": {
+            "link": {
+                "name": "a_button_pressed_value<root",
+                "file": "models\\oculus-touch-v2-right.glb"
+            },
+            "parent": "95"
+        },
+        "99": {
+            "link": {
+                "name": "a_button<a_button_pressed_value<root",
+                "file": "models\\oculus-touch-v2-right.glb"
+            },
+            "parent": "98"
+        },
+        "100": {
+            "link": {
+                "name": "b_button_pressed_max<root",
+                "file": "models\\oculus-touch-v2-right.glb"
+            },
+            "parent": "95"
+        },
+        "101": {
+            "link": {
+                "name": "b_button_pressed_min<root",
+                "file": "models\\oculus-touch-v2-right.glb"
+            },
+            "parent": "95"
+        },
+        "102": {
+            "link": {
+                "name": "b_button_pressed_value<root",
+                "file": "models\\oculus-touch-v2-right.glb"
+            },
+            "parent": "95"
+        },
+        "103": {
+            "link": {
+                "name": "b_button<b_button_pressed_value<root",
+                "file": "models\\oculus-touch-v2-right.glb"
+            },
+            "parent": "102"
+        },
+        "104": {
+            "link": {
+                "name": "controller<root",
+                "file": "models\\oculus-touch-v2-right.glb"
+            },
+            "parent": "95",
+            "components": [
+                {
+                    "active": true
+                }
+            ]
+        },
+        "105": {
+            "link": {
+                "name": "thumbrest_pressed_max<root",
+                "file": "models\\oculus-touch-v2-right.glb"
+            },
+            "parent": "95"
+        },
+        "106": {
+            "link": {
+                "name": "thumbrest_pressed_min<root",
+                "file": "models\\oculus-touch-v2-right.glb"
+            },
+            "parent": "95"
+        },
+        "107": {
+            "link": {
+                "name": "thumbrest_pressed_value<root",
+                "file": "models\\oculus-touch-v2-right.glb"
+            },
+            "parent": "95"
+        },
+        "108": {
+            "link": {
+                "name": "xr_standard_squeeze_pressed_max<root",
+                "file": "models\\oculus-touch-v2-right.glb"
+            },
+            "parent": "95"
+        },
+        "109": {
+            "link": {
+                "name": "xr_standard_squeeze_pressed_min<root",
+                "file": "models\\oculus-touch-v2-right.glb"
+            },
+            "parent": "95"
+        },
+        "110": {
+            "link": {
+                "name": "xr_standard_squeeze_pressed_value<root",
+                "file": "models\\oculus-touch-v2-right.glb"
+            },
+            "parent": "95"
+        },
+        "111": {
+            "link": {
+                "name": "squeeze<xr_standard_squeeze_pressed_value<root",
+                "file": "models\\oculus-touch-v2-right.glb"
+            },
+            "parent": "110",
+            "translation": [
+                -0.0029884,
+                -0.0316506,
+                0.015142
+            ],
+            "rotation": [
+                0.3440659,
+                0.0,
+                0.0,
+                0.9389454
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "112": {
+            "link": {
+                "name": "xr_standard_thumbstick_pressed_max<root",
+                "file": "models\\oculus-touch-v2-right.glb"
+            },
+            "parent": "95"
+        },
+        "113": {
+            "link": {
+                "name": "xr_standard_thumbstick_pressed_min<root",
+                "file": "models\\oculus-touch-v2-right.glb"
+            },
+            "parent": "95"
+        },
+        "114": {
+            "link": {
+                "name": "xr_standard_thumbstick_pressed_value<root",
+                "file": "models\\oculus-touch-v2-right.glb"
+            },
+            "parent": "95"
+        },
+        "115": {
+            "link": {
+                "name": "xr_standard_thumbstick_xaxis_pressed_max<xr_standard_thumbstick_pressed_value<root",
+                "file": "models\\oculus-touch-v2-right.glb"
+            },
+            "parent": "114"
+        },
+        "116": {
+            "link": {
+                "name": "xr_standard_thumbstick_xaxis_pressed_min<xr_standard_thumbstick_pressed_value<root",
+                "file": "models\\oculus-touch-v2-right.glb"
+            },
+            "parent": "114"
+        },
+        "117": {
+            "link": {
+                "name": "xr_standard_thumbstick_xaxis_pressed_value<xr_standard_thumbstick_pressed_value<root",
+                "file": "models\\oculus-touch-v2-right.glb"
+            },
+            "parent": "114"
+        },
+        "118": {
+            "link": {
+                "name": "xr_standard_thumbstick_yaxis_pressed_max<xr_standard_thumbstick_xaxis_pressed_value<xr_standard_thumbstick_pressed_value<root",
+                "file": "models\\oculus-touch-v2-right.glb"
+            },
+            "parent": "117"
+        },
+        "119": {
+            "link": {
+                "name": "xr_standard_thumbstick_yaxis_pressed_min<xr_standard_thumbstick_xaxis_pressed_value<xr_standard_thumbstick_pressed_value<root",
+                "file": "models\\oculus-touch-v2-right.glb"
+            },
+            "parent": "117"
+        },
+        "120": {
+            "link": {
+                "name": "xr_standard_thumbstick_yaxis_pressed_value<xr_standard_thumbstick_xaxis_pressed_value<xr_standard_thumbstick_pressed_value<root",
+                "file": "models\\oculus-touch-v2-right.glb"
+            },
+            "parent": "117"
+        },
+        "121": {
+            "link": {
+                "name": "thumbstick<xr_standard_thumbstick_yaxis_pressed_value<xr_standard_thumbstick_xaxis_pressed_value<xr_standard_thumbstick_pressed_value<root",
+                "file": "models\\oculus-touch-v2-right.glb"
+            },
+            "parent": "120"
+        },
+        "122": {
+            "link": {
+                "name": "xr_standard_trigger_pressed_max<root",
+                "file": "models\\oculus-touch-v2-right.glb"
+            },
+            "parent": "95"
+        },
+        "123": {
+            "link": {
+                "name": "xr_standard_trigger_pressed_min<root",
+                "file": "models\\oculus-touch-v2-right.glb"
+            },
+            "parent": "95"
+        },
+        "124": {
+            "link": {
+                "name": "xr_standard_trigger_pressed_value<root",
+                "file": "models\\oculus-touch-v2-right.glb"
+            },
+            "parent": "95"
+        },
+        "125": {
+            "link": {
+                "name": "trigger<xr_standard_trigger_pressed_value<root",
+                "file": "models\\oculus-touch-v2-right.glb"
+            },
+            "parent": "124"
+        },
+        "127": {
+            "name": "3DCursorHitLeft",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "mesh": "9",
+                        "material": "128"
+                    }
+                }
+            ],
+            "parent": null,
+            "translation": [
+                0.0,
+                0.0388117,
+                1.5585094
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                0.0099999,
+                0.0099999,
+                0.0099999
+            ]
+        },
+        "129": {
+            "name": "ControllerRight",
+            "parent": "205",
+            "components": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                {
+                    "type": "input",
+                    "input": {
+                        "type": "hand right"
+                    }
+                },
+                {
+                    "type": "collision",
+                    "collision": {
+                        "sphere": {
+                            "radius": 0.05
+                        },
+                        "groups": 127
+                    }
+                },
+                {
+                    "type": "interactor",
+                    "interactor": {
+                        "distance": 5.0,
+                        "ray": "248"
+                    }
+                },
+                {
+                    "type": "wlei:distance-interactor",
+                    "wlei:distance-interactor": {
+                        "ray": "248",
+                        "searchDelay": 0.2
+                    }
+                }
+            ],
+            "translation": [
+                0.0,
+                0.0,
+                -2.384185791015625e-7
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "130": {
+            "name": "ControllerLeft",
+            "parent": "205",
+            "components": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                {
+                    "type": "input",
+                    "input": {
+                        "type": "hand left"
+                    }
+                },
+                {
+                    "type": "interactor",
+                    "interactor": {
+                        "handedness": "left",
+                        "distance": 1.0,
+                        "ray": "247"
+                    },
+                    "active": true
+                },
+                {
+                    "type": "collision",
+                    "collision": {
+                        "sphere": {
+                            "radius": 0.05
+                        },
+                        "groups": 127
+                    },
+                    "active": true
+                }
+            ],
+            "translation": [
+                0.0,
+                0.0,
+                -2.384185791015625e-7
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "205": {
+            "name": "TrackedSpace",
+            "parent": "14",
+            "components": [
+                {
+                    "type": "player-height",
+                    "active": true
+                }
+            ],
+            "translation": [
+                0.0,
+                1.75,
+                0.0000419
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "208": {
+            "link": {
+                "name": "TeleportIndicator",
+                "file": "models\\teleport-indicator.glb"
+            },
+            "translation": [
+                0.0,
+                0.0099999,
+                1.156635
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.0000001,
+                1.0,
+                1.0
+            ]
+        },
+        "215": {
+            "name": "3DCursorHitRight",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "mesh": "9",
+                        "material": "128"
+                    }
+                }
+            ],
+            "parent": null,
+            "translation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                0.0099999,
+                0.0099999,
+                0.0099999
+            ]
+        },
+        "233": {
+            "name": "Weapon Single Hand",
+            "components": [
+                {
+                    "type": "grabbable",
+                    "grabbable": {
+                        "handle": "238",
+                        "throwLinearIntensity": 1.0,
+                        "useControllerVelocityData": true
+                    }
+                },
+                {
+                    "type": "physx",
+                    "physx": {
+                        "shape": "box",
+                        "box": {
+                            "extents": [
+                                0.3499999,
+                                0.05,
+                                0.05
+                            ]
+                        },
+                        "simulate": true,
+                        "kinematic": false,
+                        "groups": 255,
+                        "mass": 5.0,
+                        "linearDamping": 1.0,
+                        "bounciness": 0.0,
+                        "angularDamping": 1.0
+                    },
+                    "active": false
+                }
+            ],
+            "parent": null,
+            "translation": [
+                -0.2381033,
+                0.672035,
+                0.1044664
+            ],
+            "rotation": [
+                -0.5001489,
+                0.50015,
+                -0.4998522,
+                -0.4998486
+            ],
+            "scaling": [
+                0.9999407,
+                0.9999424,
+                0.9999988
+            ]
+        },
+        "238": {
+            "name": "Grab",
+            "parent": "233",
+            "translation": [
+                0.4385524,
+                0.001188,
+                -0.0002285
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "components": [
+                {
+                    "type": "collision",
+                    "active": true,
+                    "collision": {
+                        "sphere": {
+                            "radius": 0.1
+                        },
+                        "collider": "aabb",
+                        "aabb": {
+                            "extents": [
+                                0.0199999,
+                                0.0199999,
+                                0.1
+                            ]
+                        },
+                        "groups": 127
+                    }
+                },
+                {
+                    "type": "interactable",
+                    "active": true,
+                    "interactable": {
+                        "snap": false
+                    }
+                }
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "239": {
+            "name": "Mesh",
+            "parent": "233",
+            "translation": [
+                0.0,
+                0.0004645,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "mesh": "8",
+                        "material": "22"
+                    }
+                }
+            ],
+            "scaling": [
+                0.3399999,
+                0.05,
+                0.05
+            ]
+        },
+        "240": {
+            "name": "WeaponHandle",
+            "parent": "233",
+            "translation": [
+                0.431959,
+                0.0000283,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "mesh": "8",
+                        "material": "26"
+                    }
+                }
+            ],
+            "scaling": [
+                0.1,
+                0.0199999,
+                0.0199999
+            ]
+        },
+        "241": {
+            "name": "Environment"
+        },
+        "242": {
+            "name": "Table",
+            "parent": "241",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "mesh": "8",
+                        "material": "25"
+                    }
+                },
+                {
+                    "type": "physx",
+                    "physx": {
+                        "static": true,
+                        "shape": "box",
+                        "box": {
+                            "extents": [
+                                2.0,
+                                0.25,
+                                0.75
+                            ]
+                        },
+                        "bounciness": 0.0
+                    },
+                    "active": true
+                }
+            ],
+            "translation": [
+                0.0,
+                0.2991079,
+                0.0034008
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                2.0690922,
+                0.2675207,
+                0.75
+            ]
+        },
+        "243": {
+            "name": "Weapon Double Hand",
+            "translation": [
+                0.2825268,
+                0.6537163,
+                0.3617783
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.7071065,
+                0.7071069
+            ],
+            "scaling": [
+                0.9999639,
+                0.9999638,
+                1.0
+            ],
+            "components": [
+                {
+                    "type": "grabbable",
+                    "grabbable": {
+                        "handle": "245",
+                        "handleSecondary": "246",
+                        "distanceMarker": "249"
+                    }
+                },
+                {
+                    "type": "physx",
+                    "active": true,
+                    "physx": {
+                        "shape": "box",
+                        "box": {
+                            "extents": [
+                                0.05,
+                                0.05,
+                                0.25
+                            ]
+                        },
+                        "bounciness": 0.0,
+                        "mass": 15.0,
+                        "dynamicFriction": 1.0,
+                        "linearDamping": 1.0,
+                        "staticFriction": 1.0,
+                        "angularDamping": 1.0
+                    }
+                },
+                {
+                    "type": "collision",
+                    "collision": {
+                        "sphere": {
+                            "radius": 0.2
+                        },
+                        "collider": "box",
+                        "aabb": {
+                            "extents": [
+                                0.1,
+                                0.1,
+                                0.3
+                            ]
+                        },
+                        "groups": 128,
+                        "box": {
+                            "extents": [
+                                0.1,
+                                0.1,
+                                0.3
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        "244": {
+            "name": "Base",
+            "parent": "243",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "mesh": "8",
+                        "material": "22"
+                    }
+                }
+            ],
+            "scaling": [
+                0.05,
+                0.05,
+                0.25
+            ],
+            "translation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ]
+        },
+        "245": {
+            "name": "GrabBack",
+            "parent": "243",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "mesh": "8",
+                        "material": "26"
+                    }
+                },
+                {
+                    "type": "collision",
+                    "collision": {
+                        "sphere": {
+                            "radius": 0.05
+                        },
+                        "groups": 127
+                    }
+                },
+                {
+                    "type": "interactable",
+                    "interactable": {
+                        "snap": true
+                    }
+                }
+            ],
+            "scaling": [
+                0.0249996,
+                0.05,
+                0.0249996
+            ],
+            "translation": [
+                2.2351741790771484e-8,
+                -0.0928863,
+                0.2157722
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0000021,
+                1.0
+            ]
+        },
+        "246": {
+            "name": "GrabFront",
+            "parent": "243",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "mesh": "8",
+                        "material": "26"
+                    }
+                },
+                {
+                    "type": "collision",
+                    "collision": {
+                        "sphere": {
+                            "radius": 0.05
+                        },
+                        "groups": 127
+                    }
+                },
+                {
+                    "type": "interactable",
+                    "interactable": {
+                        "snap": true
+                    }
+                }
+            ],
+            "scaling": [
+                0.025,
+                0.05,
+                0.025
+            ],
+            "translation": [
+                0.000003,
+                -0.092888,
+                -0.0484889
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ]
+        },
+        "247": {
+            "name": "DistanceRayLeft",
+            "parent": "130",
+            "components": [
+                {
+                    "type": "mesh"
+                },
+                {
+                    "type": "collision",
+                    "collision": {
+                        "collider": "box",
+                        "box": {
+                            "extents": [
+                                0.2,
+                                0.2,
+                                1.0
+                            ]
+                        },
+                        "groups": 128
+                    }
+                }
+            ],
+            "translation": [
+                0.0,
+                0.0,
+                -1.0499999
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "249": {
+            "name": "Marker",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "mesh": "250",
+                        "material": "252"
+                    }
+                }
+            ],
+            "translation": [
+                14.3931207,
+                1.0,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                0.9999999
+            ]
+        },
+        "248": {
+            "name": "DistanceRayRight",
+            "parent": "129",
+            "translation": [
+                0.0,
+                0.0,
+                -2.0999999
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "components": [
+                {
+                    "type": "collision",
+                    "collision": {
+                        "collider": "box",
+                        "box": {
+                            "extents": [
+                                0.2,
+                                0.2,
+                                2.0
+                            ]
+                        },
+                        "groups": 128
+                    },
+                    "active": true
+                }
+            ]
+        }
+    },
+    "meshes": {
+        "7": {
+            "link": {
+                "name": "PrimitivePlane",
+                "file": "default"
+            }
+        },
+        "8": {
+            "link": {
+                "name": "PrimitiveCube",
+                "file": "default"
+            }
+        },
+        "9": {
+            "link": {
+                "name": "PrimitiveSphere",
+                "file": "default"
+            }
+        },
+        "10": {
+            "link": {
+                "name": "PrimitiveCone",
+                "file": "default"
+            }
+        },
+        "11": {
+            "link": {
+                "name": "PrimitiveCylinder",
+                "file": "default"
+            }
+        },
+        "12": {
+            "link": {
+                "name": "PrimitiveCircle",
+                "file": "default"
+            }
+        },
+        "47": {
+            "link": {
+                "name": "controller_plyShape",
+                "file": "models\\oculus-touch-v2-left.glb"
+            }
+        },
+        "48": {
+            "link": {
+                "name": "controller_plyShape.003",
+                "file": "models\\oculus-touch-v2-left.glb"
+            }
+        },
+        "49": {
+            "link": {
+                "name": "controller_plyShape.005",
+                "file": "models\\oculus-touch-v2-left.glb"
+            }
+        },
+        "50": {
+            "link": {
+                "name": "controller_plyShape.006",
+                "file": "models\\oculus-touch-v2-left.glb"
+            }
+        },
+        "51": {
+            "link": {
+                "name": "controller_plyShape.004",
+                "file": "models\\oculus-touch-v2-left.glb"
+            }
+        },
+        "52": {
+            "link": {
+                "name": "controller_plyShape.002",
+                "file": "models\\oculus-touch-v2-left.glb"
+            }
+        },
+        "89": {
+            "link": {
+                "name": "controller_plyShape.004",
+                "file": "models\\oculus-touch-v2-right.glb"
+            }
+        },
+        "90": {
+            "link": {
+                "name": "controller_plyShape.005",
+                "file": "models\\oculus-touch-v2-right.glb"
+            }
+        },
+        "91": {
+            "link": {
+                "name": "controller_plyShape",
+                "file": "models\\oculus-touch-v2-right.glb"
+            }
+        },
+        "92": {
+            "link": {
+                "name": "controller_plyShape.002",
+                "file": "models\\oculus-touch-v2-right.glb"
+            }
+        },
+        "93": {
+            "link": {
+                "name": "controller_plyShape.003",
+                "file": "models\\oculus-touch-v2-right.glb"
+            }
+        },
+        "94": {
+            "link": {
+                "name": "controller_plyShape.001",
+                "file": "models\\oculus-touch-v2-right.glb"
+            }
+        },
+        "132": {
+            "link": {
+                "name": "Mesh",
+                "file": "models\\hand-left.glb"
+            },
+            "name": "HandLeft"
+        },
+        "165": {
+            "link": {
+                "name": "Mesh.001",
+                "file": "models\\hand-right.glb"
+            },
+            "name": "HandRight"
+        },
+        "195": {
+            "link": {
+                "name": "Cube.001",
+                "file": "models\\button.glb"
+            },
+            "name": "Button"
+        },
+        "207": {
+            "link": {
+                "name": "TeleportIndicator",
+                "file": "models\\teleport-indicator.glb"
+            }
+        },
+        "250": {
+            "link": {
+                "name": "Circle",
+                "file": "models\\marker.glb"
+            }
+        }
+    },
+    "textures": {
+        "44": {
+            "link": {
+                "name": "texture_0",
+                "file": "models\\oculus-touch-v2-left.glb"
+            }
+        },
+        "45": {
+            "link": {
+                "name": "texture_1",
+                "file": "models\\oculus-touch-v2-left.glb"
+            }
+        },
+        "86": {
+            "link": {
+                "name": "texture_0",
+                "file": "models\\oculus-touch-v2-right.glb"
+            }
+        },
+        "87": {
+            "link": {
+                "name": "texture_1",
+                "file": "models\\oculus-touch-v2-right.glb"
+            }
+        },
+        "236": {
+            "link": {
+                "name": "skybox.png",
+                "file": "textures\\skybox.png"
+            }
+        }
+    },
+    "images": {
+        "42": {
+            "link": {
+                "name": "Image_0",
+                "file": "models\\oculus-touch-v2-left.glb"
+            },
+            "maxSize": [
+                1024,
+                1024
+            ]
+        },
+        "43": {
+            "link": {
+                "name": "Image_1",
+                "file": "models\\oculus-touch-v2-left.glb"
+            },
+            "maxSize": [
+                256,
+                256
+            ]
+        },
+        "84": {
+            "link": {
+                "name": "Image_0",
+                "file": "models\\oculus-touch-v2-right.glb"
+            },
+            "maxSize": [
+                1024,
+                1024
+            ]
+        },
+        "85": {
+            "link": {
+                "name": "Image_1",
+                "file": "models\\oculus-touch-v2-right.glb"
+            },
+            "maxSize": [
+                256,
+                256
+            ]
+        }
+    },
+    "materials": {
+        "DefaultFontMaterial": {
+            "link": {
+                "name": "DefaultFontMaterial",
+                "file": "default"
+            },
+            "Text": {
+                "effectColor": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "font": "232"
+            }
+        },
+        "20": {
+            "name": "White",
+            "shader": "Phong",
+            "Phong": {
+                "specularColor": [
+                    9.999899930335232e-7,
+                    9.99993744699168e-7,
+                    9.999999974752427e-7,
+                    1.0
+                ],
+                "shininess": 1,
+                "emissiveColor": [
+                    0.2,
+                    0.2,
+                    0.2,
+                    1.0
+                ],
+                "ambientColor": [
+                    0.05,
+                    0.05,
+                    0.05,
+                    1.0
+                ],
+                "diffuseColor": [
+                    0.5,
+                    0.5,
+                    0.5,
+                    1.0
+                ]
+            }
+        },
+        "22": {
+            "name": "Pink",
+            "Phong": {
+                "diffuseColor": [
+                    0.9098039,
+                    0.0,
+                    0.5411764,
+                    1.0
+                ],
+                "specularColor": [
+                    9.999899930335232e-7,
+                    9.999911299019004e-7,
+                    9.999999974752427e-7,
+                    1.0
+                ],
+                "shininess": 10,
+                "ambientColor": [
+                    0.05,
+                    0.05,
+                    0.05,
+                    1.0
+                ],
+                "emissiveColor": [
+                    0.317647,
+                    0.0,
+                    0.2165776,
+                    1.0
+                ]
+            }
+        },
+        "25": {
+            "name": "Yellow",
+            "Phong": {
+                "diffuseColor": [
+                    1.0,
+                    0.8039215,
+                    0.0,
+                    1.0
+                ],
+                "specularColor": [
+                    9.999999974752427e-7,
+                    9.999899930335232e-7,
+                    9.999899930335232e-7,
+                    1.0
+                ],
+                "ambientColor": [
+                    0.05,
+                    0.05,
+                    0.05,
+                    1.0
+                ],
+                "emissiveColor": [
+                    0.3843137,
+                    0.3089579,
+                    0.0,
+                    1.0
+                ]
+            }
+        },
+        "26": {
+            "name": "Green",
+            "Phong": {
+                "diffuseColor": [
+                    0.1529411,
+                    0.7882353,
+                    0.5411764,
+                    1.0
+                ],
+                "specularColor": [
+                    9.999999974752427e-7,
+                    9.999899930335232e-7,
+                    9.999899930335232e-7,
+                    1.0
+                ],
+                "ambientColor": [
+                    0.05,
+                    0.05,
+                    0.05,
+                    1.0
+                ],
+                "emissiveColor": [
+                    0.0,
+                    0.2352941,
+                    0.1437907,
+                    1.0
+                ]
+            }
+        },
+        "46": {
+            "link": {
+                "name": "skel_controller_materials_controllerMTL1",
+                "file": "models\\oculus-touch-v2-left.glb"
+            },
+            "name": "ControllerLeft",
+            "Phong": {
+                "ambientColor": [
+                    0.05,
+                    0.05,
+                    0.05,
+                    1.0
+                ],
+                "diffuseColor": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "diffuseTexture": "44",
+                "specularColor": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    0.004
+                ]
+            },
+            "pipeline": "38"
+        },
+        "88": {
+            "link": {
+                "name": "skel_controller_materials_controllerMTL",
+                "file": "models\\oculus-touch-v2-right.glb"
+            },
+            "name": "ControllerRight",
+            "Phong": {
+                "ambientColor": [
+                    0.05,
+                    0.05,
+                    0.05,
+                    1.0
+                ],
+                "diffuseColor": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            }
+        },
+        "128": {
+            "name": "Cursor",
+            "shader": "Phong",
+            "Phong": {
+                "specularColor": [
+                    9.999899930335232e-7,
+                    9.99993744699168e-7,
+                    9.999999974752427e-7,
+                    1.0
+                ],
+                "shininess": 1
+            },
+            "pipeline": "34"
+        },
+        "131": {
+            "link": {
+                "name": "Default_Material",
+                "file": "models\\hand-left.glb"
+            },
+            "name": "HandLeft",
+            "Phong": {
+                "ambientColor": [
+                    0.05,
+                    0.05,
+                    0.05,
+                    1.0
+                ]
+            }
+        },
+        "164": {
+            "link": {
+                "name": "lambert2",
+                "file": "models\\hand-right.glb"
+            },
+            "name": "HandRight",
+            "Phong": {
+                "ambientColor": [
+                    0.05,
+                    0.05,
+                    0.05,
+                    1.0
+                ]
+            }
+        },
+        "201": {
+            "link": {
+                "name": "DefaultFontMaterial",
+                "file": "default"
+            },
+            "name": "TextAccent",
+            "Text": {
+                "color": [
+                    0.9098039,
+                    0.0,
+                    0.5411764,
+                    1.0
+                ],
+                "font": "232"
+            }
+        },
+        "202": {
+            "name": "Dark",
+            "shader": "Phong",
+            "Phong": {
+                "specularColor": [
+                    9.999899930335232e-7,
+                    9.99993744699168e-7,
+                    9.999999974752427e-7,
+                    1.0
+                ],
+                "shininess": 1,
+                "diffuseColor": [
+                    0.1686274,
+                    0.1686257,
+                    0.1686257,
+                    1.0
+                ],
+                "ambientColor": [
+                    0.05,
+                    0.05,
+                    0.05,
+                    1.0
+                ],
+                "emissiveColor": [
+                    0.0274509,
+                    0.0274506,
+                    0.0274506,
+                    1.0
+                ]
+            }
+        },
+        "203": {
+            "name": "GreenHover",
+            "Phong": {
+                "diffuseColor": [
+                    0.4894117,
+                    0.917647,
+                    0.7511102,
+                    1.0
+                ],
+                "specularColor": [
+                    9.999999974752427e-7,
+                    9.999899930335232e-7,
+                    9.999899930335232e-7,
+                    1.0
+                ],
+                "ambientColor": [
+                    0.05,
+                    0.05,
+                    0.05,
+                    1.0
+                ],
+                "emissiveColor": [
+                    0.0,
+                    0.3294116,
+                    0.2013071,
+                    1.0
+                ]
+            }
+        },
+        "206": {
+            "link": {
+                "name": "TeleportIndicator",
+                "file": "models\\teleport-indicator.glb"
+            },
+            "Phong": {
+                "diffuseColor": [
+                    0.6862745,
+                    0.6862676,
+                    0.6862676,
+                    1.0
+                ]
+            },
+            "pipeline": "34",
+            "Flat": {
+                "color": [
+                    0.8392156,
+                    0.8392072,
+                    0.8392072,
+                    1.0
+                ]
+            }
+        },
+        "234": {
+            "link": {
+                "name": "TeleportIndicator",
+                "file": "models\\teleport-indicator.glb"
+            },
+            "Phong": {
+                "diffuseColor": [
+                    0.6862745,
+                    0.6862676,
+                    0.6862676,
+                    1.0
+                ]
+            },
+            "pipeline": "229",
+            "Flat": {
+                "color": [
+                    0.8392156,
+                    0.8392072,
+                    0.8392072,
+                    1.0
+                ]
+            },
+            "name": "Sky",
+            "Sky": {
+                "texture": "236"
+            }
+        },
+        "252": {
+            "link": {
+                "name": "TeleportIndicator",
+                "file": "models\\teleport-indicator.glb"
+            },
+            "Phong": {
+                "diffuseColor": [
+                    0.6862745,
+                    0.6862676,
+                    0.6862676,
+                    1.0
+                ]
+            },
+            "pipeline": "253",
+            "Flat": {
+                "color": [
+                    0.75,
+                    0.8999999,
+                    1.0,
+                    0.75
+                ]
+            },
+            "name": "GrabMarker"
+        }
+    },
+    "shaders": {
+        "1": {
+            "link": {
+                "name": "DistanceFieldVector Textured.frag",
+                "file": "default"
+            }
+        },
+        "2": {
+            "link": {
+                "name": "Flat.frag",
+                "file": "default"
+            }
+        },
+        "3": {
+            "link": {
+                "name": "Flat Textured.frag",
+                "file": "default"
+            }
+        },
+        "4": {
+            "link": {
+                "name": "MeshVisualizer.frag",
+                "file": "default"
+            }
+        },
+        "5": {
+            "link": {
+                "name": "Phong.frag",
+                "file": "default"
+            }
+        },
+        "6": {
+            "link": {
+                "name": "Phong Textured.frag",
+                "file": "default"
+            }
+        },
+        "28": {
+            "link": {
+                "name": "Dynamic.vert",
+                "file": "default"
+            }
+        },
+        "29": {
+            "link": {
+                "name": "Particle Textured.frag",
+                "file": "default"
+            }
+        },
+        "30": {
+            "link": {
+                "name": "Skinning.vert",
+                "file": "default"
+            }
+        },
+        "31": {
+            "link": {
+                "name": "Static.frag",
+                "file": "default"
+            }
+        },
+        "32": {
+            "link": {
+                "name": "DistanceFieldVector.frag",
+                "file": "default"
+            }
+        },
+        "37": {
+            "link": {
+                "name": "Particle.frag",
+                "file": "default"
+            }
+        },
+        "217": {
+            "link": {
+                "name": "Background.frag",
+                "file": "default"
+            }
+        },
+        "218": {
+            "link": {
+                "name": "Depth.frag",
+                "file": "default"
+            }
+        },
+        "220": {
+            "link": {
+                "name": "FullScreenTriangle.vert",
+                "file": "default"
+            }
+        },
+        "221": {
+            "link": {
+                "name": "Physical.frag",
+                "file": "default"
+            }
+        },
+        "224": {
+            "link": {
+                "name": "Sky.frag",
+                "file": "default"
+            }
+        },
+        "225": {
+            "link": {
+                "name": "Text.frag",
+                "file": "default"
+            }
+        },
+        "227": {
+            "link": {
+                "name": "Text.vert",
+                "file": "default"
+            }
+        },
+        "228": {
+            "link": {
+                "name": "TileFeedback.frag",
+                "file": "default"
+            }
+        },
+        "254": {
+            "link": {
+                "name": "lib\\Color.glsl",
+                "file": "default"
+            }
+        },
+        "255": {
+            "link": {
+                "name": "lib\\Compatibility.frag",
+                "file": "default"
+            }
+        },
+        "256": {
+            "link": {
+                "name": "lib\\CoordinateSystems.glsl",
+                "file": "default"
+            }
+        },
+        "257": {
+            "link": {
+                "name": "lib\\GI.frag",
+                "file": "default"
+            }
+        },
+        "258": {
+            "link": {
+                "name": "lib\\Inputs.frag",
+                "file": "default"
+            }
+        },
+        "259": {
+            "link": {
+                "name": "lib\\Lights.frag",
+                "file": "default"
+            }
+        },
+        "260": {
+            "link": {
+                "name": "lib\\Materials.frag",
+                "file": "default"
+            }
+        },
+        "261": {
+            "link": {
+                "name": "lib\\Math.glsl",
+                "file": "default"
+            }
+        },
+        "262": {
+            "link": {
+                "name": "lib\\Packing.frag",
+                "file": "default"
+            }
+        },
+        "263": {
+            "link": {
+                "name": "lib\\Quaternion.glsl",
+                "file": "default"
+            }
+        },
+        "264": {
+            "link": {
+                "name": "lib\\ShaderType.glsl",
+                "file": "default"
+            }
+        },
+        "265": {
+            "link": {
+                "name": "lib\\Slug.frag",
+                "file": "default"
+            }
+        },
+        "266": {
+            "link": {
+                "name": "lib\\Slug.vert",
+                "file": "default"
+            }
+        },
+        "267": {
+            "link": {
+                "name": "lib\\Surface.frag",
+                "file": "default"
+            }
+        },
+        "268": {
+            "link": {
+                "name": "lib\\Textures.frag",
+                "file": "default"
+            }
+        },
+        "269": {
+            "link": {
+                "name": "lib\\Uniforms.glsl",
+                "file": "default"
+            }
+        }
+    },
+    "settings": {
+        "project": {
+            "name": "Interaction",
+            "version": [
+                1,
+                0,
+                4
+            ]
+        },
+        "vr": {
+            "leftEyeObject": "18",
+            "rightEyeObject": "19"
+        },
+        "scripting": {
+            "sourcePaths": [
+                "js/"
+            ],
+            "bundlingType": "esbuild",
+            "libraryPaths": [
+                "/js/lib/"
+            ]
+        },
+        "runtime": {
+            "visualizeColliders": false,
+            "webxr": {
+                "optionalFeatures": {
+                    "local-floor": true
+                }
+            },
+            "visualizePhysX": false
+        },
+        "physx": {
+            "enable": true,
+            "restOffset": 0.0,
+            "contactOffset": 1.0
+        },
+        "rendering": {
+            "sky": {
+                "enabled": false,
+                "material": "234"
+            }
+        }
+    },
+    "animations": {},
+    "skins": {
+        "133": {
+            "link": {
+                "name": "Armature",
+                "file": "models\\hand-left.glb"
+            },
+            "name": "HandLeftSkin",
+            "joints": []
+        },
+        "166": {
+            "link": {
+                "name": "Armature",
+                "file": "models\\hand-right.glb"
+            },
+            "name": "HandRightSkin",
+            "joints": []
+        }
+    },
+    "pipelines": {
+        "33": {
+            "link": {
+                "name": "DistanceFieldVector",
+                "file": "default"
+            }
+        },
+        "34": {
+            "link": {
+                "name": "Flat Opaque",
+                "file": "default"
+            }
+        },
+        "35": {
+            "link": {
+                "name": "Flat Opaque Textured",
+                "file": "default"
+            },
+            "features": {
+                "ALPHA_MASKED": true
+            }
+        },
+        "36": {
+            "link": {
+                "name": "MeshVisualizer",
+                "file": "default"
+            }
+        },
+        "37": {
+            "link": {
+                "name": "Phong Opaque",
+                "file": "default"
+            },
+            "features": {
+                "DEPRECATED_LIGHT_ATTENUATION": true,
+                "WITH_EMISSIVE": true
+            }
+        },
+        "38": {
+            "link": {
+                "name": "Phong Opaque Textured",
+                "file": "default"
+            },
+            "features": {
+                "ALPHA_MASKED": true,
+                "DEPRECATED_LIGHT_ATTENUATION": true
+            }
+        },
+        "39": {
+            "link": {
+                "name": "Foliage",
+                "file": "default"
+            },
+            "features": {
+                "DEPRECATED_LIGHT_ATTENUATION": true
+            }
+        },
+        "40": {
+            "link": {
+                "name": "Particle",
+                "file": "default"
+            }
+        },
+        "219": {
+            "link": {
+                "name": "Depth",
+                "file": "default"
+            }
+        },
+        "222": {
+            "link": {
+                "name": "Physical Opaque",
+                "file": "default"
+            }
+        },
+        "223": {
+            "link": {
+                "name": "Physical Opaque Textured",
+                "file": "default"
+            },
+            "features": {
+                "ALPHA_MASKED": true
+            }
+        },
+        "226": {
+            "link": {
+                "name": "Text",
+                "file": "default"
+            }
+        },
+        "229": {
+            "link": {
+                "name": "Sky",
+                "file": "default"
+            }
+        },
+        "230": {
+            "link": {
+                "name": "Phong Normalmapped",
+                "file": "default"
+            },
+            "features": {
+                "DEPRECATED_LIGHT_ATTENUATION": true
+            }
+        },
+        "231": {
+            "link": {
+                "name": "Phong Lightmapped",
+                "file": "default"
+            },
+            "features": {
+                "DEPRECATED_LIGHT_ATTENUATION": true
+            }
+        },
+        "253": {
+            "link": {
+                "name": "Flat Opaque",
+                "file": "default"
+            },
+            "name": "Flat Transparent",
+            "depthTest": false,
+            "depthWrite": false,
+            "blending": true
+        }
+    },
+    "files": [
+        {
+            "fileName": "models/oculus-touch-v2-left.glb",
+            "importerName": ""
+        },
+        {
+            "fileName": "models/oculus-touch-v2-right.glb",
+            "importerName": ""
+        },
+        {
+            "fileName": "models/hand-left.glb",
+            "importerName": ""
+        },
+        {
+            "fileName": "models/hand-right.glb",
+            "importerName": ""
+        },
+        {
+            "fileName": "models/button.glb",
+            "importerName": ""
+        },
+        {
+            "fileName": "models/teleport-indicator.glb",
+            "importerName": ""
+        },
+        {
+            "fileName": "models/marker.glb",
+            "importerName": ""
+        }
+    ],
+    "fonts": {
+        "232": {
+            "link": {
+                "name": "DejaVuSans.ttf",
+                "file": "default"
+            }
+        }
+    },
+    "languages": {}
+}
