@@ -1,0 +1,60 @@
+{
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended-type-checked"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+        "@typescript-eslint"
+    ],
+    "root": true,
+    "settings": {},
+    "parserOptions": {
+        "project": true,
+        "tsconfigRootDir": "./"
+    },
+    "overrides": [
+        {
+            "files": [
+                "src/**/*.ts"
+            ]
+        }
+    ],
+    "rules": {
+        "@typescript-eslint/naming-convention": [
+            "error",
+            {
+                "selector": "enum",
+                "format": [
+                    "PascalCase"
+                ]
+            },
+            {
+                "selector": "property",
+                "format": [
+                    "camelCase"
+                    
+                ]
+            },
+            {
+                "selector": "property",
+                "modifiers": [
+                    "static"
+                ],
+                "format": [
+                    "PascalCase"
+                ]
+            },
+            {
+                "selector": "property",
+                "types": ["boolean"],
+                "format": ["PascalCase"],
+                "prefix": ["is", "should", "has", "can", "did", "will","use"]
+            }
+        ],
+        "@typescript-eslint/no-unsafe-member-access": "warn",
+        "@typescript-eslint/no-unsafe-call": "warn",
+        "@typescript-eslint/no-inferrable-types": "error",
+        "curly": "error"
+    }
+}
