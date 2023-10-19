@@ -31,10 +31,16 @@
             },
             {
                 "selector": "property",
-                "format": [
-                    "camelCase"
-                    
-                ]
+                "format": ["camelCase"],
+                "leadingUnderscore": "forbid"
+            },
+            {
+                "selector": "property",
+                "modifiers":[
+                    "private"
+                ],
+                "format": ["camelCase"],
+                "leadingUnderscore": "allow"
             },
             {
                 "selector": "property",
@@ -49,7 +55,16 @@
                 "selector": "property",
                 "types": ["boolean"],
                 "format": ["PascalCase"],
-                "prefix": ["is", "should", "has", "can", "did", "will","use"]
+                "prefix": ["is", "should", "has", "can", "did", "will","use","enable"]
+            },
+            {
+                "selector": "property",
+                "modifiers":[
+                    "private"
+                ],
+                "format": ["PascalCase"],
+                "types": ["boolean"],
+                "prefix": ["_is", "_should", "_has", "_can", "_did", "_will","_use","_enable"]
             }
         ],
         "@typescript-eslint/no-unsafe-member-access": "warn",

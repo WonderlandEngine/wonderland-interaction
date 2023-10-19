@@ -30,7 +30,7 @@ export class Interactor extends Component {
      * gamepad library.
      */
     @property.bool(true)
-    public useDefaultInputs: boolean = true;
+    public useDefaultInputs = true;
 
     /** Handedness value. Compare against {@link Handedness}. */
     @property.enum(HandednessValues, Handedness.Right)
@@ -99,8 +99,9 @@ export class Interactor extends Component {
      */
     start() {
         this._collision = this.object.getComponent('collision', 0)!;
-        if (!this._collision)
+        if (!this._collision) {
             throw new Error('grabber.start(): No collision component found');
+        }
 
         this._onSceneLoaded();
     }
@@ -149,7 +150,7 @@ export class Interactor extends Component {
      */
     public stopInteraction() {
         if (this._interactable) {
-            this._interactable!.onSelectEnd.notify(this, this._interactable);
+            this._interactable.onSelectEnd.notify(this, this._interactable);
             this._onGripEnd.notify(this._interactable);
         }
         this._interactable = null;
@@ -203,7 +204,9 @@ export class Interactor extends Component {
             }
         });
 
-        if (!this.useDefaultInputs) return;
+        if (!this.useDefaultInputs) {
+            return;
+        }
 
         session.addEventListener('selectstart', (event) => {
             if (this.#xrInputSource === event.inputSource) {

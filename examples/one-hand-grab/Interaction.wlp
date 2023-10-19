@@ -2334,8 +2334,8 @@
             "name": "Interaction",
             "version": [
                 1,
-                0,
-                4
+                1,
+                2
             ]
         },
         "vr": {
@@ -2349,7 +2349,8 @@
             "bundlingType": "esbuild",
             "libraryPaths": [
                 "/js/lib/"
-            ]
+            ],
+            "esbuildFlags": "--format=esm --target=es2022"
         },
         "runtime": {
             "visualizeColliders": false,
@@ -2514,38 +2515,44 @@
             "depthTest": false,
             "depthWrite": false,
             "blending": true
+        },
+        "270": {
+            "link": {
+                "name": "TileFeedback",
+                "file": "default"
+            }
         }
     },
-    "files": [
-        {
+    "files": {
+        "271": {
             "fileName": "models/oculus-touch-v2-left.glb",
             "importerName": ""
         },
-        {
+        "272": {
             "fileName": "models/oculus-touch-v2-right.glb",
             "importerName": ""
         },
-        {
+        "273": {
             "fileName": "models/hand-left.glb",
             "importerName": ""
         },
-        {
+        "274": {
             "fileName": "models/hand-right.glb",
             "importerName": ""
         },
-        {
+        "275": {
             "fileName": "models/button.glb",
             "importerName": ""
         },
-        {
+        "276": {
             "fileName": "models/teleport-indicator.glb",
             "importerName": ""
         },
-        {
+        "277": {
             "fileName": "models/marker.glb",
             "importerName": ""
         }
-    ],
+    },
     "fonts": {
         "232": {
             "link": {

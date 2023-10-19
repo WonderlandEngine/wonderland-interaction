@@ -26,7 +26,7 @@ export class Interactable extends Component {
      * of the object containing this interactable as an anchor point / rotation.
      */
     @property.bool(true)
-    public snap: boolean = true;
+    public shouldSnap = true;
 
     /** Private Attributes. */
 

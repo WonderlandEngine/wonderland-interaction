@@ -26,7 +26,9 @@ enum InteractionType {
 const search = (function () {
     const temp = vec3.create();
     return function (target: vec3, collision: CollisionComponent | null) {
-        if (!collision) return null;
+        if (!collision) {
+            return null;
+        }
         // @todo: Add delay to only check every few frames
         const overlaps = collision.queryOverlaps();
         let closestDistance = Number.MAX_VALUE;
@@ -34,7 +36,9 @@ const search = (function () {
 
         for (let i = 0; i < overlaps.length; ++i) {
             const grabbable = overlaps[i].object.getComponent(Grabbable);
-            if (!grabbable) continue;
+            if (!grabbable) {
+                continue;
+            }
             const world = grabbable.object.getPositionWorld(temp);
             const dist = vec3.squaredDistance(target, world);
             if (dist < closestDistance) {
@@ -91,11 +95,11 @@ export class DistanceInteractor extends Component {
 
     /** Index of the collision component on the {@link ray} object. */
     @property.int(0)
-    rayCollision: number = 0;
+    rayCollision = 0;
 
     /** Distance grabbing speed. */
     @property.float(1.0)
-    speed: number = 1.0;
+    speed = 1.0;
 
     /**
      * Delay, in **seconds**, before the next search.
@@ -103,7 +107,7 @@ export class DistanceInteractor extends Component {
      * Higher delay improve performance, but decrease the reaction
      */
     @property.float(0.0)
-    searchDelay: number = 0.05;
+    searchDelay = 0.05;
 
     /** Main interactor. @hidden */
     private _interactor: Interactor = null!;
@@ -121,7 +125,9 @@ export class DistanceInteractor extends Component {
 
     /** @hidden */
     private _onGripStart = () => {
-        if (this._interaction !== InteractionType.Searching || !this._targetGrab) return;
+        if (this._interaction !== InteractionType.Searching || !this._targetGrab) {
+            return;
+        }
 
         this._targetInteract = this._targetGrab.getInteractable(
             this._targetGrab.distanceHandle
@@ -179,9 +185,13 @@ export class DistanceInteractor extends Component {
     /** @overload */
     update(dt: number) {
         /* Interaction is ongoing, skip search. */
-        if (this._interactor.interactable) return;
+        if (this._interactor.interactable) {
+            return;
+        }
 
-        if (this._interaction === InteractionType.None) return;
+        if (this._interaction === InteractionType.None) {
+            return;
+        }
 
         const interactorPos = this._interactor.object.getPositionWorld(_pointA);
 
