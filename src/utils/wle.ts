@@ -6,7 +6,9 @@ const _vectorA = vec3.create();
 const _boundingSphere = vec4.create();
 
 function joinBoundingSphere(out: vec4, other: vec4): vec4 {
-    if (other[3] <= 0.00001) return out;
+    if (other[3] <= 0.00001) {
+        return out;
+    }
 
     if (other[3] <= 0.00001) {
         vec3.copy(out as vec3, other as vec3);
@@ -43,10 +45,14 @@ function joinBoundingSphere(out: vec4, other: vec4): vec4 {
 
 function radiusHierarchyRec(out: vec4, target: Object3D): vec4 {
     const children = target.children;
-    for (const child of children) radiusHierarchyRec(out, child);
+    for (const child of children) {
+        radiusHierarchyRec(out, child);
+    }
 
     const mesh = target.getComponent(MeshComponent);
-    if (!mesh || !mesh.mesh) return out;
+    if (!mesh || !mesh.mesh) {
+        return out;
+    }
 
     mesh.mesh.getBoundingSphere(_boundingSphere);
     const worldScale = target.getScalingWorld();
