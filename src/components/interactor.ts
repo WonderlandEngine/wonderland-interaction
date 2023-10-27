@@ -8,6 +8,15 @@ export enum Handedness {
     Right = 'right',
     Left = 'left',
 }
+
+/**
+ * Mapping from button name to their index in [Gamepad.buttons](https://developer.mozilla.org/en-US/docs/Web/API/Gamepad/buttons).
+ */
+export enum GamepadButtonBinding {
+    Trigger = 0,
+    Grip = 1,
+}
+
 export const HandednessValues = Object.values(Handedness);
 
 /**
@@ -174,6 +183,13 @@ export class Interactor extends Component {
      */
     get xrPose(): XRPose | null {
         return this.#xrPose;
+    }
+
+    /**
+     * Current [XR input source](https://developer.mozilla.org/en-US/docs/Web/API/XRInputSource).
+     */
+    get xrInputSource(): XRInputSource | null {
+        return this.#xrInputSource;
     }
 
     /**

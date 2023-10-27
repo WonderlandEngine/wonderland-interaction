@@ -7,11 +7,10 @@ import {typename} from '../constants.js';
 import {radiusHierarchy} from '../utils/wle.js';
 import {Grabbable} from './grabbable.js';
 import {Interactable} from './interactable.js';
-import {Interactor} from './interactor.js';
+import {GamepadButtonBinding, Interactor} from './interactor.js';
 
 /** Different interaction type. */
 enum InteractionType {
-    None,
     Searching,
     Fetching,
 }
@@ -123,8 +122,8 @@ export class DistanceInteractor extends Component {
     /** Elapsed time to last search. */
     private _lastSearchElapsedTime = 0.0;
 
-    /** @hidden */
-    private _onGripStart = () => {
+    /** Try to distance interact with the focused object. */
+    startInteraction() {
         if (this._interaction !== InteractionType.Searching || !this._targetGrab) {
             return;
         }
@@ -135,10 +134,10 @@ export class DistanceInteractor extends Component {
         this._interaction = InteractionType.Fetching;
         resetMarker(this._targetGrab.distanceMarker);
         this._targetGrab.disablePhysx();
-    };
+    }
 
-    /** @hidden */
-    private _onGripEnd = () => {
+    /** Stop distance interaction. */
+    stopInteraction() {
         if (this._interaction == InteractionType.Fetching && this._targetGrab) {
             this._targetGrab.enablePhysx();
             this._targetGrab.distanceMarker?.setPositionWorld(
@@ -146,7 +145,7 @@ export class DistanceInteractor extends Component {
             );
         }
         this._interaction = InteractionType.Searching;
-    };
+    }
 
     /** @overload */
     onActivate(): void {
@@ -171,30 +170,28 @@ export class DistanceInteractor extends Component {
         this._ray = ray;
         this._interaction = InteractionType.Searching;
         this._interactor = interactor;
-        this._interactor.onGripStart.add(this._onGripStart);
-        this._interactor.onGripEnd.add(this._onGripEnd);
         this._lastSearchElapsedTime = 0.0;
     }
 
     /** @overload */
-    onDeactivate(): void {
-        this._interactor.onGripStart.remove(this._onGripStart);
-        this._interactor.onGripStart.remove(this._onGripEnd);
-    }
-
-    /** @overload */
     update(dt: number) {
+        /* In case we use the default input system, we need to start the interaction
+         * based on the xr input source grip button. */
+        if (this._interactor.useDefaultInputs && this._interactor.xrInputSource) {
+            const button = this._interactor.xrInputSource.gamepad?.buttons[GamepadButtonBinding.Trigger];
+            if (button?.pressed) {
+                this.startInteraction();
+            } else {
+                this.stopInteraction();
+            }
+        }
+
         /* Interaction is ongoing, skip search. */
         if (this._interactor.interactable) {
             return;
         }
 
-        if (this._interaction === InteractionType.None) {
-            return;
-        }
-
         const interactorPos = this._interactor.object.getPositionWorld(_pointA);
-
         if (this._interaction === InteractionType.Fetching) {
             const speed = this.speed * dt * 10.0;
             const from = this._targetInteract!.object.getPositionWorld(_pointB);
@@ -208,7 +205,6 @@ export class DistanceInteractor extends Component {
             this._targetGrab!.object.translateWorld(toInteractor);
 
             if (distSqrt < 0.01) {
-                this._interaction = InteractionType.None;
                 const interactable = this._targetInteract!;
                 this._targetGrab = null;
                 this._targetInteract = null;
