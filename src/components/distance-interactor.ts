@@ -94,7 +94,7 @@ export class DistanceInteractor extends Component {
     ray: Object3D | null = null;
 
     /** Index of the collision component on the {@link ray} object. */
-    @property.int(0)
+    @property.int()
     rayCollision = 0;
 
     /** Distance grabbing speed. */
@@ -107,7 +107,7 @@ export class DistanceInteractor extends Component {
      * Higher delay improve performance, but decrease the reaction
      */
     @property.float(0.0)
-    searchDelay = 0.05;
+    searchDelay = 0.0;
 
     /** Main interactor. @hidden */
     private _interactor: Interactor = null!;
