@@ -2,7 +2,7 @@
     "compilerOptions": {
         "target": "ES2022",
         "module": "NodeNext",
-        "moduleResolution": "nodenext",
+        "moduleResolution": "NodeNext",
         "outDir": "./dist",
         "declaration": true,
         "allowJs": false,
