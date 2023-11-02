@@ -8,6 +8,18 @@ import {typename} from '../constants.js';
  *
  * It needs to have a physx component attached to it. And be on the root of the
  * player hierarchy.
+ *
+ * The player-controller is the main component for controlling the player's movement and
+ * uses other components to implement the various things.
+ *
+ *
+ * @see {@link InputBridge} for handling input from various input providers
+ * @see {@link LocomotionSelector} for selecting the type of locomotion to use
+ * @see {@link TeleportLocomotion} for teleport locomotion
+ * @see {@link SmoothLocomotion} for smooth locomotion
+ * @see {@link PlayerRotate} for rotating the player
+ * @see {@link HeadCollissionMove} for pushing the player backwards when their head collides with a wall / object
+ * @see {@link HeadCollissionFade} for fading to black when the player's head collides with a wall / object
  */
 export class PlayerController extends Component {
     static TypeName = typename('player-controller');
@@ -79,23 +91,13 @@ export class HeadCollissionFade extends Component {
 }
 
 /**
- * A proxy for handling input from various input providers, such as keyboard, mouse
+ * A proxy for handling input from various input providers, such as keyboard, mouse, touch,
  * VR controllers or game controllers.
  */
 export class InputBridge extends Component {
     static TypeName = typename('input-bridge');
 
-    /**
-     * The input provider to use for this bridge
-     */
-    @property.object({required: true})
-    leftHandInput!: Object3D;
-
-    leftHandInputComponent?: InputComponent | null;
-
-    start(): void {
-        this.leftHandInputComponent = this.leftHandInput.getComponent(InputComponent);
-    }
+    start(): void {}
 }
 
 /**
