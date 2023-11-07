@@ -110,21 +110,20 @@ export class ControlsKeyboard extends Component {
             return;
         }
         this.wasMoving = true;
-        // Move via Force Physx
-        this.headForward = [0, 0, 0];
+
         this.direction = [0, 0, 0];
 
         if (this.up) {
-            this.direction[2] -= 1.0;
+            this.direction[2] = -1.0;
         }
         if (this.down) {
-            this.direction[2] += 1.0;
+            this.direction[2] = 1.0;
         }
         if (this.left) {
-            this.direction[0] -= 1.0;
+            this.direction[0] = -1.0;
         }
         if (this.right) {
-            this.direction[0] += 1.0;
+            this.direction[0] = 1.0;
         }
 
         // // Move according to headObject Forward Direction

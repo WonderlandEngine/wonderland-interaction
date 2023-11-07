@@ -39,8 +39,12 @@
                             0.15,
                             0.0
                         ],
-                        "angularDamping": 0.0,
-                        "lockAxis": 56
+                        "angularDamping": 10.0,
+                        "lockAxis": 56,
+                        "linearDamping": 5.0,
+                        "staticFriction": 0.0,
+                        "dynamicFriction": 0.001,
+                        "bounciness": 0.0
                     }
                 },
                 {
