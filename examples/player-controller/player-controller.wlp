@@ -25,7 +25,7 @@
                 {
                     "type": "wlei:locomotion-selector",
                     "wlei:locomotion-selector": {
-                        "locomotionType": "Teleport"
+                        "locomotionType": "SmoothLocomotion"
                     }
                 },
                 {
@@ -48,6 +48,19 @@
                 },
                 {
                     "type": "wlei:teleport-locomotion"
+                },
+                {
+                    "type": "wlei:input-bridge",
+                    "wlei:input-bridge": {
+                        "inputs": "263"
+                    }
+                },
+                {
+                    "type": "wlei:active-camera",
+                    "wlei:active-camera": {
+                        "nonVrCamera": "17",
+                        "leftEye": "18"
+                    }
                 }
             ],
             "parent": "256"
@@ -70,9 +83,9 @@
                         "static": true,
                         "shape": "plane",
                         "rotationOffset": [
-                            -6.181724643283815e-8,
+                            -6.181724643283816e-8,
                             0.7071068,
-                            -6.181724643283815e-8,
+                            -6.181724643283816e-8,
                             -0.7071068
                         ]
                     }
@@ -1506,7 +1519,7 @@
             "translation": [
                 -2.5,
                 1.2,
-                5.960464477539063e-8
+                5.960464477539065e-8
             ],
             "rotation": [
                 0.5002118,
@@ -2133,6 +2146,15 @@
         },
         "262": {
             "name": "Lights"
+        },
+        "263": {
+            "name": "Inputs",
+            "parent": "256",
+            "components": [
+                {
+                    "type": "wlei:controls-keyboard"
+                }
+            ]
         }
     },
     "meshes": {
