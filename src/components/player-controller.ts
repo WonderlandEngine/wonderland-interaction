@@ -48,7 +48,17 @@ export class PlayerController extends Component {
 export class SmoothLocomotion extends Component {
     static TypeName = typename('smooth-locomotion');
 
+    /**
+     * Whether or not the player is allowed to move
+     */
+    @property.bool(true)
+    allowMovement = true;
+
     private playerController!: PlayerController;
+
+    private movementX = 0;
+    private movementY = 0;
+    private movementZ = 0;
 
     start(): void {
         const tempPlayerController = this.object.getComponent(PlayerController);
@@ -58,6 +68,22 @@ export class SmoothLocomotion extends Component {
             );
         }
         this.playerController = tempPlayerController;
+    }
+
+    update(dt: number) {
+        // Check inputs
+        // move player
+    }
+
+    private updateInputs() {
+        this.movementX = 0;
+        this.movementY = 0;
+        this.movementZ = 0;
+
+        if (!this.allowMovement) {
+            return;
+        }
+        //
     }
 }
 

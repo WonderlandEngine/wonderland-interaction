@@ -53,7 +53,7 @@
             "parent": "256"
         },
         "15": {
-            "name": "FloorPlane",
+            "name": "FloorPlane_Physx",
             "components": [
                 {
                     "type": "mesh",
@@ -64,7 +64,18 @@
                     "active": true
                 },
                 {
-                    "type": "physx"
+                    "type": "physx",
+                    "physx": {
+                        "gravity": false,
+                        "static": true,
+                        "shape": "plane",
+                        "rotationOffset": [
+                            -6.181724643283815e-8,
+                            0.7071068,
+                            -6.181724643283815e-8,
+                            -0.7071068
+                        ]
+                    }
                 }
             ],
             "translation": [
@@ -80,12 +91,13 @@
             ],
             "scaling": [
                 4.0,
-                4.0,
-                4.0
-            ]
+                3.9999995,
+                3.9999995
+            ],
+            "parent": "261"
         },
         "16": {
-            "name": "Cube",
+            "name": "SmallWall4_Physx",
             "components": [
                 {
                     "type": "mesh",
@@ -98,7 +110,7 @@
             "translation": [
                 2.9802322387695313e-8,
                 0.4999999,
-                5.960464477539065e-8
+                -4.0
             ],
             "rotation": [
                 0.0,
@@ -107,10 +119,11 @@
                 1.0
             ],
             "scaling": [
+                4.0,
                 0.5,
-                0.5,
-                0.5
-            ]
+                0.25
+            ],
+            "parent": "261"
         },
         "17": {
             "name": "NonVrCamera",
@@ -243,7 +256,8 @@
                 1.0,
                 1.0,
                 1.0
-            ]
+            ],
+            "parent": "262"
         },
         "23": {
             "name": "Light.000",
@@ -270,35 +284,8 @@
                 1.0,
                 1.0,
                 1.0
-            ]
-        },
-        "24": {
-            "name": "Cone",
-            "components": [
-                {
-                    "type": "mesh",
-                    "mesh": {
-                        "mesh": "10",
-                        "material": "25"
-                    }
-                }
             ],
-            "translation": [
-                1.5,
-                1.0,
-                -1.4901161193847656e-8
-            ],
-            "rotation": [
-                0.0,
-                0.0,
-                0.0,
-                1.0
-            ],
-            "scaling": [
-                1.0,
-                1.0,
-                1.0
-            ]
+            "parent": "262"
         },
         "27": {
             "name": "Sphere",
@@ -312,9 +299,9 @@
                 }
             ],
             "translation": [
-                0.4999999,
+                1.6392948,
                 0.75,
-                -1.25
+                -2.5464406
             ],
             "rotation": [
                 0.0,
@@ -323,10 +310,11 @@
                 1.0
             ],
             "scaling": [
-                0.75,
-                0.75,
-                0.75
-            ]
+                0.5,
+                0.5,
+                0.5
+            ],
+            "parent": "261"
         },
         "53": {
             "link": {
@@ -1518,19 +1506,20 @@
             "translation": [
                 -2.5,
                 1.2,
-                0.0
+                5.960464477539063e-8
             ],
             "rotation": [
-                0.5002117,
+                0.5002118,
                 0.0,
                 0.0,
-                0.8659031
+                0.865903
             ],
             "scaling": [
                 0.25,
                 0.1249998,
                 0.2499998
-            ]
+            ],
+            "parent": "261"
         },
         "196": {
             "link": {
@@ -1905,7 +1894,245 @@
             ]
         },
         "256": {
-            "name": "XRRig"
+            "name": "XRRig",
+            "translation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "257": {
+            "name": "SmallWall1_Physx",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "mesh": "8",
+                        "material": "22"
+                    }
+                },
+                {
+                    "type": "physx",
+                    "physx": {
+                        "shape": "box",
+                        "translationOffset": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "box": {
+                            "extents": [
+                                4.0,
+                                0.5,
+                                0.25
+                            ]
+                        },
+                        "static": true
+                    }
+                }
+            ],
+            "translation": [
+                2.9802322387695313e-8,
+                0.4999999,
+                4.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                4.0,
+                0.5,
+                0.25
+            ],
+            "parent": "261"
+        },
+        "258": {
+            "name": "SmallWall2_Physx",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "mesh": "8",
+                        "material": "22"
+                    }
+                },
+                {
+                    "type": "physx",
+                    "physx": {
+                        "shape": "box",
+                        "translationOffset": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "box": {
+                            "extents": [
+                                4.0,
+                                0.5,
+                                0.25
+                            ]
+                        },
+                        "static": true
+                    }
+                }
+            ],
+            "translation": [
+                -4.0000004,
+                0.4999999,
+                0.0013811
+            ],
+            "rotation": [
+                0.0,
+                0.7072289,
+                0.0,
+                0.7069846
+            ],
+            "scaling": [
+                4.0,
+                0.5,
+                0.25
+            ],
+            "parent": "261"
+        },
+        "259": {
+            "name": "SmallWall3_Physx",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "mesh": "8",
+                        "material": "22"
+                    }
+                },
+                {
+                    "type": "physx",
+                    "physx": {
+                        "shape": "box",
+                        "translationOffset": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "box": {
+                            "extents": [
+                                4.0,
+                                0.5,
+                                0.25
+                            ]
+                        },
+                        "static": true
+                    }
+                }
+            ],
+            "translation": [
+                4.0,
+                0.4999999,
+                -0.0013812
+            ],
+            "rotation": [
+                0.0,
+                0.7072289,
+                0.0,
+                0.7069846
+            ],
+            "scaling": [
+                4.0,
+                0.5,
+                0.25
+            ],
+            "parent": "261"
+        },
+        "24": {
+            "name": "Cone",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "mesh": "10",
+                        "material": "25"
+                    }
+                }
+            ],
+            "translation": [
+                1.5,
+                1.0,
+                2.5
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                0.5,
+                0.5,
+                0.5
+            ],
+            "parent": "261"
+        },
+        "260": {
+            "name": "LargeWall_Physx",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "mesh": "8",
+                        "material": "22"
+                    }
+                },
+                {
+                    "type": "physx",
+                    "physx": {
+                        "shape": "box",
+                        "box": {
+                            "extents": [
+                                2.0,
+                                1.0,
+                                0.25
+                            ]
+                        },
+                        "static": true
+                    }
+                }
+            ],
+            "translation": [
+                2.0,
+                0.9999998,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                2.0,
+                1.0,
+                0.25
+            ],
+            "parent": "261"
+        },
+        "261": {
+            "name": "Scene"
+        },
+        "262": {
+            "name": "Lights"
         }
     },
     "meshes": {

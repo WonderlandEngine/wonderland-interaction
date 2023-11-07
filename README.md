@@ -56,3 +56,11 @@ For more information about how to use the components, please refer to the [./DOC
 * [ ] Improve throwing speed uniformity between emulated and native
 * [ ] Find a way to improve performance for collision check (distance grab)
 * [ ] Interaction mapping for selection / shoot etc...
+
+### Player controller
+* [ ] General setup for player controller based on physx
+* [ ] Prevent from moving through walls
+* [ ] Prevent from putting your head into the wall (fade to black)
+* [ ] different ways of movement (smooth locomotion, teleport, room scale)
+* [ ] different ways of rotating (smooth, snap)
+* [ ] input support for VR controllers, Keyboard, Mouse, Touch, Gamepad?
