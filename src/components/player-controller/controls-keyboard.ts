@@ -43,27 +43,10 @@ const keyMap: {[key: string]: Direction} = {
 export class ControlsKeyboard extends Component {
     static TypeName = typename('controls-keyboard');
 
-    // /** Whether or not the player can move */
-    // @property.bool(true)
-    // moveActive = true;
-
-    // /** Whether or not the player can rotate */
-    // @property.bool(true)
-    // rotActive = true;
-
-    // /** Movement speed of the player */
-    // @property.float(12)
-    // moveSpeed = 12;
-
-    // @property.object({required: true})
-    // inputBridgeObject!: Object3D;
-
     private up = false;
     private right = false;
     private down = false;
     private left = false;
-    private headForward: vec3 = [0, 0, 0];
-    private physxComponent?: PhysXComponent;
     private direction: vec3 = [0, 0, 0];
     private wasMoving = false;
 
@@ -72,16 +55,6 @@ export class ControlsKeyboard extends Component {
         this.right = false;
         this.down = false;
         this.left = false;
-    }
-
-    start() {
-        // const tempPhysx = this.object.getComponent(PhysXComponent);
-        // if (!tempPhysx) {
-        //     console.error(
-        //         'WasdControlsFps: No PhysX Component found on object. Please add a PhysX Component to the object.'
-        //     );
-        // }
-        // this.physxComponent = tempPhysx!;
     }
 
     getAxis(): vec3 {
@@ -125,24 +98,6 @@ export class ControlsKeyboard extends Component {
         if (this.right) {
             this.direction[0] = 1.0;
         }
-
-        // // Move according to headObject Forward Direction
-        // vec3.normalize(direction, direction);
-        // direction[0] *= this.moveSpeed;
-        // direction[2] *= this.moveSpeed;
-        // this.nonVRCamera.getForwardWorld(this.headForward);
-
-        // // Combine direction with headObject
-        // vec3.transformQuat(direction, direction, this.nonVRCamera.getTransformWorld());
-
-        // if (this.moveActive) {
-        //     if (this.up || this.down || this.left || this.right) {
-        //         // Do not move on Y axis
-        //         direction[1] = 0;
-        //         // Add force to Physx Component to move the player
-        //         this.physxComponent.addForce(direction);
-        //     }
-        // }
     }
 
     private pressKeyboard = (input: KeyboardEvent) => {
