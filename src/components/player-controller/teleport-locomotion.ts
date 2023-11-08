@@ -2,6 +2,9 @@ import {Component} from '@wonderlandengine/api';
 import {typename} from '../../constants.js';
 import {PlayerController} from './player-controller.js';
 
+// TODO:
+// - teleport freely
+// - teleport to targets
 export class TeleportLocomotion extends Component {
     static TypeName = typename('teleport-locomotion');
 

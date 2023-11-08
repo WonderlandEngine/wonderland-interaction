@@ -26,7 +26,8 @@
                     "type": "wlei:locomotion-selector",
                     "wlei:locomotion-selector": {
                         "locomotionType": "SmoothLocomotion"
-                    }
+                    },
+                    "active": true
                 },
                 {
                     "type": "physx",
@@ -48,7 +49,10 @@
                     }
                 },
                 {
-                    "type": "wlei:smooth-locomotion"
+                    "type": "wlei:smooth-locomotion",
+                    "wlei:smooth-locomotion": {
+                        "speed": 15.0
+                    }
                 },
                 {
                     "type": "wlei:teleport-locomotion"
@@ -121,6 +125,19 @@
                     "mesh": {
                         "mesh": "8",
                         "material": "22"
+                    }
+                },
+                {
+                    "type": "physx",
+                    "physx": {
+                        "shape": "box",
+                        "box": {
+                            "extents": [
+                                4.0,
+                                0.5,
+                                0.25
+                            ]
+                        }
                     }
                 }
             ],
@@ -2157,6 +2174,13 @@
             "components": [
                 {
                     "type": "wlei:controls-keyboard"
+                },
+                {
+                    "type": "wlei:controls-vr",
+                    "wlei:controls-vr": {
+                        "leftControlObject": "130",
+                        "rightControlObject": "129"
+                    }
                 }
             ]
         }
@@ -2835,7 +2859,8 @@
                 "optionalFeatures": {
                     "local-floor": true
                 }
-            }
+            },
+            "visualizePhysX": true
         },
         "physx": {
             "enable": true
