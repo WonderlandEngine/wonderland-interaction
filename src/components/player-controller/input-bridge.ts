@@ -3,6 +3,7 @@ import {property} from '@wonderlandengine/api/decorators.js';
 import {typename} from '../../constants.js';
 import {ControlsKeyboard} from './controls-keyboard.js';
 import {vec3} from 'gl-matrix';
+import {ControlsVR} from './controls-vr.js';
 
 /**
  * A proxy for handling input from various input providers, such as keyboard, mouse, touch,
@@ -18,18 +19,43 @@ export class InputBridge extends Component {
     inputs!: Object3D;
 
     private keyboardController?: ControlsKeyboard | null;
+    private vrController?: ControlsVR | null;
 
     start(): void {
         this.keyboardController = this.inputs.getComponent(ControlsKeyboard);
+        this.vrController = this.inputs.getComponent(ControlsVR);
     }
 
     getMovementAxis(): vec3 {
         vec3.zero(InputBridge.movementAxis);
 
+        // determine the movement axis with the highest values
         if (this.keyboardController && this.keyboardController.active) {
-            vec3.copy(InputBridge.movementAxis, this.keyboardController.getAxis());
+            this.maxAbs(
+                InputBridge.movementAxis,
+                InputBridge.movementAxis,
+                this.keyboardController.getAxis()
+            );
+        }
+
+        if (this.vrController && this.vrController.active) {
+            this.maxAbs(
+                InputBridge.movementAxis,
+                InputBridge.movementAxis,
+                this.vrController.getAxis()
+            );
         }
 
         return InputBridge.movementAxis;
+    }
+
+    private maxAbs(out: vec3, a: vec3, b: vec3) {
+        const v1 = Math.abs(a[0]) + Math.abs(a[1]) + Math.abs(a[2]);
+        const v2 = Math.abs(b[0]) + Math.abs(b[1]) + Math.abs(b[2]);
+
+        if (v1 > v2) {
+            return vec3.copy(out, a);
+        }
+        return vec3.copy(out, b);
     }
 }

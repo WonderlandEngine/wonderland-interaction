@@ -64,3 +64,7 @@ For more information about how to use the components, please refer to the [./DOC
 * [ ] different ways of movement (smooth locomotion, teleport, room scale)
 * [ ] different ways of rotating (smooth, snap)
 * [ ] input support for VR controllers, Keyboard, Mouse, Touch, Gamepad?
+
+### Templates
+* [ ] Template project based on 'default VR', but with this packages set up.
+* [ ] Documentation on how to use the template

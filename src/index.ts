@@ -7,6 +7,9 @@ export {FixedJoint} from './components/helpers/fixed-joint.js';
 export {ActiveCamera} from './components/helpers/active-camera.js';
 
 export {ControlsKeyboard} from './components/player-controller/controls-keyboard.js';
+export {ControlsVR} from './components/player-controller/controls-vr.js';
+export {ControlsTouch} from './components/player-controller/controls-touch.js';
+export {ControlsMouse} from './components/player-controller/controls-mouse.js';
 export {HeadCollissionFade} from './components/player-controller/head-collission-fade.js';
 export {HeadCollissionMove} from './components/player-controller/head-collission-move.js';
 export {InputBridge} from './components/player-controller/input-bridge.js';
