@@ -36,15 +36,15 @@ export class SmoothLocomotion extends Component {
         }
         this.playerController = tempPlayerController;
 
-        const tempImputBridge =
+        const tempInputBridge =
             this.inputBridgeObject?.getComponent(InputBridge) ||
             this.object.getComponent(InputBridge);
-        if (!tempImputBridge) {
+        if (!tempInputBridge) {
             throw new Error(
                 `player-controller(${this.object.name}): object does not have a InputBridge and the inputBridgeObject parameter is not defined. One of these is required.`
             );
         }
-        this.inputBridge = tempImputBridge;
+        this.inputBridge = tempInputBridge;
     }
 
     update() {

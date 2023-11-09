@@ -9,11 +9,11 @@ import {ControlsVR} from './controls-vr.js';
  * A proxy for handling input from various input providers, such as keyboard, mouse, touch,
  * VR controllers or game controllers.
  */
-
 export class InputBridge extends Component {
     static TypeName = typename('input-bridge');
 
     private static movementAxis = vec3.create();
+    private static rotationAxis = vec3.create();
 
     @property.object({required: true})
     inputs!: Object3D;
@@ -24,6 +24,20 @@ export class InputBridge extends Component {
     start(): void {
         this.keyboardController = this.inputs.getComponent(ControlsKeyboard);
         this.vrController = this.inputs.getComponent(ControlsVR);
+    }
+
+    getRotationAxis(): vec3 {
+        vec3.zero(InputBridge.rotationAxis);
+
+        if (this.vrController && this.vrController.active) {
+            this.maxAbs(
+                InputBridge.rotationAxis,
+                InputBridge.rotationAxis,
+                this.vrController.getAxisRotation()
+            );
+        }
+
+        return InputBridge.rotationAxis;
     }
 
     getMovementAxis(): vec3 {
@@ -42,7 +56,7 @@ export class InputBridge extends Component {
             this.maxAbs(
                 InputBridge.movementAxis,
                 InputBridge.movementAxis,
-                this.vrController.getAxis()
+                this.vrController.getAxisMove()
             );
         }
 

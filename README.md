@@ -58,11 +58,16 @@ For more information about how to use the components, please refer to the [./DOC
 * [ ] Interaction mapping for selection / shoot etc...
 
 ### Player controller
-* [ ] General setup for player controller based on physx
-* [ ] Prevent from moving through walls
+* [X] General setup for player controller based on physx
+* [X] Prevent from moving through walls
 * [ ] Prevent from putting your head into the wall (fade to black)
-* [ ] different ways of movement (smooth locomotion, teleport, room scale)
-* [ ] different ways of rotating (smooth, snap)
+* [ ] different ways of movement
+  * [X] Smooth locomotion 
+  * [ ] Teleport
+* [ ] make the ways of movenent work all at the same time
+* [ ] different ways of rotating 
+  * [ ] smooth rotation
+  * [X] snap rotation
 * [ ] input support for VR controllers, Keyboard, Mouse, Touch, Gamepad?
 
 ### Templates

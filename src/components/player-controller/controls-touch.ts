@@ -1,6 +1,7 @@
-import {Component} from '@wonderlandengine/api';
-import {typename} from '../../constants.js';
+//import {Component} from '@wonderlandengine/api';
+//import {typename} from '../../constants.js';
 
-export class ControlsTouch extends Component {
-    static TypeName = typename('controls-touch');
-}
+// NOT IMPLEMENTED YET
+// export class ControlsTouch extends Component {
+//     static TypeName = typename('controls-touch');
+// }

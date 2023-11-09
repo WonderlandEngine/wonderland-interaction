@@ -45,7 +45,14 @@
                         "linearDamping": 5.0,
                         "staticFriction": 0.0,
                         "dynamicFriction": 0.001,
-                        "bounciness": 0.0
+                        "bounciness": 0.0,
+                        "rotationOffset": [
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0
+                        ],
+                        "kinematic": false
                     }
                 },
                 {
@@ -68,6 +75,13 @@
                     "wlei:active-camera": {
                         "nonVrCamera": "17",
                         "leftEye": "18"
+                    }
+                },
+                {
+                    "type": "wlei:player-rotate",
+                    "wlei:player-rotate": {
+                        "rotationType": "Snap",
+                        "rotationSpeed": 10.0
                     }
                 }
             ],
@@ -95,7 +109,9 @@
                             0.7071068,
                             -6.181724643283816e-8,
                             -0.7071068
-                        ]
+                        ],
+                        "groups": 24,
+                        "block": 16
                     }
                 }
             ],
@@ -137,7 +153,10 @@
                                 0.5,
                                 0.25
                             ]
-                        }
+                        },
+                        "static": true,
+                        "groups": 247,
+                        "block": 247
                     }
                 }
             ],
@@ -1972,7 +1991,9 @@
                                 0.25
                             ]
                         },
-                        "static": true
+                        "static": true,
+                        "groups": 247,
+                        "block": 247
                     }
                 }
             ],
@@ -2020,7 +2041,9 @@
                                 0.25
                             ]
                         },
-                        "static": true
+                        "static": true,
+                        "groups": 247,
+                        "block": 247
                     }
                 }
             ],
@@ -2068,7 +2091,9 @@
                                 0.25
                             ]
                         },
-                        "static": true
+                        "static": true,
+                        "groups": 247,
+                        "block": 247
                     }
                 }
             ],
@@ -2140,7 +2165,9 @@
                                 0.25
                             ]
                         },
-                        "static": true
+                        "static": true,
+                        "groups": 247,
+                        "block": 247
                     }
                 }
             ],
