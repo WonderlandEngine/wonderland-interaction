@@ -1,9 +1,12 @@
-import {Component} from '@wonderlandengine/api';
+import {Component, Object3D} from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
 import {typename} from '../../constants.js';
 import {PlayerController} from './player-controller.js';
 import {RotationType} from './enums/RotationType.js';
+import {InputBridge} from './input-bridge.js';
+import {vec3} from 'gl-matrix';
 
+const tempVecAxis = vec3.create();
 export class PlayerRotate extends Component {
     static TypeName = typename('player-rotate');
     private static rotationTypeMapping = ['Snap', 'Smooth'];
@@ -12,27 +15,33 @@ export class PlayerRotate extends Component {
         PlayerRotate.rotationTypeMapping,
         PlayerRotate.rotationTypeMapping[RotationType.Snap]
     )
-    rotationType = PlayerRotate.rotationTypeMapping[RotationType.Snap];
-    // Tooltip("Set to false to skip Update")]
-    // public bool AllowInput = true;
-    // [Tooltip("Used to determine whether to turn left / right. This can be an X Axis on the thumbstick, for example. -1 to snap left, 1 to snap right.")]
-    // public List<InputAxis> inputAxis = new List<InputAxis>() { InputAxis.RightThumbStickAxis };
-    // [Tooltip("Unity Input Action used to rotate the player")]
-    // public InputActionReference RotateAction;
-    // [Header("Smooth / Snap Turning")]
-    // [Tooltip("Snap rotation will rotate a fixed amount of degrees on turn. Smooth will linearly rotate the player.")]
-    // public RotationMechanic RotationType = RotationMechanic.Snap;
-    // [Header("Snap Turn Settings")]
-    // [Tooltip("How many degrees to rotate if RotationType is set to 'Snap'")]
-    // public float SnapRotationAmount = 45f;
-    // [Tooltip("Thumbstick X axis must be >= this amount to be considered an input event")]
-    // public float SnapInputAmount = 0.75f;
-    // [Header("Smooth Turn Settings")]
-    // [Tooltip("How fast to rotate the player if RotationType is set to 'Smooth'")]
-    // public float SmoothTurnSpeed = 40f;
-    // [Tooltip("Thumbstick X axis must be >= this amount to be considered an input event")]
-    // public float SmoothTurnMinInput = 0.1f;
+    rotationType = RotationType.Snap;
+
+    @property.bool(true)
+    allowRotation = true;
+
+    @property.object({required: false})
+    inputBridgeObject?: Object3D;
+
+    /**
+     * The number of degrees at which the player rotates when snap-rotating
+     */
+    @property.float(45)
+    snapDegrees = 45;
+
+    /**
+     *
+     */
+    @property.float(1)
+    rotationSpeed = 1;
+
     private playerController!: PlayerController;
+    private inputBridge!: InputBridge;
+    private rotation = vec3.create();
+    private snapped = false;
+    private lowThreshold = 0.2;
+    private highThreshold = 0.5;
+
     start(): void {
         const tempPlayerController = this.object.getComponent(PlayerController);
         if (!tempPlayerController) {
@@ -41,5 +50,64 @@ export class PlayerRotate extends Component {
             );
         }
         this.playerController = tempPlayerController;
+
+        const tempInputBridge =
+            this.inputBridgeObject?.getComponent(InputBridge) ||
+            this.object.getComponent(InputBridge);
+        if (!tempInputBridge) {
+            throw new Error(
+                `player-controller(${this.object.name}): object does not have a InputBridge and the inputBridgeObject parameter is not defined. One of these is required.`
+            );
+        }
+        this.inputBridge = tempInputBridge;
+    }
+
+    update(dt: number) {
+        this.updateInputs();
+        if (this.rotationType === RotationType.Snap) {
+            this.rotatePlayerSnap();
+        } else if (this.rotationType === RotationType.Smooth) {
+            this.rotatePlayerSmooth(dt);
+        }
+    }
+
+    private updateInputs() {
+        vec3.zero(this.rotation);
+
+        if (!this.allowRotation) {
+            return;
+        }
+
+        vec3.copy(this.rotation, this.inputBridge.getRotationAxis());
+    }
+
+    private rotatePlayerSnap() {
+        const currentAxis = this.rotation[0];
+
+        if (Math.abs(currentAxis) < this.lowThreshold) {
+            this.snapped = false;
+            return;
+        }
+
+        // need to release trigger before snapping again
+        if (this.snapped || Math.abs(currentAxis) < this.highThreshold) {
+            return;
+        }
+        this.snapped = true;
+        let rotation = this.snapDegrees;
+        if (currentAxis < 0) {
+            rotation *= -1;
+        }
+        this.playerController.rotate(rotation);
+    }
+
+    private rotatePlayerSmooth(dt: number) {
+        // TODO: Can't do smooth rotation without kinematic mode. This needs to be solved first.
+        // if (!this.isRotating) {
+        //     return;
+        // }
+        // let currentAxis = this.rotation[0];
+        // currentAxis *= this.rotationSpeed * dt;
+        // this.playerController.rotate(currentAxis);
     }
 }

@@ -33,8 +33,12 @@ export class ControlsVR extends Component {
     private axisRight = vec3.create();
     private wasMoving = false;
 
-    getAxis(): vec3 {
+    getAxisMove(): vec3 {
         return this.axisLeft;
+    }
+
+    getAxisRotation(): vec3 {
+        return this.axisRight;
     }
 
     start() {

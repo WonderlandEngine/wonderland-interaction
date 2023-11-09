@@ -28,8 +28,7 @@ export class PlayerController extends Component {
     private physxComponent!: PhysXComponent;
     private headForward: vec3 = [0, 0, 0];
     private activeCamera!: ActiveCamera;
-
-    init() {}
+    private isRotating = false;
 
     start() {
         const tempPhysx = this.object.getComponent(PhysXComponent);
@@ -49,27 +48,55 @@ export class PlayerController extends Component {
         this.activeCamera = tempActiveCamera;
     }
 
-    update() {}
+    /**
+     * Queues a function to be executed on the next update.
+     * This way we can can set kinematic mode and disable it the next frame.
+     */
+    private queue = new Array<() => void>();
+
+    update(): void {
+        const exec = this.queue.shift(); // get the first item from the queue
+        if (exec) {
+            exec();
+            return;
+        }
+    }
 
     move(movement: vec3) {
-        // Move according to headObject Forward Direction
-        //vec3.normalize(movement, movement);
-        // movement[0] *= this.moveSpeed;
-        // movement[2] *= this.moveSpeed;
+        if (this.isRotating) {
+            // for now, don't move while rotating.
+            // because we use physics to move, we need to switch to kinematic mode
+            // during rotation.
+            return;
+        }
 
+        // Move according to headObject Forward Direction
         const currentCamera = this.activeCamera.getActiveCamera();
         currentCamera.getForwardWorld(this.headForward);
 
         // Combine direction with headObject
         vec3.transformQuat(movement, movement, currentCamera.getTransformWorld());
 
-        //  if (this.moveActive) {
-        //      if (this.up || this.down || this.left || this.right) {
         // Do not move on Y axis
         movement[1] = 0;
+
         // Add force to Physx Component to move the player
         this.physxComponent.addForce(movement);
     }
 
-    rotate() {}
+    /**
+     * Rotates the player on the Y axis for the given amount of degrees.
+     * Can be called every frame.
+     */
+    rotate(angle: number) {
+        this.queue.push(() => {
+            this.isRotating = true;
+            this.physxComponent.kinematic = true;
+            this.physxComponent.object.rotateAxisAngleDegObject([0, 1, 0], -angle);
+        });
+        this.queue.push(() => {
+            this.isRotating = false;
+            this.physxComponent.kinematic = false;
+        });
+    }
 }
