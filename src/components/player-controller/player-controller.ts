@@ -62,6 +62,10 @@ export class PlayerController extends Component {
         }
     }
 
+    /**
+     * Moves the player in the given direction.
+     * @param movement The direction to move in.
+     */
     move(movement: vec3) {
         if (this.isRotating) {
             // for now, don't move while rotating.
@@ -93,6 +97,24 @@ export class PlayerController extends Component {
             this.isRotating = true;
             this.physxComponent.kinematic = true;
             this.physxComponent.object.rotateAxisAngleDegObject([0, 1, 0], -angle);
+        });
+        this.queue.push(() => {
+            this.isRotating = false;
+            this.physxComponent.kinematic = false;
+        });
+    }
+
+    /**
+     * Sets the player's position and rotation.
+     * @param location the location to move to
+     * @param rotation the rotation to rotate to
+     */
+    setPositionRotation(location: vec3, rotation: vec3) {
+        this.queue.push(() => {
+            this.isRotating = true;
+            this.physxComponent.kinematic = true;
+            this.physxComponent.object.rotateAxisAngleDegObject([0, 1, 0], rotation[1]);
+            this.object.setPositionWorld(location);
         });
         this.queue.push(() => {
             this.isRotating = false;

@@ -18,7 +18,7 @@ export class LocomotionSelector extends Component {
         LocomotionSelector.locomotionTypeMapping,
         LocomotionSelector.locomotionTypeMapping[LocomotionType.Teleport]
     )
-    locomotionType = LocomotionSelector.locomotionTypeMapping[LocomotionType.Teleport];
+    locomotionType = LocomotionType.Teleport;
 
     private smoothLocomotion?: SmoothLocomotion | null;
     private teleportLocomotion?: TeleportLocomotion | null;
@@ -39,17 +39,13 @@ export class LocomotionSelector extends Component {
             );
         }
         this.teleportLocomotion = tempTeleportLocomotion;
+
+        this.setLocomotion();
     }
 
     private setLocomotion() {
-        this.toggleTeleport(
-            this.locomotionType ===
-                LocomotionSelector.locomotionTypeMapping[LocomotionType.Teleport]
-        );
-        this.toggleSmoothLocomotion(
-            this.locomotionType ===
-                LocomotionSelector.locomotionTypeMapping[LocomotionType.Smooth]
-        );
+        this.toggleTeleport(this.locomotionType === LocomotionType.Teleport);
+        this.toggleSmoothLocomotion(this.locomotionType === LocomotionType.Smooth);
     }
 
     toggleSmoothLocomotion(enabled: boolean) {
