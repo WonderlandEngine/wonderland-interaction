@@ -73,3 +73,27 @@ For more information about how to use the components, please refer to the [./DOC
 ### Templates
 * [ ] Template project based on 'default VR', but with this packages set up.
 * [ ] Documentation on how to use the template
+
+### Ideas:
+* Poke interaction
+* Climbing
+* Hand poses
+* Prevent objects from passing through eachother
+* Moving platform
+* Interact with objects (Cursor+Input), including icons etc
+  * So that this could be the base for other libraries with weapons, doors/hinges and UI
+* Templates (With CLI to install?)
+
+# Plan for V0.1:
+* Physx required
+* Grab, throw in VR
+* Distance Grab
+* 2 handed
+* PlayerController
+  * Mouse/WASD + VR Controller
+  * Teleport
+  * Smooth locomotion
+  * Snap rotate
+* Document
+
+

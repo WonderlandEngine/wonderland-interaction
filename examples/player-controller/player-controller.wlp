@@ -25,7 +25,7 @@
                 {
                     "type": "wlei:locomotion-selector",
                     "wlei:locomotion-selector": {
-                        "locomotionType": "SmoothLocomotion"
+                        "locomotionType": "Teleport"
                     },
                     "active": true
                 },
@@ -62,7 +62,12 @@
                     }
                 },
                 {
-                    "type": "wlei:teleport-locomotion"
+                    "type": "wlei:teleport-locomotion",
+                    "wlei:teleport-locomotion": {
+                        "teleportIndicatorMeshObject": "208",
+                        "floorGroup": 3,
+                        "thumbstickActivationThreshhold": -0.6999999
+                    }
                 },
                 {
                     "type": "wlei:input-bridge",
@@ -2864,7 +2869,7 @@
             "version": [
                 1,
                 1,
-                2
+                3
             ]
         },
         "vr": {
@@ -2891,6 +2896,9 @@
         },
         "physx": {
             "enable": true
+        },
+        "editor": {
+            "serverPort": 7551
         }
     },
     "animations": {},
