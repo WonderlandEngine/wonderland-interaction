@@ -23,6 +23,10 @@ export class LocomotionSelector extends Component {
     private smoothLocomotion?: SmoothLocomotion | null;
     private teleportLocomotion?: TeleportLocomotion | null;
 
+    public get isKinematic(): boolean {
+        return true;
+    }
+
     start(): void {
         const tempSmoothLocomotion = this.object.getComponent(SmoothLocomotion);
         if (!tempSmoothLocomotion) {

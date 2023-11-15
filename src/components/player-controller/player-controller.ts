@@ -2,6 +2,10 @@ import {Component, PhysXComponent} from '@wonderlandengine/api';
 import {typename} from '../../constants.js';
 import {vec3} from 'gl-matrix';
 import {ActiveCamera} from '../helpers/active-camera.js';
+import {LocomotionSelector} from './locomotion-selector.js';
+
+const tempCameraVec = vec3.create();
+const tempPlayerVec = vec3.create();
 
 /**
  * This component is attached to the player object and is responsible for
@@ -29,6 +33,7 @@ export class PlayerController extends Component {
     private headForward: vec3 = [0, 0, 0];
     private activeCamera!: ActiveCamera;
     private isRotating = false;
+    private locomotionSelector!: LocomotionSelector;
 
     start() {
         const tempPhysx = this.object.getComponent(PhysXComponent);
@@ -46,6 +51,16 @@ export class PlayerController extends Component {
             );
         }
         this.activeCamera = tempActiveCamera;
+
+        const tempLocomotionSelector = this.object.getComponent(LocomotionSelector);
+        if (!tempLocomotionSelector) {
+            throw new Error(
+                `player-controller(${this.object.name}): object does not have a LocomotionSelector`
+            );
+        }
+        this.locomotionSelector = tempLocomotionSelector;
+
+        this.physxComponent.kinematic = this.locomotionSelector.isKinematic;
     }
 
     /**
@@ -67,9 +82,9 @@ export class PlayerController extends Component {
      * @param movement The direction to move in.
      */
     move(movement: vec3) {
-        if (this.isRotating) {
-            // for now, don't move while rotating.
-            // because we use physics to move, we need to switch to kinematic mode
+        if (this.isRotating || this.physxComponent.kinematic) {
+            // for now, don't move while rotating or when kinematic is on.
+            // Because we use physics to move, we need to switch to kinematic mode
             // during rotation.
             return;
         }
@@ -93,32 +108,39 @@ export class PlayerController extends Component {
      * Can be called every frame.
      */
     rotate(angle: number) {
-        this.queue.push(() => {
-            this.isRotating = true;
-            this.physxComponent.kinematic = true;
-            this.physxComponent.object.rotateAxisAngleDegObject([0, 1, 0], -angle);
-        });
-        this.queue.push(() => {
-            this.isRotating = false;
-            this.physxComponent.kinematic = false;
-        });
+        if (this.physxComponent.kinematic) {
+            this.object.rotateAxisAngleDegObject([0, 1, 0], -angle);
+        } else {
+            this.queue.push(() => {
+                this.isRotating = true;
+                this.physxComponent.kinematic = true;
+                this.object.rotateAxisAngleDegObject([0, 1, 0], -angle);
+            });
+            this.queue.push(() => {
+                this.isRotating = false;
+                this.physxComponent.kinematic = this.locomotionSelector.isKinematic;
+            });
+        }
     }
 
     /**
      * Sets the player's position and rotation.
      * @param location the location to move to
-     * @param rotation the rotation to rotate to
+     * @param rotation the rotation to rotate to in radians
      */
-    setPositionRotation(location: vec3, rotation: vec3) {
-        this.queue.push(() => {
-            this.isRotating = true;
-            this.physxComponent.kinematic = true;
-            this.physxComponent.object.rotateAxisAngleDegObject([0, 1, 0], rotation[1]);
-            this.object.setPositionWorld(location);
-        });
-        this.queue.push(() => {
-            this.isRotating = false;
-            this.physxComponent.kinematic = false;
-        });
+    setPositionRotation(location: vec3, rotation: number) {
+        this.object.resetRotation();
+        this.object.rotateAxisAngleRadObject([0, 1, 0], rotation);
+
+        // Correct for room scale
+        this.activeCamera.getCameraPosition(tempCameraVec);
+        this.object.getPositionWorld(tempPlayerVec);
+
+        vec3.sub(tempPlayerVec, tempCameraVec, tempPlayerVec);
+        tempPlayerVec[0] += location[0];
+        tempPlayerVec[1] = location[1];
+        tempPlayerVec[2] += location[2];
+
+        this.object.setPositionWorld(location);
     }
 }

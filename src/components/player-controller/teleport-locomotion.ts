@@ -5,6 +5,7 @@ import {property} from '@wonderlandengine/api/decorators.js';
 import {InputBridge} from './input-bridge.js';
 import {vec2, vec3} from 'gl-matrix';
 import {ActiveCamera} from '../helpers/active-camera.js';
+import {Handedness} from '../interactor.js';
 
 // TODO:
 // - teleport freely
@@ -21,6 +22,10 @@ export class TeleportLocomotion extends Component {
     @property.int(1)
     floorGroup = 1;
 
+    /**
+     * The threshold for activating the teleport indicator.
+     * @default -0.7 (70% forward on the thumbstick)
+     */
     @property.float(-0.7)
     thumbstickActivationThreshhold = -0.7;
 
@@ -47,6 +52,7 @@ export class TeleportLocomotion extends Component {
 
     private tempVec1 = vec3.create();
     private tempVec2 = vec3.create();
+    private tempVec3 = vec3.create();
     private currentIndicatorRotation = 0;
     private hasHit = false;
 
@@ -78,7 +84,7 @@ export class TeleportLocomotion extends Component {
         this.activeCamera = tempActiveCamera;
     }
 
-    update(delta: number): void {
+    update(): void {
         // check button/key for teleport
         this.getTeleportButton();
         if (this.isIndicating) {
@@ -87,6 +93,7 @@ export class TeleportLocomotion extends Component {
         } else {
             if (this.wasIndicating) {
                 this.teleportIndicatorMeshObject.active = false;
+                this.doTeleport(this.hitSpot, this.currentIndicatorRotation);
                 // - yes: this.doTeleport();
             }
         }
@@ -122,13 +129,19 @@ export class TeleportLocomotion extends Component {
 
     private getTarget() {
         if (this.isIndicating && this.teleportIndicatorMeshObject) {
-            const origin = this.tempVec1;
-            this.object.getPositionWorld(origin);
+            // get the current hand position, or use the camera position for non VR.
 
-            const direction = this.object.getForwardWorld(this.tempVec2);
+            if (!this.inputBridge.getControllerPosition(this.tempVec1, Handedness.Left)) {
+                this.activeCamera.getActiveCamera().getPositionWorld(this.tempVec1);
+            }
+
+            if (!this.inputBridge.getControllerForward(this.tempVec2, Handedness.Left)) {
+                this.activeCamera.getActiveCamera().getForwardWorld(this.tempVec2);
+            }
+
             const rayHit = this.engine.physics!.rayCast(
-                origin,
-                direction,
+                this.tempVec1,
+                this.tempVec2,
                 1 << this.floorGroup,
                 this.maxDistance
             );
@@ -139,6 +152,7 @@ export class TeleportLocomotion extends Component {
                 this.extraRotation =
                     Math.PI +
                     Math.atan2(this.currentStickAxes[0], this.currentStickAxes[1]);
+
                 this.currentIndicatorRotation =
                     this.getCamRotation() + (this.extraRotation - Math.PI);
 
@@ -170,15 +184,15 @@ export class TeleportLocomotion extends Component {
         // }
     }
 
-    private doTeleport(location: vec3, rotation: vec3) {
+    private doTeleport(location: vec3, rotation: number) {
         this.playerController.setPositionRotation(location, rotation);
     }
 
     /* Get current camera Y rotation */
     private getCamRotation() {
-        this.activeCamera.getActiveCamera().getForwardWorld(this.tempVec1);
-        this.tempVec1[1] = 0;
-        vec3.normalize(this.tempVec1, this.tempVec1);
-        return Math.atan2(this.tempVec1[0], this.tempVec1[2]);
+        this.activeCamera.getActiveCamera().getForwardWorld(this.tempVec3);
+        this.tempVec3[1] = 0;
+        vec3.normalize(this.tempVec3, this.tempVec3);
+        return Math.atan2(this.tempVec3[0], this.tempVec3[2]);
     }
 }

@@ -1,7 +1,8 @@
 import {Component, InputComponent, Object3D} from '@wonderlandengine/api';
 import {typename} from '../../constants.js';
 import {property} from '@wonderlandengine/api/decorators.js';
-import {vec3} from 'gl-matrix';
+import {mat4, vec3} from 'gl-matrix';
+import {Handedness} from '../interactor.js';
 
 const tempVectorAxisLeft = vec3.create();
 const tempVectorAxisRight = vec3.create();
@@ -39,6 +40,14 @@ export class ControlsVR extends Component {
 
     getAxisRotation(): vec3 {
         return this.axisRight;
+    }
+
+    getObject(handedness: Handedness) {
+        if (handedness === Handedness.Left) {
+            return this.leftControlObject;
+        } else {
+            return this.rightControlObject;
+        }
     }
 
     start() {
