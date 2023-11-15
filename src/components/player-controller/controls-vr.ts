@@ -104,7 +104,5 @@ export class ControlsVR extends Component {
         } else {
             vec3.zero(this.axisRight);
         }
-
-        // get button presses of the controllers
     }
 }
