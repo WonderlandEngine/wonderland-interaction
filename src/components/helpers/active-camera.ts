@@ -39,19 +39,20 @@ export class ActiveCamera extends Component {
      * @returns The position of the active camera.
      */
     getCameraPosition(position: vec3): vec3 {
-        const p = tempVec1;
-        const p1 = tempVec2;
+        const cameraPosition = tempVec1;
 
         if (this.engine.xr?.session) {
-            this.leftEye.getPositionWorld(p);
-            this.rightEye.getPositionWorld(p1);
+            const rightEyePosition = tempVec2;
 
-            vec3.add(p, p, p1);
-            vec3.scale(p, p, 0.5);
+            this.leftEye.getPositionWorld(cameraPosition);
+            this.rightEye.getPositionWorld(rightEyePosition);
+
+            vec3.add(cameraPosition, cameraPosition, rightEyePosition);
+            vec3.scale(cameraPosition, cameraPosition, 0.5);
         } else {
-            this.nonVrCamera.getPositionWorld(p);
+            this.nonVrCamera.getPositionWorld(cameraPosition);
         }
 
-        return vec3.copy(position, p);
+        return vec3.copy(position, cameraPosition);
     }
 }
