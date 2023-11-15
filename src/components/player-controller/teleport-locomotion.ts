@@ -7,9 +7,6 @@ import {vec2, vec3} from 'gl-matrix';
 import {ActiveCamera} from '../helpers/active-camera.js';
 import {Handedness} from '../interactor.js';
 
-// TODO:
-// - teleport freely
-// - teleport to targets
 export class TeleportLocomotion extends Component {
     static TypeName = typename('teleport-locomotion');
 
@@ -54,7 +51,6 @@ export class TeleportLocomotion extends Component {
     private tempVec2 = vec3.create();
     private tempVec3 = vec3.create();
     private currentIndicatorRotation = 0;
-    private hasHit = false;
 
     start(): void {
         const tempPlayerController = this.object.getComponent(PlayerController);
@@ -85,16 +81,14 @@ export class TeleportLocomotion extends Component {
     }
 
     update(): void {
-        // check button/key for teleport
         this.getTeleportButton();
+
         if (this.isIndicating) {
             this.getTarget();
-            // - rotate target
         } else {
             if (this.wasIndicating) {
                 this.teleportIndicatorMeshObject.active = false;
                 this.doTeleport(this.hitSpot, this.currentIndicatorRotation);
-                // - yes: this.doTeleport();
             }
         }
 
@@ -119,10 +113,6 @@ export class TeleportLocomotion extends Component {
         ) {
             this.isIndicating = false;
             this.teleportIndicatorMeshObject.active = false;
-
-            // if (this.hasHit) {
-            //     this._teleportPlayer(this.hitSpot, this._extraRotation);
-            // }
         }
         vec2.copy(this.prevThumbstickAxes, this.currentStickAxes);
     }
@@ -130,7 +120,6 @@ export class TeleportLocomotion extends Component {
     private getTarget() {
         if (this.isIndicating && this.teleportIndicatorMeshObject) {
             // get the current hand position, or use the camera position for non VR.
-
             if (!this.inputBridge.getControllerPosition(this.tempVec1, Handedness.Left)) {
                 this.activeCamera.getActiveCamera().getPositionWorld(this.tempVec1);
             }
@@ -170,18 +159,13 @@ export class TeleportLocomotion extends Component {
                 ]);
                 this.teleportIndicatorMeshObject.active = true;
                 vec3.copy(this.hitSpot, rayHit.locations[0]);
-                this.hasHit = true;
             } else {
                 if (!this.indicatorHidden) {
                     this.teleportIndicatorMeshObject.active = false;
                     this.indicatorHidden = true;
                 }
-                this.hasHit = false;
             }
         }
-        // else if (this.teleportIndicatorMeshObject && this.isMouseIndicating) {
-        //     this.onMousePressed();
-        // }
     }
 
     private doTeleport(location: vec3, rotation: number) {
