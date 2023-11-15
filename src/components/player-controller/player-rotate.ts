@@ -6,7 +6,6 @@ import {RotationType} from './enums/RotationType.js';
 import {InputBridge} from './input-bridge.js';
 import {vec3} from 'gl-matrix';
 
-const tempVecAxis = vec3.create();
 export class PlayerRotate extends Component {
     static TypeName = typename('player-rotate');
     private static rotationTypeMapping = ['Snap', 'Smooth'];
@@ -30,7 +29,7 @@ export class PlayerRotate extends Component {
     snapDegrees = 45;
 
     /**
-     *
+     * The speed at which the player rotates when smooth-rotating
      */
     @property.float(1)
     rotationSpeed = 1;
