@@ -1,6 +1,10 @@
 import {Component, Object3D} from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
 import {typename} from '../../constants.js';
+import {vec3} from 'gl-matrix';
+
+const tempVec1 = vec3.create();
+const tempVec2 = vec3.create();
 
 /**
  * Helper component to get the active camera.
@@ -16,11 +20,38 @@ export class ActiveCamera extends Component {
     @property.object({required: true})
     leftEye!: Object3D;
 
+    @property.object({required: true})
+    rightEye!: Object3D;
+
     /**
      * Based on the current XR session (is VR active or not), returns the active camera.
      * @returns The active camera.
      */
     getActiveCamera(): Object3D {
         return this.engine.xr?.session ? this.leftEye : this.nonVrCamera;
+    }
+
+    /**
+     * Depending on the current XR session (is VR active or not),
+     * returns the position of the active camera. For VR this is the average
+     * of the left and right eye.
+     * @param position The position to write the result to.
+     * @returns The position of the active camera.
+     */
+    getCameraPosition(position: vec3): vec3 {
+        const p = tempVec1;
+        const p1 = tempVec2;
+
+        if (this.engine.xr?.session) {
+            this.leftEye.getPositionWorld(p);
+            this.rightEye.getPositionWorld(p1);
+
+            vec3.add(p, p, p1);
+            vec3.scale(p, p, 0.5);
+        } else {
+            this.nonVrCamera.getPositionWorld(p);
+        }
+
+        return vec3.copy(position, p);
     }
 }

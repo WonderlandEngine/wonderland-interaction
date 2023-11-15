@@ -4,6 +4,7 @@ import {typename} from '../../constants.js';
 import {ControlsKeyboard} from './controls-keyboard.js';
 import {vec3} from 'gl-matrix';
 import {ControlsVR} from './controls-vr.js';
+import {Handedness} from '../interactor.js';
 
 /**
  * A proxy for handling input from various input providers, such as keyboard, mouse, touch,
@@ -61,6 +62,32 @@ export class InputBridge extends Component {
         }
 
         return InputBridge.movementAxis;
+    }
+
+    /**
+     * get the position of the VR controller
+     * @param position the position to write to
+     * @param handedness the handedness of the controller
+     * @returns true if the controller is active, false otherwise
+     */
+    getControllerPosition(position: vec3, handedness: Handedness | null = null): boolean {
+        if (this.vrController && this.vrController.active) {
+            this.vrController
+                .getObject(handedness ?? Handedness.Left)
+                .getPositionWorld(position);
+            return true;
+        }
+        return false;
+    }
+
+    getControllerForward(forward: vec3, handedness: Handedness | null = null): boolean {
+        if (this.vrController && this.vrController.active) {
+            this.vrController
+                .getObject(handedness ?? Handedness.Left)
+                .getForwardWorld(forward);
+            return true;
+        }
+        return false;
     }
 
     private maxAbs(out: vec3, a: vec3, b: vec3) {

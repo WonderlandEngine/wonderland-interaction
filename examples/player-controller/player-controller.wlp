@@ -65,7 +65,7 @@
                     "type": "wlei:teleport-locomotion",
                     "wlei:teleport-locomotion": {
                         "teleportIndicatorMeshObject": "208",
-                        "floorGroup": 3,
+                        "floorGroup": 4,
                         "thumbstickActivationThreshhold": -0.6999999
                     }
                 },
@@ -79,7 +79,8 @@
                     "type": "wlei:active-camera",
                     "wlei:active-camera": {
                         "nonVrCamera": "17",
-                        "leftEye": "18"
+                        "leftEye": "18",
+                        "rightEye": "19"
                     }
                 },
                 {
@@ -2210,8 +2211,8 @@
                 {
                     "type": "wlei:controls-vr",
                     "wlei:controls-vr": {
-                        "leftControlObject": "130",
-                        "rightControlObject": "129"
+                        "leftControlObject": "126",
+                        "rightControlObject": "212"
                     }
                 }
             ]
