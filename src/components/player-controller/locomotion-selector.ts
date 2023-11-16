@@ -24,7 +24,7 @@ export class LocomotionSelector extends Component {
     private teleportLocomotion?: TeleportLocomotion | null;
 
     public get isKinematic(): boolean {
-        return true;
+        return this.locomotionType === LocomotionType.Teleport;
     }
 
     start(): void {
