@@ -5,7 +5,7 @@ import {vec3} from 'gl-matrix';
 const tempVec3 = vec3.create();
 
 /**
- * The Fixed joint groups together objects,
+ * Synchronise the world position of two Object3D instances,
  * making them stick together.
  */
 export class SyncPositionWorld extends Component {
