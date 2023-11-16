@@ -121,11 +121,11 @@ export class TeleportLocomotion extends Component {
         if (this.isIndicating && this.teleportIndicatorMeshObject) {
             // get the current hand position, or use the camera position for non VR.
             if (!this.inputBridge.getControllerPosition(this.tempVec1, Handedness.Left)) {
-                this.activeCamera.getActiveCamera().getPositionWorld(this.tempVec1);
+                this.activeCamera.current.getPositionWorld(this.tempVec1);
             }
 
             if (!this.inputBridge.getControllerForward(this.tempVec2, Handedness.Left)) {
-                this.activeCamera.getActiveCamera().getForwardWorld(this.tempVec2);
+                this.activeCamera.current.getForwardWorld(this.tempVec2);
             }
 
             const rayHit = this.engine.physics!.rayCast(
@@ -174,7 +174,7 @@ export class TeleportLocomotion extends Component {
 
     /* Get current camera Y rotation */
     private getCamRotation() {
-        this.activeCamera.getActiveCamera().getForwardWorld(this.tempVec3);
+        this.activeCamera.current.getForwardWorld(this.tempVec3);
         this.tempVec3[1] = 0;
         vec3.normalize(this.tempVec3, this.tempVec3);
         return Math.atan2(this.tempVec3[0], this.tempVec3[2]);
