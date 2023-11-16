@@ -90,7 +90,7 @@ export class PlayerController extends Component {
         }
 
         // Move according to headObject Forward Direction
-        const currentCamera = this.activeCamera.getActiveCamera();
+        const currentCamera = this.activeCamera.current;
         currentCamera.getForwardWorld(this.headForward);
 
         // Combine direction with headObject
@@ -133,7 +133,7 @@ export class PlayerController extends Component {
         this.object.rotateAxisAngleRadObject([0, 1, 0], rotation);
 
         // Correct for room scale
-        this.activeCamera.getCameraPosition(tempCameraVec);
+        this.activeCamera.getPositionWorld(tempCameraVec);
         this.object.getPositionWorld(tempPlayerVec);
 
         vec3.sub(tempPlayerVec, tempCameraVec, tempPlayerVec);

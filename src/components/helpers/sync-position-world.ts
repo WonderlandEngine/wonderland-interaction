@@ -5,11 +5,11 @@ import {vec3} from 'gl-matrix';
 const tempVec3 = vec3.create();
 
 /**
- * The Fixed joint groups together object,
+ * The Fixed joint groups together objects,
  * making them stick together.
  */
-export class FixedJoint extends Component {
-    static TypeName = 'fixed-joint';
+export class SyncPositionWorld extends Component {
+    static TypeName = 'sync-position-world';
 
     @property.object({required: true})
     target!: Object3D;

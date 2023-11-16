@@ -3,7 +3,7 @@ export {Interactor, Handedness} from './components/interactor.js';
 export {DistanceInteractor} from './components/distance-interactor.js';
 export {Interactable} from './components/interactable.js';
 
-export {FixedJoint} from './components/helpers/fixed-joint.js';
+export {SyncPositionWorld} from './components/helpers/sync-position-world.js';
 export {ActiveCamera} from './components/helpers/active-camera.js';
 
 export {ControlsKeyboard} from './components/player-controller/controls-keyboard.js';

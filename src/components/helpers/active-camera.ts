@@ -7,9 +7,7 @@ const tempVec1 = vec3.create();
 const tempVec2 = vec3.create();
 
 /**
- * Helper component to get the active camera.
- *
- * This component adds a bit of reusable code for getting the object for the active camera.
+ * This component helps retrieve the camera position in VR and non-VR.
  */
 export class ActiveCamera extends Component {
     static TypeName = typename('active-camera');
@@ -27,7 +25,7 @@ export class ActiveCamera extends Component {
      * Based on the current XR session (is VR active or not), returns the active camera.
      * @returns The active camera.
      */
-    getActiveCamera(): Object3D {
+    get current(): Object3D {
         return this.engine.xr?.session ? this.leftEye : this.nonVrCamera;
     }
 
@@ -36,9 +34,9 @@ export class ActiveCamera extends Component {
      * returns the position of the active camera. For VR this is the average
      * of the left and right eye.
      * @param position The position to write the result to.
-     * @returns The position of the active camera.
+     * @returns The world position of the active camera.
      */
-    getCameraPosition(position: vec3): vec3 {
+    getPositionWorld(position: vec3): vec3 {
         const cameraPosition = tempVec1;
 
         if (this.engine.xr?.session) {
