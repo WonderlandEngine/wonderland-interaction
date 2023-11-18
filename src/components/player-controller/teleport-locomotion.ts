@@ -3,9 +3,10 @@ import {typename} from '../../constants.js';
 import {PlayerController} from './player-controller.js';
 import {property} from '@wonderlandengine/api/decorators.js';
 import {InputBridge} from './input-bridge.js';
-import {vec2, vec3} from 'gl-matrix';
+import {quat, vec2, vec3} from 'gl-matrix';
 import {ActiveCamera} from '../helpers/active-camera.js';
 import {Handedness} from '../interactor.js';
+import {setComponentsActive} from '../../utils/activate-children.js';
 
 export class TeleportLocomotion extends Component {
     static TypeName = typename('teleport-locomotion');
@@ -15,6 +16,20 @@ export class TeleportLocomotion extends Component {
 
     @property.object({required: true})
     teleportIndicatorMeshObject!: Object3D;
+
+    /**
+     * If `true`, the player will be teleported to the center of the target location.
+     * If `false`, the player will be teleported to the location of the controller on an area.
+     */
+    @property.bool(false)
+    teleportToTarget = false;
+
+    /**
+     *  if `true`, the player can rotate the indicator with the controller.
+     *  if `false`, the rotation of the target is used
+     */
+    @property.bool(true)
+    indicatorRotation = true;
 
     @property.int(1)
     floorGroup = 1;
@@ -46,10 +61,13 @@ export class TeleportLocomotion extends Component {
     private wasIndicating = false;
     private indicatorHidden = true;
     private prevThumbstickAxes = vec2.create();
-
+    private hasHit = false;
     private tempVec1 = vec3.create();
     private tempVec2 = vec3.create();
     private tempVec3 = vec3.create();
+    private tempVec4 = vec3.create();
+    private tempQuat1 = quat.create();
+
     private currentIndicatorRotation = 0;
 
     start(): void {
@@ -78,6 +96,9 @@ export class TeleportLocomotion extends Component {
             );
         }
         this.activeCamera = tempActiveCamera;
+
+        this.teleportIndicatorMeshObject.active = false;
+        setComponentsActive(this.teleportIndicatorMeshObject, false);
     }
 
     update(): void {
@@ -88,7 +109,10 @@ export class TeleportLocomotion extends Component {
         } else {
             if (this.wasIndicating) {
                 this.teleportIndicatorMeshObject.active = false;
-                this.doTeleport(this.hitSpot, this.currentIndicatorRotation);
+                setComponentsActive(this.teleportIndicatorMeshObject, false);
+                if (this.hasHit) {
+                    this.doTeleport(this.hitSpot, this.currentIndicatorRotation);
+                }
             }
         }
 
@@ -138,12 +162,19 @@ export class TeleportLocomotion extends Component {
             if (rayHit.hitCount > 0) {
                 this.indicatorHidden = false;
 
-                this.extraRotation =
-                    Math.PI +
-                    Math.atan2(this.currentStickAxes[0], this.currentStickAxes[1]);
+                if (this.indicatorRotation) {
+                    this.extraRotation =
+                        Math.PI +
+                        Math.atan2(this.currentStickAxes[0], this.currentStickAxes[1]);
 
-                this.currentIndicatorRotation =
-                    this.getCamRotation() + (this.extraRotation - Math.PI);
+                    this.currentIndicatorRotation =
+                        this.getCamRotation() + (this.extraRotation - Math.PI);
+                } else {
+                    rayHit.objects[0]?.getRotationWorld(this.tempQuat1);
+                    // rotatin in degrees
+                    quat.getAxisAngle(this.tempVec3, this.tempQuat1);
+                    this.currentIndicatorRotation = this.tempVec3[1];
+                }
 
                 this.teleportIndicatorMeshObject.resetPositionRotation();
                 this.teleportIndicatorMeshObject.rotateAxisAngleRadLocal(
@@ -151,18 +182,27 @@ export class TeleportLocomotion extends Component {
                     this.currentIndicatorRotation
                 );
 
-                this.teleportIndicatorMeshObject.translateWorld(rayHit.locations[0]);
+                if (this.teleportToTarget) {
+                    rayHit.objects[0]?.getPositionWorld(this.hitSpot);
+                } else {
+                    vec3.copy(this.hitSpot, rayHit.locations[0]);
+                }
+
+                this.teleportIndicatorMeshObject.translateWorld(this.hitSpot);
                 this.teleportIndicatorMeshObject.translateWorld([
                     0.0,
                     this.indicatorYOffset,
                     0.0,
                 ]);
+                setComponentsActive(this.teleportIndicatorMeshObject, true);
                 this.teleportIndicatorMeshObject.active = true;
-                vec3.copy(this.hitSpot, rayHit.locations[0]);
+                this.hasHit = true;
             } else {
                 if (!this.indicatorHidden) {
                     this.teleportIndicatorMeshObject.active = false;
+                    setComponentsActive(this.teleportIndicatorMeshObject, false);
                     this.indicatorHidden = true;
+                    this.hasHit = false;
                 }
             }
         }
