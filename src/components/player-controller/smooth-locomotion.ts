@@ -17,7 +17,7 @@ export class SmoothLocomotion extends Component {
     @property.float(10)
     speed = 10;
 
-    @property.object({required: false})
+    @property.object()
     inputBridgeObject?: Object3D;
 
     private playerController!: PlayerController;

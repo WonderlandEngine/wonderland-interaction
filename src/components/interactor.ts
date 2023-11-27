@@ -138,7 +138,7 @@ export class Interactor extends Component {
     /**
      * Force this interactor to start interacting with the given interactable.
      *
-     * @param interactable The interactable to process.
+     * @param interactable - The interactable to process.
      */
     public startInteraction(interactable: Interactable) {
         this._interactable = interactable;

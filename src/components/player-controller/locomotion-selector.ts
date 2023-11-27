@@ -20,6 +20,22 @@ export class LocomotionSelector extends Component {
     )
     locomotionType = LocomotionType.Teleport;
 
+    // TK: This is the proposed way to do it, but it doesn't work yet.
+    //     I'm keeping it here for now so we can continue development and revisit it later.
+    // get locomotionType(): LocomotionType {
+    //     return this._locomotionType;
+    // }
+    // set locomotionType(value: LocomotionType) {
+    //     if (this._locomotionType === value) {
+    //         return;
+    //     }
+    //     this._locomotionType = value;
+    //     this.setLocomotion();
+    // }
+
+    // /** @hidden */
+    // private _locomotionType = LocomotionType.Teleport;
+
     private smoothLocomotion?: SmoothLocomotion | null;
     private teleportLocomotion?: TeleportLocomotion | null;
 

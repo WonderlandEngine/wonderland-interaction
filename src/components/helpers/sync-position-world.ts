@@ -2,8 +2,6 @@ import {Component, Object3D} from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
 import {vec3} from 'gl-matrix';
 
-const tempVec3 = vec3.create();
-
 /**
  * Synchronise the world position of two Object3D instances,
  * making them stick together.
@@ -14,8 +12,10 @@ export class SyncPositionWorld extends Component {
     @property.object({required: true})
     target!: Object3D;
 
+    #position = vec3.create();
+
     update() {
-        this.target.getPositionWorld(tempVec3);
-        this.object.setPositionWorld(tempVec3);
+        this.target.getPositionWorld(this.#position);
+        this.object.setPositionWorld(this.#position);
     }
 }
