@@ -1,4 +1,9 @@
-import {Component, CollisionComponent, Emitter} from '@wonderlandengine/api';
+import {
+    Component,
+    CollisionComponent,
+    Emitter,
+    PhysXComponent,
+} from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
 
 import {Interactor} from './interactor.js';
@@ -37,8 +42,11 @@ export class Interactable extends Component {
 
     /** @overload */
     public start(): void {
-        if (!this.object.getComponent(CollisionComponent)) {
-            throw new Error('Interactable.start(): No collision component found.');
+        if (
+            !this.object.getComponent(PhysXComponent) &&
+            !this.object.getComponent(CollisionComponent)
+        ) {
+            throw new Error('Interactable.start(): No collision or Physx component found.');
         }
     }
 

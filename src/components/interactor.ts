@@ -1,4 +1,11 @@
-import {CollisionComponent, Component, Emitter, Scene} from '@wonderlandengine/api';
+import {
+    CollisionComponent,
+    CollisionEventType,
+    Component,
+    Emitter,
+    PhysXComponent,
+    Scene,
+} from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
 
 import {Interactable} from './interactable.js';
@@ -40,6 +47,9 @@ export class Interactor extends Component {
 
     /** Collision component of this object. @hidden */
     private _collision: CollisionComponent = null!;
+    /** Collision component of this object. @hidden */
+    private _physx: PhysXComponent = null!;
+
     /** Cached interactable after it's gripped. @hidden */
     private _interactable: Interactable | null = null;
 
@@ -89,6 +99,8 @@ export class Interactor extends Component {
     /** @hidden */
     #onSessionEnd = this._endSession.bind(this);
 
+    #currentlyCollidingWith: PhysXComponent | null = null;
+
     /**
      * Set the collision component needed to perform
      * grab interaction
@@ -98,9 +110,14 @@ export class Interactor extends Component {
      * @returns This instance, for chaining
      */
     start() {
-        this._collision = this.object.getComponent('collision', 0)!;
-        if (!this._collision) {
-            throw new Error('grabber.start(): No collision component found');
+        this._collision = this.object.getComponent(CollisionComponent, 0)!;
+        this._physx = this.object.getComponent(PhysXComponent, 0)!;
+
+        if (!this._collision && !this._physx) {
+            throw new Error('grabber.start(): No collision or physx component found');
+        }
+        if (this._physx) {
+            this._physx.onCollision(this.onPhysxCollision);
         }
 
         this._onSceneLoaded();
@@ -134,15 +151,34 @@ export class Interactor extends Component {
      * interacts with it.
      */
     public checkForNearbyInteractables() {
-        const overlaps = this._collision.queryOverlaps();
-        for (const overlap of overlaps) {
-            const interactable = overlap.object.getComponent(Interactable);
-            if (interactable) {
-                this.startInteraction(interactable);
-                return;
+        if (this._collision) {
+            const overlaps = this._collision.queryOverlaps();
+            for (const overlap of overlaps) {
+                const interactable = overlap.object.getComponent(Interactable);
+                if (interactable) {
+                    this.startInteraction(interactable);
+                    return;
+                }
+            }
+        } else {
+            if (this.#currentlyCollidingWith) {
+                const interactable =
+                    this.#currentlyCollidingWith.object.getComponent(Interactable);
+                if (interactable) {
+                    this.startInteraction(interactable);
+                    return;
+                }
             }
         }
     }
+
+    onPhysxCollision = (type: CollisionEventType, other: PhysXComponent) => {
+        if (type == CollisionEventType.TriggerTouch) {
+            this.#currentlyCollidingWith = other;
+        } else {
+            this.#currentlyCollidingWith = null;
+        }
+    };
 
     /**
      * Force this interactor to stop interacting with the
