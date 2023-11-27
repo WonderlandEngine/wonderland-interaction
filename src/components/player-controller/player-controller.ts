@@ -73,7 +73,6 @@ export class PlayerController extends Component {
         const exec = this.queue.shift(); // get the first item from the queue
         if (exec) {
             exec();
-            return;
         }
     }
 

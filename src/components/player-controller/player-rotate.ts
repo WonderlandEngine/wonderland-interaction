@@ -19,7 +19,7 @@ export class PlayerRotate extends Component {
     @property.bool(true)
     allowRotation = true;
 
-    @property.object({required: false})
+    @property.object()
     inputBridgeObject?: Object3D;
 
     /**

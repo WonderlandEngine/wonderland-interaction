@@ -142,68 +142,70 @@ export class TeleportLocomotion extends Component {
     }
 
     private getTarget() {
-        if (this.isIndicating && this.teleportIndicatorMeshObject) {
-            // get the current hand position, or use the camera position for non VR.
-            if (!this.inputBridge.getControllerPosition(this.tempVec1, Handedness.Left)) {
-                this.activeCamera.current.getPositionWorld(this.tempVec1);
+        if (!this.isIndicating || !this.teleportIndicatorMeshObject) {
+            return;
+        }
+
+        // get the current hand position, or use the camera position for non VR.
+        if (!this.inputBridge.getControllerPosition(this.tempVec1, Handedness.Left)) {
+            this.activeCamera.current.getPositionWorld(this.tempVec1);
+        }
+
+        if (!this.inputBridge.getControllerForward(this.tempVec2, Handedness.Left)) {
+            this.activeCamera.current.getForwardWorld(this.tempVec2);
+        }
+
+        const rayHit = this.engine.physics!.rayCast(
+            this.tempVec1,
+            this.tempVec2,
+            1 << this.floorGroup,
+            this.maxDistance
+        );
+
+        if (rayHit.hitCount > 0) {
+            this.indicatorHidden = false;
+
+            if (this.indicatorRotation) {
+                this.extraRotation =
+                    Math.PI +
+                    Math.atan2(this.currentStickAxes[0], this.currentStickAxes[1]);
+
+                this.currentIndicatorRotation =
+                    this.getCamRotation() + (this.extraRotation - Math.PI);
+            } else {
+                rayHit.objects[0]?.getRotationWorld(this.tempQuat1);
+                // rotatin in degrees
+                quat.getAxisAngle(this.tempVec3, this.tempQuat1);
+                this.currentIndicatorRotation = this.tempVec3[1];
             }
 
-            if (!this.inputBridge.getControllerForward(this.tempVec2, Handedness.Left)) {
-                this.activeCamera.current.getForwardWorld(this.tempVec2);
-            }
-
-            const rayHit = this.engine.physics!.rayCast(
-                this.tempVec1,
-                this.tempVec2,
-                1 << this.floorGroup,
-                this.maxDistance
+            this.teleportIndicatorMeshObject.resetPositionRotation();
+            this.teleportIndicatorMeshObject.rotateAxisAngleRadLocal(
+                [0, 1, 0],
+                this.currentIndicatorRotation
             );
 
-            if (rayHit.hitCount > 0) {
-                this.indicatorHidden = false;
-
-                if (this.indicatorRotation) {
-                    this.extraRotation =
-                        Math.PI +
-                        Math.atan2(this.currentStickAxes[0], this.currentStickAxes[1]);
-
-                    this.currentIndicatorRotation =
-                        this.getCamRotation() + (this.extraRotation - Math.PI);
-                } else {
-                    rayHit.objects[0]?.getRotationWorld(this.tempQuat1);
-                    // rotatin in degrees
-                    quat.getAxisAngle(this.tempVec3, this.tempQuat1);
-                    this.currentIndicatorRotation = this.tempVec3[1];
-                }
-
-                this.teleportIndicatorMeshObject.resetPositionRotation();
-                this.teleportIndicatorMeshObject.rotateAxisAngleRadLocal(
-                    [0, 1, 0],
-                    this.currentIndicatorRotation
-                );
-
-                if (this.teleportToTarget) {
-                    rayHit.objects[0]?.getPositionWorld(this.hitSpot);
-                } else {
-                    vec3.copy(this.hitSpot, rayHit.locations[0]);
-                }
-
-                this.teleportIndicatorMeshObject.translateWorld(this.hitSpot);
-                this.teleportIndicatorMeshObject.translateWorld([
-                    0.0,
-                    this.indicatorYOffset,
-                    0.0,
-                ]);
-                setComponentsActive(this.teleportIndicatorMeshObject, true);
-                this.teleportIndicatorMeshObject.active = true;
-                this.hasHit = true;
+            if (this.teleportToTarget) {
+                rayHit.objects[0]?.getPositionWorld(this.hitSpot);
             } else {
-                if (!this.indicatorHidden) {
-                    this.teleportIndicatorMeshObject.active = false;
-                    setComponentsActive(this.teleportIndicatorMeshObject, false);
-                    this.indicatorHidden = true;
-                    this.hasHit = false;
-                }
+                vec3.copy(this.hitSpot, rayHit.locations[0]);
+            }
+
+            this.teleportIndicatorMeshObject.translateWorld(this.hitSpot);
+            this.teleportIndicatorMeshObject.translateWorld([
+                0.0,
+                this.indicatorYOffset,
+                0.0,
+            ]);
+            setComponentsActive(this.teleportIndicatorMeshObject, true);
+            this.teleportIndicatorMeshObject.active = true;
+            this.hasHit = true;
+        } else {
+            if (!this.indicatorHidden) {
+                this.teleportIndicatorMeshObject.active = false;
+                setComponentsActive(this.teleportIndicatorMeshObject, false);
+                this.indicatorHidden = true;
+                this.hasHit = false;
             }
         }
     }
