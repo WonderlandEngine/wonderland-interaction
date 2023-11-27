@@ -25,9 +25,9 @@ const _quatB = quat.create();
 /**
  * Grabbable object.
  */
-export class Grabbable extends Component {
+export class GrabbablePhysx extends Component {
     /** @override */
-    static TypeName = 'grabbable';
+    static TypeName = 'grabbable-physx';
 
     /** Properties. */
 
@@ -427,8 +427,7 @@ export class Grabbable extends Component {
 
         const world = interactor.object.getPositionWorld(vec3.create());
         this.object.setPositionWorld(world);
-        // this.object.translateObject(grab.offsetTrans);
-        // console.log(grab.offsetTrans);
+        this.object.translateObject(grab.offsetTrans);
     }
 
     /**
