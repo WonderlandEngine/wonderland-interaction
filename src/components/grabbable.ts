@@ -1,4 +1,4 @@
-import {vec3, quat} from 'gl-matrix';
+import {vec3, quat, mat4, mat3} from 'gl-matrix';
 import {Component, Emitter, Object3D, PhysXComponent} from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
 
@@ -265,9 +265,12 @@ export class Grabbable extends Component {
             offsetRot: quat.create(),
         };
 
+        vec3.zero(_delta);
+        vec3.zero(grab.offsetTrans);
+
         /** Compute the offset between the interactable and this grabbable. */
-        interactable.object.getPositionLocal(grab.offsetTrans);
-        vec3.scale(grab.offsetTrans, grab.offsetTrans, -1);
+        // interactable.object.getPositionLocal(grab.offsetTrans);
+        // vec3.scale(grab.offsetTrans, grab.offsetTrans, -1);
 
         if (interactable.shouldSnap) {
             interactable.object.getRotationLocal(grab.offsetRot);
@@ -278,10 +281,11 @@ export class Grabbable extends Component {
                 grab.interactor.object.getRotationWorld(_quatA),
                 this.object.getRotationWorld(_quatB)
             );
-
             interactable.object.getPositionWorld(_pointA);
             interactor.object.getPositionWorld(_pointB);
-            vec3.sub(_delta, _pointB, _pointA);
+            //console.log(_pointA, _pointB);
+
+            vec3.sub(_delta, _pointA, _pointB);
             vec3.add(grab.offsetTrans, grab.offsetTrans, _delta);
         }
 
@@ -415,20 +419,24 @@ export class Grabbable extends Component {
      */
     private _updateTransformSingleHand(index: number) {
         const grab = this._grabData[index]!;
-        const interactor = grab.interactor;
-        // const interactable = this._interactable[index];
+        const hand = grab.interactor;
 
-        const rotation = quat.copy(quat.create(), interactor.object.getRotationWorld());
-        quat.multiply(rotation, rotation, grab.offsetRot);
+        const worldPos = hand.object.getPositionWorld(vec3.create());
+        const worldRot = hand.object.getRotationWorld(quat.create());
+
+        const newRot = quat.multiply(quat.create(), grab.offsetRot, worldRot);
 
         this.object.resetRotation();
-        this.object.setRotationWorld(rotation);
-        // this.object.rot(grab.offsetRot);
+        this.object.setRotationWorld(newRot);
 
-        const world = interactor.object.getPositionWorld(vec3.create());
-        this.object.setPositionWorld(world);
-        // this.object.translateObject(grab.offsetTrans);
-        // console.log(grab.offsetTrans);
+        const worldOffsetTrans = vec3.transformQuat(
+            vec3.create(),
+            grab.offsetTrans,
+            worldRot
+        );
+
+        this.object.setPositionWorld(worldPos);
+        this.object.translateWorld(worldOffsetTrans);
     }
 
     /**
