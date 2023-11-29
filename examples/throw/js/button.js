@@ -1,4 +1,4 @@
-import {Component, InputComponent, MeshComponent, Property} from '@wonderlandengine/api';
+import {Component, Emitter, InputComponent, MeshComponent, Property} from '@wonderlandengine/api';
 import {CursorTarget, HowlerAudioSource} from '@wonderlandengine/components';
 
 /**
@@ -45,6 +45,8 @@ export class ButtonComponent extends Component {
 
     /* Position to return to when "unpressing" the button */
     returnPos = new Float32Array(3);
+
+    onPressed = new Emitter();
 
     start() {
         this.mesh = this.buttonMeshObject.getComponent(MeshComponent);
@@ -101,6 +103,7 @@ export class ButtonComponent extends Component {
         this.soundUnClick.play();
         this.buttonMeshObject.setTranslationLocal(this.returnPos);
         hapticFeedback(cursor.object, 0.7, 20);
+        this.onPressed?.notify();
     }
 
     /* Called by 'cursor-target' */

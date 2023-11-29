@@ -3,9 +3,9 @@
         "14": {
             "name": "Player",
             "translation": [
-                -2.5,
-                0.0,
-                1.1575535
+                -1.7552953,
+                0.4331987,
+                0.6344988
             ],
             "rotation": [
                 0.0,
@@ -1363,11 +1363,19 @@
             ]
         },
         "256": {
-            "name": "Interactables"
+            "name": "Interactables",
+            "components": [
+                {
+                    "type": "game-manager",
+                    "game-manager": {
+                        "button": "197"
+                    }
+                }
+            ]
         },
         "257": {
             "name": "Ball",
-            "parent": "256",
+            "parent": "273",
             "components": [
                 {
                     "type": "grabbable",
@@ -1394,7 +1402,7 @@
                 }
             ],
             "translation": [
-                -1.9302892,
+                -1.9302891,
                 1.1625483,
                 0.0
             ],
@@ -1733,7 +1741,7 @@
         },
         "268": {
             "name": "Ball",
-            "parent": "256",
+            "parent": "273",
             "components": [
                 {
                     "type": "grabbable",
@@ -1755,7 +1763,7 @@
                 {
                     "type": "interactable",
                     "interactable": {
-                        "shouldSnap": true
+                        "shouldSnap": false
                     }
                 }
             ],
@@ -1783,7 +1791,7 @@
                     "type": "mesh",
                     "mesh": {
                         "mesh": "9",
-                        "material": "25"
+                        "material": "26"
                     }
                 }
             ],
@@ -1807,7 +1815,7 @@
         },
         "270": {
             "name": "Ball",
-            "parent": "256",
+            "parent": "273",
             "components": [
                 {
                     "type": "grabbable",
@@ -1834,7 +1842,7 @@
                 }
             ],
             "translation": [
-                -1.4501491,
+                -1.450149,
                 1.1625483,
                 0.0
             ],
@@ -1878,6 +1886,39 @@
                 0.1
             ],
             "parent": "270"
+        },
+        "272": {
+            "name": "Mesh.001",
+            "parent": "268",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "mesh": "8",
+                        "material": "20"
+                    }
+                }
+            ],
+            "scaling": [
+                0.0099999,
+                0.2,
+                0.0099999
+            ],
+            "translation": [
+                0.0,
+                0.2586424,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ]
+        },
+        "273": {
+            "name": "Balls",
+            "parent": "256"
         }
     },
     "meshes": {

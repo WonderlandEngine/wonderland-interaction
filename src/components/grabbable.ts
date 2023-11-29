@@ -10,8 +10,10 @@ import {quatDelta} from '../utils/math.js';
 /** Temporary info about grabbed target. */
 interface GrabData {
     interactor: Interactor;
-    offsetTrans: vec3;
-    offsetRot: quat;
+    /** Local translation in **interactor** space */
+    trans: vec3;
+    /** Local rotation in **interactor** space */
+    rot: quat;
 }
 
 /** Temporaries. */
@@ -261,32 +263,28 @@ export class Grabbable extends Component {
 
         const grab: GrabData = {
             interactor,
-            offsetTrans: vec3.create(),
-            offsetRot: quat.create(),
+            trans: vec3.create(),
+            rot: quat.create(),
         };
 
-        vec3.zero(_delta);
-        vec3.zero(grab.offsetTrans);
+        if (!interactable.shouldSnap) {
+            // @todo: Optimize allocations.
+            const handPos = interactor.object.getPositionWorld();
 
-        /** Compute the offset between the interactable and this grabbable. */
-        // interactable.object.getPositionLocal(grab.offsetTrans);
-        // vec3.scale(grab.offsetTrans, grab.offsetTrans, -1);
+            const handRotInv = interactor.object.getRotationWorld(quat.create());
+            quat.invert(handRotInv, handRotInv);
 
-        if (interactable.shouldSnap) {
-            interactable.object.getRotationLocal(grab.offsetRot);
+            /* Transform rotation into interactor's space */
+            this.object.getRotationWorld(grab.rot);
+            quat.multiply(grab.rot, handRotInv, grab.rot);
+
+            /* Transform position into interactor's space */
+            this.object.getPositionWorld(grab.trans);
+            vec3.sub(grab.trans, grab.trans, handPos);
+            vec3.transformQuat(grab.trans, grab.trans, handRotInv);
+
         } else {
-            /* Compute the delta rotation between the interactable and the grabbable. */
-            quatDelta(
-                grab.offsetRot,
-                grab.interactor.object.getRotationWorld(_quatA),
-                this.object.getRotationWorld(_quatB)
-            );
-            interactable.object.getPositionWorld(_pointA);
-            interactor.object.getPositionWorld(_pointB);
-            //console.log(_pointA, _pointB);
-
-            vec3.sub(_delta, _pointA, _pointB);
-            vec3.add(grab.offsetTrans, grab.offsetTrans, _delta);
+            interactable.object.getRotationLocal(grab.rot);
         }
 
         this._grabData[index] = grab;
@@ -333,7 +331,7 @@ export class Grabbable extends Component {
         if (secondaryGrab) {
             /* Compute the delta rotation between the interactable and the grabbable. */
             quatDelta(
-                secondaryGrab.offsetRot,
+                secondaryGrab.rot,
                 secondaryGrab.interactor.object.getRotationWorld(_quatA),
                 this.object.getRotationWorld(_quatB)
             );
@@ -418,25 +416,31 @@ export class Grabbable extends Component {
      * @hidden
      */
     private _updateTransformSingleHand(index: number) {
+        // @todo: Optimize allocations.
+
         const grab = this._grabData[index]!;
-        const hand = grab.interactor;
+        const hand = grab.interactor.object;
 
-        const worldPos = hand.object.getPositionWorld(vec3.create());
-        const worldRot = hand.object.getRotationWorld(quat.create());
+        /* Local transformation matrix relative to the interactor's space. */
+        const matrix = mat4.create();
+        mat4.fromRotationTranslation(matrix, grab.rot, grab.trans);
 
-        const newRot = quat.multiply(quat.create(), grab.offsetRot, worldRot);
+        /* Interactor's space matrix. */
+        const parent = mat4.create();
+        mat4.fromRotationTranslation(parent, hand.getRotationWorld(), hand.getPositionWorld());
 
+        /* Combine the parent matrix (interactor) with target */
+        const result = mat4.create();
+        mat4.multiply(result, parent, matrix);
+
+        this.object.resetPosition();
         this.object.resetRotation();
-        this.object.setRotationWorld(newRot);
 
-        const worldOffsetTrans = vec3.transformQuat(
-            vec3.create(),
-            grab.offsetTrans,
-            worldRot
-        );
+        const posWorld = mat4.getTranslation(vec3.create(), result);
+        const rotWorld = mat4.getRotation(quat.create(), result);
 
-        this.object.setPositionWorld(worldPos);
-        this.object.translateWorld(worldOffsetTrans);
+        this.object.setPositionWorld(posWorld);
+        this.object.setRotationWorld(rotWorld);
     }
 
     /**
@@ -460,7 +464,7 @@ export class Grabbable extends Component {
         }
 
         this.object.setPositionWorld(primaryWorld);
-        this.object.translateObject(primaryGrab.offsetTrans);
+        this.object.translateObject(primaryGrab.trans);
 
         /* Rotate the grabbable from first handle to secondary. */
         const dir = vec3.subtract(_vectorA, secondaryWorld, primaryWorld);
