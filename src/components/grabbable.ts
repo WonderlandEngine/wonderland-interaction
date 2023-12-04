@@ -5,15 +5,13 @@ import {property} from '@wonderlandengine/api/decorators.js';
 import {Interactor} from './interactor.js';
 import {Interactable} from './interactable.js';
 import {HistoryTracker} from '../history-tracker.js';
-import {quatDelta} from '../utils/math.js';
+import {computeRelativeTransform, quatDelta} from '../utils/math.js';
 
 /** Temporary info about grabbed target. */
 interface GrabData {
     interactor: Interactor;
-    /** Local translation in **interactor** space */
-    trans: vec3;
-    /** Local rotation in **interactor** space */
-    rot: quat;
+    /** Local transform in **interactor** space */
+    transform: mat4;
 }
 
 /** Temporaries. */
@@ -40,7 +38,7 @@ export class Grabbable extends Component {
      *
      * This is an Object3D containing an {@link Interactable} component.
      */
-    @property.object()
+    @property.object({required: true})
     public handle: Object3D = null!;
 
     /**
@@ -129,10 +127,6 @@ export class Grabbable extends Component {
 
     /** @hidden */
     start(): void {
-        if (!this.handle) {
-            throw new Error('Grabbable.start(): `handle` property must be set.');
-        }
-
         this._interactable[0] = this.handle.getComponent(Interactable)!;
         if (!this._interactable[0]) {
             throw new Error(
@@ -263,29 +257,12 @@ export class Grabbable extends Component {
             return;
         }
 
-        const grab: GrabData = {
-            interactor,
-            trans: vec3.create(),
-            rot: quat.create(),
-        };
+        const grab: GrabData = {interactor, transform: mat4.create()};
 
         if (!interactable.shouldSnap) {
-            // @todo: Optimize allocations.
-            const handPos = interactor.object.getPositionWorld();
-
-            const handRotInv = interactor.object.getRotationWorld(quat.create());
-            quat.invert(handRotInv, handRotInv);
-
-            /* Transform rotation into interactor's space */
-            this.object.getRotationWorld(grab.rot);
-            quat.multiply(grab.rot, handRotInv, grab.rot);
-
-            /* Transform position into interactor's space */
-            this.object.getPositionWorld(grab.trans);
-            vec3.sub(grab.trans, grab.trans, handPos);
-            vec3.transformQuat(grab.trans, grab.trans, handRotInv);
+            computeRelativeTransform(this.object, interactor.object, grab.transform);
         } else {
-            interactable.object.getRotationLocal(grab.rot);
+            // interactable.object.getRotationLocal(grab.rot);
         }
 
         this._grabData[index] = grab;
@@ -331,11 +308,11 @@ export class Grabbable extends Component {
         const secondaryGrab = index === 0 ? this._grabData[1] : this._grabData[0];
         if (secondaryGrab) {
             /* Compute the delta rotation between the interactable and the grabbable. */
-            quatDelta(
-                secondaryGrab.rot,
-                secondaryGrab.interactor.object.getRotationWorld(_quatA),
-                this.object.getRotationWorld(_quatB)
-            );
+            // quatDelta(
+            //     secondaryGrab.rot,
+            //     secondaryGrab.interactor.object.getRotationWorld(_quatA),
+            //     this.object.getRotationWorld(_quatB)
+            // );
         }
 
         this._grabData[index] = null;
@@ -422,10 +399,6 @@ export class Grabbable extends Component {
         const grab = this._grabData[index]!;
         const hand = grab.interactor.object;
 
-        /* Local transformation matrix relative to the interactor's space. */
-        const matrix = mat4.create();
-        mat4.fromRotationTranslation(matrix, grab.rot, grab.trans);
-
         /* Interactor's space matrix. */
         const parent = mat4.create();
         mat4.fromRotationTranslation(
@@ -436,7 +409,7 @@ export class Grabbable extends Component {
 
         /* Combine the parent matrix (interactor) with target */
         const result = mat4.create();
-        mat4.multiply(result, parent, matrix);
+        mat4.multiply(result, parent, grab.transform);
 
         this.object.resetPosition();
         this.object.resetRotation();
@@ -469,7 +442,7 @@ export class Grabbable extends Component {
         }
 
         this.object.setPositionWorld(primaryWorld);
-        this.object.translateObject(primaryGrab.trans);
+        // this.object.translateObject(primaryGrab.trans);
 
         /* Rotate the grabbable from first handle to secondary. */
         const dir = vec3.subtract(_pointC, secondaryWorld, primaryWorld);
