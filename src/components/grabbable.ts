@@ -20,9 +20,6 @@ const _pointB = vec3.create();
 const _pointC = vec3.create();
 const _vectorA = vec3.create();
 const _vectorB = vec3.create();
-const _vectorC = vec3.create();
-const _quatA = quat.create();
-const _quatB = quat.create();
 const _transform = quat2.create();
 
 /**
@@ -218,24 +215,15 @@ export class Grabbable extends Component {
         if (!this._physx) {
             return;
         }
-
         this._physx.active = true;
 
         const angular = this._history.angular(_vectorA);
         vec3.scale(angular, angular, this.throwAngularIntensity);
-        this._physx.angularVelocity = angular;
 
-        // @todo: How to deal with that for 2 hands?
-        const rotation = vec3.subtract(
-            _vectorB,
-            this.object.getPositionWorld(_pointA),
-            this._interactable[0].object.getPositionWorld(_pointB)
-        );
-        vec3.cross(rotation, angular, rotation);
-
-        const velocity = this._history.velocity(_vectorC);
-        vec3.add(velocity, velocity, rotation);
+        const velocity = this._history.velocity(_vectorB);
         vec3.scale(velocity, velocity, this.throwLinearIntensity);
+
+        this._physx.angularVelocity = angular;
         this._physx.linearVelocity = velocity;
     }
 
