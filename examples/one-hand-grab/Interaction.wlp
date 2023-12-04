@@ -5,7 +5,7 @@
             "translation": [
                 -0.0822798,
                 0.0,
-                1.2053258
+                0.8072429
             ],
             "rotation": [
                 0.0,
@@ -825,15 +825,6 @@
                     }
                 },
                 {
-                    "type": "collision",
-                    "collision": {
-                        "sphere": {
-                            "radius": 0.05
-                        },
-                        "groups": 127
-                    }
-                },
-                {
                     "type": "interactor",
                     "interactor": {
                         "distance": 5.0,
@@ -845,6 +836,28 @@
                     "wlei:distance-interactor": {
                         "ray": "248",
                         "searchDelay": 0.2
+                    }
+                },
+                {
+                    "type": "physx",
+                    "physx": {
+                        "sphere": {
+                            "radius": 0.05
+                        },
+                        "trigger": false,
+                        "allowSimulation": true,
+                        "gravity": false,
+                        "kinematic": false,
+                        "simulate": false
+                    },
+                    "active": false
+                },
+                {
+                    "type": "collision",
+                    "collision": {
+                        "sphere": {
+                            "radius": 0.05
+                        }
                     }
                 }
             ],
@@ -911,14 +924,26 @@
                     "active": true
                 },
                 {
-                    "type": "collision",
-                    "collision": {
+                    "type": "physx",
+                    "physx": {
                         "sphere": {
                             "radius": 0.05
                         },
-                        "groups": 127
+                        "trigger": true,
+                        "allowSimulation": false,
+                        "kinematic": true,
+                        "gravity": false
                     },
-                    "active": true
+                    "active": false
+                },
+                {
+                    "type": "collision",
+                    "collision": {
+                        "groups": 128,
+                        "sphere": {
+                            "radius": 0.05
+                        }
+                    }
                 }
             ],
             "translation": [
@@ -1082,28 +1107,31 @@
             ],
             "components": [
                 {
-                    "type": "collision",
-                    "active": true,
-                    "collision": {
-                        "sphere": {
-                            "radius": 0.1
-                        },
-                        "collider": "aabb",
-                        "aabb": {
-                            "extents": [
-                                0.0199999,
-                                0.0199999,
-                                0.1
-                            ]
-                        },
-                        "groups": 127
-                    }
-                },
-                {
                     "type": "interactable",
                     "active": true,
                     "interactable": {
                         "snap": false
+                    }
+                },
+                {
+                    "type": "physx",
+                    "physx": {
+                        "sphere": {
+                            "radius": 0.1
+                        },
+                        "shape": "box",
+                        "box": {
+                            "extents": [
+                                0.1,
+                                0.0199999,
+                                0.0199999
+                            ]
+                        },
+                        "simulate": true,
+                        "gravity": false,
+                        "trigger": false,
+                        "allowSimulation": true,
+                        "kinematic": false
                     }
                 }
             ],
@@ -1222,19 +1250,19 @@
         "243": {
             "name": "Weapon Double Hand",
             "translation": [
-                0.2825268,
-                0.6537163,
-                0.3617783
+                0.2825264,
+                1.0467165,
+                0.3617782
             ],
             "rotation": [
                 0.0,
                 0.0,
-                0.7071065,
-                0.7071069
+                0.7071063,
+                0.7071071
             ],
             "scaling": [
-                0.9999639,
-                0.9999638,
+                0.9999582,
+                0.9999581,
                 1.0
             ],
             "components": [
@@ -1254,7 +1282,7 @@
                         "box": {
                             "extents": [
                                 0.05,
-                                0.05,
+                                0.1,
                                 0.25
                             ]
                         },
@@ -1263,7 +1291,13 @@
                         "dynamicFriction": 1.0,
                         "linearDamping": 1.0,
                         "staticFriction": 1.0,
-                        "angularDamping": 1.0
+                        "angularDamping": 1.0,
+                        "allowQuery": false,
+                        "translationOffset": [
+                            0.0,
+                            -0.05,
+                            0.0
+                        ]
                     }
                 },
                 {
@@ -1288,7 +1322,8 @@
                                 0.3
                             ]
                         }
-                    }
+                    },
+                    "active": false
                 }
             ]
         },
@@ -1326,10 +1361,10 @@
             "parent": "243",
             "components": [
                 {
-                    "type": "mesh",
-                    "mesh": {
-                        "mesh": "8",
-                        "material": "26"
+                    "type": "interactable",
+                    "interactable": {
+                        "snap": true,
+                        "shouldSnap": true
                     }
                 },
                 {
@@ -1338,13 +1373,8 @@
                         "sphere": {
                             "radius": 0.05
                         },
-                        "groups": 127
-                    }
-                },
-                {
-                    "type": "interactable",
-                    "interactable": {
-                        "snap": true
+                        "collider": "sphere",
+                        "groups": 128
                     }
                 }
             ],
@@ -1359,10 +1389,10 @@
                 0.2157722
             ],
             "rotation": [
-                0.0,
-                0.0,
-                0.0000021,
-                1.0
+                0.7071068,
+                0.0000014,
+                0.0000014,
+                0.7071068
             ]
         },
         "246": {
@@ -1370,25 +1400,36 @@
             "parent": "243",
             "components": [
                 {
-                    "type": "mesh",
-                    "mesh": {
-                        "mesh": "8",
-                        "material": "26"
+                    "type": "interactable",
+                    "interactable": {
+                        "snap": true,
+                        "shouldSnap": true
                     }
+                },
+                {
+                    "type": "physx",
+                    "physx": {
+                        "shape": "box",
+                        "box": {
+                            "extents": [
+                                0.0199999,
+                                0.05,
+                                0.025
+                            ]
+                        },
+                        "gravity": false,
+                        "simulate": true,
+                        "static": true
+                    },
+                    "active": false
                 },
                 {
                     "type": "collision",
                     "collision": {
+                        "groups": 128,
                         "sphere": {
                             "radius": 0.05
-                        },
-                        "groups": 127
-                    }
-                },
-                {
-                    "type": "interactable",
-                    "interactable": {
-                        "snap": true
+                        }
                     }
                 }
             ],
@@ -1403,10 +1444,10 @@
                 -0.0484889
             ],
             "rotation": [
+                -0.7071068,
                 0.0,
                 0.0,
-                0.0,
-                1.0
+                0.7071068
             ]
         },
         "247": {
@@ -1511,6 +1552,44 @@
                     },
                     "active": true
                 }
+            ]
+        },
+        "280": {
+            "name": "Mesh",
+            "parent": "245",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "mesh": "8",
+                        "material": "26"
+                    }
+                }
+            ],
+            "rotation": [
+                -0.7071068,
+                0.0,
+                0.0,
+                0.7071068
+            ]
+        },
+        "281": {
+            "name": "Mesh",
+            "parent": "246",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "mesh": "8",
+                        "material": "26"
+                    }
+                }
+            ],
+            "rotation": [
+                -0.7071068,
+                0.0,
+                0.0,
+                0.7071068
             ]
         }
     },
@@ -2335,7 +2414,7 @@
             "version": [
                 1,
                 1,
-                3
+                4
             ]
         },
         "vr": {
@@ -2373,7 +2452,7 @@
             }
         },
         "editor": {
-            "serverPort": 7890
+            "serverPort": 8080
         }
     },
     "animations": {},

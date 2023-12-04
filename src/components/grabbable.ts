@@ -20,6 +20,7 @@ const _pointB = vec3.create();
 const _pointC = vec3.create();
 const _vectorA = vec3.create();
 const _vectorB = vec3.create();
+const _rotation = quat.create();
 const _transform = quat2.create();
 
 /**
@@ -248,10 +249,10 @@ export class Grabbable extends Component {
 
         const grab: GrabData = {interactor, transform: quat2.create()};
 
-        if (!interactable.shouldSnap) {
-            computeRelativeTransform(this.object, interactor.object, grab.transform);
+        if (interactable.shouldSnap) {
+            computeRelativeTransform(this.object, interactable.object, grab.transform);
         } else {
-            // interactable.object.getRotationLocal(grab.rot);
+            computeRelativeTransform(this.object, interactor.object, grab.transform);
         }
 
         this._grabData[index] = grab;
@@ -392,8 +393,6 @@ export class Grabbable extends Component {
         const transform = hand.getTransformWorld(_transform);
         quat2.multiply(transform, transform, grab.transform);
 
-        this.object.resetPosition();
-        this.object.resetRotation();
         this.object.setTransformWorld(transform);
     }
 
@@ -417,8 +416,13 @@ export class Grabbable extends Component {
             return;
         }
 
-        this.object.setPositionWorld(primaryWorld);
-        // this.object.translateObject(primaryGrab.trans);
+        /* `grab.transform` is in the hand space, thus multiplyig
+         * the hand transform by the object's transform leads to
+         * its world space transform. */
+        const transform = primaryInteractor.object.getTransformWorld(_transform);
+        quat2.multiply(transform, transform, primaryGrab.transform);
+
+        this.object.setPositionWorld(quat2.getTranslation(vec3.create(), transform));
 
         /* Rotate the grabbable from first handle to secondary. */
         const dir = vec3.subtract(_pointC, secondaryWorld, primaryWorld);

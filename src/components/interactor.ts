@@ -9,7 +9,7 @@ import {
 import {property} from '@wonderlandengine/api/decorators.js';
 
 import {Interactable} from './interactable.js';
-import { vec3 } from 'gl-matrix';
+import {vec3} from 'gl-matrix';
 
 /** Handedness for left / right hands. */
 export enum Handedness {
@@ -117,7 +117,7 @@ export class Interactor extends Component {
         if (!this._collision && !this._physx) {
             throw new Error('grabber.start(): No collision or physx component found');
         }
-        if (this._physx) {
+        if (!this._collision) {
             this._physx.onCollision(this.onPhysxCollision);
         }
 
