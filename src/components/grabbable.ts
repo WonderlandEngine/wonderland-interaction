@@ -1,4 +1,4 @@
-import {vec3, quat, mat4, mat3} from 'gl-matrix';
+import {vec3, quat, mat4, mat3, quat2} from 'gl-matrix';
 import {Component, Emitter, Object3D, PhysXComponent} from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
 
@@ -11,7 +11,7 @@ import {computeRelativeTransform, quatDelta} from '../utils/math.js';
 interface GrabData {
     interactor: Interactor;
     /** Local transform in **interactor** space */
-    transform: mat4;
+    transform: quat2;
 }
 
 /** Temporaries. */
@@ -23,6 +23,7 @@ const _vectorB = vec3.create();
 const _vectorC = vec3.create();
 const _quatA = quat.create();
 const _quatB = quat.create();
+const _transform = quat2.create();
 
 /**
  * Grabbable object.
@@ -257,7 +258,7 @@ export class Grabbable extends Component {
             return;
         }
 
-        const grab: GrabData = {interactor, transform: mat4.create()};
+        const grab: GrabData = {interactor, transform: quat2.create()};
 
         if (!interactable.shouldSnap) {
             computeRelativeTransform(this.object, interactor.object, grab.transform);
@@ -394,31 +395,18 @@ export class Grabbable extends Component {
      * @hidden
      */
     private _updateTransformSingleHand(index: number) {
-        // @todo: Optimize allocations.
-
         const grab = this._grabData[index]!;
         const hand = grab.interactor.object;
 
-        /* Interactor's space matrix. */
-        const parent = mat4.create();
-        mat4.fromRotationTranslation(
-            parent,
-            hand.getRotationWorld(),
-            hand.getPositionWorld()
-        );
-
-        /* Combine the parent matrix (interactor) with target */
-        const result = mat4.create();
-        mat4.multiply(result, parent, grab.transform);
+        /* `grab.transform` is in the hand space, thus multiplyig
+         * the hand transform by the object's transform leads to
+         * its world space transform. */
+        const transform = hand.getTransformWorld(_transform);
+        quat2.multiply(transform, transform, grab.transform);
 
         this.object.resetPosition();
         this.object.resetRotation();
-
-        const posWorld = mat4.getTranslation(vec3.create(), result);
-        const rotWorld = mat4.getRotation(quat.create(), result);
-
-        this.object.setPositionWorld(posWorld);
-        this.object.setRotationWorld(rotWorld);
+        this.object.setTransformWorld(transform);
     }
 
     /**

@@ -1,5 +1,5 @@
 import {Object3D} from '@wonderlandengine/api';
-import {mat4, quat, vec3} from 'gl-matrix';
+import {mat4, quat, quat2, vec3} from 'gl-matrix';
 
 /** Temporaries. */
 const _quat = quat.create();
@@ -25,8 +25,8 @@ export function quatDelta(out: quat, src: quat, dst: quat): quat {
 export function computeRelativeTransform(
     source: Object3D,
     target: Object3D,
-    out: mat4 = mat4.create()
-): mat4 {
+    out: quat2 = quat2.create()
+): quat2 {
     const handPos = target.getPositionWorld();
     const handRotInv = target.getRotationWorld(quat.create());
     quat.invert(handRotInv, handRotInv);
@@ -40,8 +40,7 @@ export function computeRelativeTransform(
     vec3.sub(trans, trans, handPos);
     vec3.transformQuat(trans, trans, handRotInv);
 
-    /* Local transformation matrix relative to the interactor's space. */
-    mat4.fromRotationTranslation(out, rot, trans);
+    quat2.fromRotationTranslation(out, rot, trans);
 
     return out;
 }
