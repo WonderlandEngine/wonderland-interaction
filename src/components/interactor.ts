@@ -9,7 +9,6 @@ import {
 import {property} from '@wonderlandengine/api/decorators.js';
 
 import {Interactable} from './interactable.js';
-import {vec3} from 'gl-matrix';
 
 /** Handedness for left / right hands. */
 export enum Handedness {

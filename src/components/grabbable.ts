@@ -1,11 +1,11 @@
-import {vec3, quat, mat4, mat3, quat2} from 'gl-matrix';
+import {vec3, quat2} from 'gl-matrix';
 import {Component, Emitter, Object3D, PhysXComponent} from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
 
 import {Interactor} from './interactor.js';
 import {Interactable} from './interactable.js';
 import {HistoryTracker} from '../history-tracker.js';
-import {computeRelativeTransform, quatDelta} from '../utils/math.js';
+import {computeRelativeTransform} from '../utils/math.js';
 
 /** Temporary info about grabbed target. */
 interface GrabData {
@@ -20,7 +20,6 @@ const _pointB = vec3.create();
 const _pointC = vec3.create();
 const _vectorA = vec3.create();
 const _vectorB = vec3.create();
-const _rotation = quat.create();
 const _transform = quat2.create();
 
 /**
