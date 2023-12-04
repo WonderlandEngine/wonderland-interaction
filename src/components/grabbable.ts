@@ -1,4 +1,4 @@
-import {vec3, quat2} from 'gl-matrix';
+import {vec3, quat2, quat} from 'gl-matrix';
 import {Component, Emitter, Object3D, PhysXComponent} from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
 
@@ -20,6 +20,7 @@ const _pointB = vec3.create();
 const _pointC = vec3.create();
 const _vectorA = vec3.create();
 const _vectorB = vec3.create();
+const _rotation = quat.create();
 const _transform = quat2.create();
 
 /**
@@ -401,10 +402,8 @@ export class Grabbable extends Component {
      * @hidden
      */
     private _updateTransformDoubleHand() {
-        const primaryGrab = this._grabData[0] as GrabData;
-        const primaryInteractor = primaryGrab.interactor;
+        const primaryInteractor = this._grabData[0]!.interactor;
         const secondaryInteractor = this._grabData[1]!.interactor;
-
         const primaryWorld = primaryInteractor.object.getPositionWorld(_pointA);
         const secondaryWorld = secondaryInteractor.object.getPositionWorld(_pointB);
 
@@ -415,18 +414,19 @@ export class Grabbable extends Component {
             return;
         }
 
-        /* `grab.transform` is in the hand space, thus multiplyig
-         * the hand transform by the object's transform leads to
-         * its world space transform. */
-        const transform = primaryInteractor.object.getTransformWorld(_transform);
-        quat2.multiply(transform, transform, primaryGrab.transform);
-
-        this.object.setPositionWorld(quat2.getTranslation(vec3.create(), transform));
-
         /* Rotate the grabbable from first handle to secondary. */
-        const dir = vec3.subtract(_pointC, secondaryWorld, primaryWorld);
+        const dir = vec3.subtract(_vectorA, secondaryWorld, primaryWorld);
         vec3.normalize(dir, dir);
-        vec3.scale(dir, dir, 100.0);
-        this.object.lookAt(vec3.add(primaryWorld, primaryWorld, dir));
+        const rotation = quat.rotationTo(_rotation, [0, 0, -1], dir);
+        this.object.setRotationWorld(rotation);
+
+        /* Translate using the distance from the grabbable to the first handle */
+        const translation = vec3.sub(
+            _vectorA,
+            this.object.getPositionWorld(_pointB),
+            this._interactable[0].object.getPositionWorld(_pointC)
+        );
+        vec3.add(translation, translation, primaryWorld);
+        this.object.setPositionWorld(translation);
     }
 }
