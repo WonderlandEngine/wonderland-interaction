@@ -19,22 +19,22 @@ export class InputBridge extends Component {
     @property.object({required: true})
     inputs!: Object3D;
 
-    private keyboardController?: ControlsKeyboard | null;
-    private vrController?: ControlsVR | null;
+    private _keyboardController?: ControlsKeyboard | null;
+    private _vrController?: ControlsVR | null;
 
     start(): void {
-        this.keyboardController = this.inputs.getComponent(ControlsKeyboard);
-        this.vrController = this.inputs.getComponent(ControlsVR);
+        this._keyboardController = this.inputs.getComponent(ControlsKeyboard);
+        this._vrController = this.inputs.getComponent(ControlsVR);
     }
 
     getRotationAxis(): vec3 {
         vec3.zero(InputBridge.rotationAxis);
 
-        if (this.vrController && this.vrController.active) {
+        if (this._vrController && this._vrController.active) {
             this.maxAbs(
                 InputBridge.rotationAxis,
                 InputBridge.rotationAxis,
-                this.vrController.getAxisRotation()
+                this._vrController.getAxisRotation()
             );
         }
 
@@ -45,19 +45,19 @@ export class InputBridge extends Component {
         vec3.zero(InputBridge.movementAxis);
 
         // determine the movement axis with the highest values
-        if (this.keyboardController && this.keyboardController.active) {
+        if (this._keyboardController && this._keyboardController.active) {
             this.maxAbs(
                 InputBridge.movementAxis,
                 InputBridge.movementAxis,
-                this.keyboardController.getAxis()
+                this._keyboardController.getAxis()
             );
         }
 
-        if (this.vrController && this.vrController.active) {
+        if (this._vrController && this._vrController.active) {
             this.maxAbs(
                 InputBridge.movementAxis,
                 InputBridge.movementAxis,
-                this.vrController.getAxisMove()
+                this._vrController.getAxisMove()
             );
         }
 
@@ -71,8 +71,8 @@ export class InputBridge extends Component {
      * @returns true if the controller is active, false otherwise
      */
     getControllerPosition(position: vec3, handedness: Handedness | null = null): boolean {
-        if (this.vrController && this.vrController.active) {
-            this.vrController
+        if (this._vrController && this._vrController.active) {
+            this._vrController
                 .getObject(handedness ?? Handedness.Left)
                 .getPositionWorld(position);
             return true;
@@ -81,8 +81,8 @@ export class InputBridge extends Component {
     }
 
     getControllerForward(forward: vec3, handedness: Handedness | null = null): boolean {
-        if (this.vrController && this.vrController.active) {
-            this.vrController
+        if (this._vrController && this._vrController.active) {
+            this._vrController
                 .getObject(handedness ?? Handedness.Left)
                 .getForwardWorld(forward);
             return true;

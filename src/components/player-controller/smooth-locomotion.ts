@@ -20,12 +20,12 @@ export class SmoothLocomotion extends Component {
     @property.object()
     inputBridgeObject?: Object3D;
 
-    private playerController!: PlayerController;
+    private _playerController!: PlayerController;
 
-    private movement = vec3.create();
+    private _movement = vec3.create();
 
-    private inputBridge!: InputBridge;
-    private moving = false;
+    private _inputBridge!: InputBridge;
+    private _moving = false;
 
     start(): void {
         const tempPlayerController = this.object.getComponent(PlayerController);
@@ -34,7 +34,7 @@ export class SmoothLocomotion extends Component {
                 `player-controller(${this.object.name}): object does not have a PlayerController. This is required.`
             );
         }
-        this.playerController = tempPlayerController;
+        this._playerController = tempPlayerController;
 
         const tempInputBridge =
             this.inputBridgeObject?.getComponent(InputBridge) ||
@@ -44,7 +44,7 @@ export class SmoothLocomotion extends Component {
                 `player-controller(${this.object.name}): object does not have a InputBridge and the inputBridgeObject parameter is not defined. One of these is required.`
             );
         }
-        this.inputBridge = tempInputBridge;
+        this._inputBridge = tempInputBridge;
     }
 
     update() {
@@ -53,23 +53,23 @@ export class SmoothLocomotion extends Component {
     }
 
     private updateInputs() {
-        vec3.zero(this.movement);
+        vec3.zero(this._movement);
 
         if (!this.allowMovement) {
             return;
         }
 
-        vec3.copy(this.movement, this.inputBridge.getMovementAxis());
-        this.moving =
-            this.movement[0] !== 0 || this.movement[1] !== 0 || this.movement[2] !== 0;
-        vec3.scale(this.movement, this.movement, this.speed);
+        vec3.copy(this._movement, this._inputBridge.getMovementAxis());
+        this._moving =
+            this._movement[0] !== 0 || this._movement[1] !== 0 || this._movement[2] !== 0;
+        vec3.scale(this._movement, this._movement, this.speed);
     }
 
     private movePlayer() {
-        if (!this.allowMovement || !this.moving) {
+        if (!this.allowMovement || !this._moving) {
             return;
         }
 
-        this.playerController.move(this.movement);
+        this._playerController.move(this._movement);
     }
 }

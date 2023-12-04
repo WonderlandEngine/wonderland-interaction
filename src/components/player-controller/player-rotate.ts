@@ -34,12 +34,12 @@ export class PlayerRotate extends Component {
     @property.float(1)
     rotationSpeed = 1;
 
-    private playerController!: PlayerController;
-    private inputBridge!: InputBridge;
-    private rotation = vec3.create();
-    private snapped = false;
-    private lowThreshold = 0.2;
-    private highThreshold = 0.5;
+    private _playerController!: PlayerController;
+    private _inputBridge!: InputBridge;
+    private _rotation = vec3.create();
+    private _snapped = false;
+    private _lowThreshold = 0.2;
+    private _highThreshold = 0.5;
 
     start(): void {
         const tempPlayerController = this.object.getComponent(PlayerController);
@@ -48,7 +48,7 @@ export class PlayerRotate extends Component {
                 `player-controller(${this.object.name}): object does not have a PlayerController. This is required.`
             );
         }
-        this.playerController = tempPlayerController;
+        this._playerController = tempPlayerController;
 
         const tempInputBridge =
             this.inputBridgeObject?.getComponent(InputBridge) ||
@@ -58,7 +58,7 @@ export class PlayerRotate extends Component {
                 `player-controller(${this.object.name}): object does not have a InputBridge and the inputBridgeObject parameter is not defined. One of these is required.`
             );
         }
-        this.inputBridge = tempInputBridge;
+        this._inputBridge = tempInputBridge;
     }
 
     update(dt: number) {
@@ -71,33 +71,33 @@ export class PlayerRotate extends Component {
     }
 
     private updateInputs() {
-        vec3.zero(this.rotation);
+        vec3.zero(this._rotation);
 
         if (!this.allowRotation) {
             return;
         }
 
-        vec3.copy(this.rotation, this.inputBridge.getRotationAxis());
+        vec3.copy(this._rotation, this._inputBridge.getRotationAxis());
     }
 
     private rotatePlayerSnap() {
-        const currentAxis = this.rotation[0];
+        const currentAxis = this._rotation[0];
 
-        if (Math.abs(currentAxis) < this.lowThreshold) {
-            this.snapped = false;
+        if (Math.abs(currentAxis) < this._lowThreshold) {
+            this._snapped = false;
             return;
         }
 
         // need to release trigger before snapping again
-        if (this.snapped || Math.abs(currentAxis) < this.highThreshold) {
+        if (this._snapped || Math.abs(currentAxis) < this._highThreshold) {
             return;
         }
-        this.snapped = true;
+        this._snapped = true;
         let rotation = this.snapDegrees;
         if (currentAxis < 0) {
             rotation *= -1;
         }
-        this.playerController.rotate(rotation);
+        this._playerController.rotate(rotation);
     }
 
     private rotatePlayerSmooth(dt: number) {

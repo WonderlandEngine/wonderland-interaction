@@ -43,12 +43,13 @@ const keyMap: {[key: string]: Direction} = {
 export class ControlsKeyboard extends Component {
     static TypeName = typename('controls-keyboard');
 
-    private up = false;
-    private right = false;
-    private down = false;
-    private left = false;
-    private direction: vec3 = [0, 0, 0];
-    private wasMoving = false;
+    up = false;
+    right = false;
+    down = false;
+    left = false;
+
+    private _direction: vec3 = [0, 0, 0];
+    private _wasMoving = false;
 
     init() {
         this.up = false;
@@ -58,49 +59,50 @@ export class ControlsKeyboard extends Component {
     }
 
     getAxis(): vec3 {
-        return this.direction;
+        return this._direction;
     }
 
     onActivate(): void {
+        // @todo: Allow user to select dom element to listen to.
         // Set Keyboard Inputs Listeners
-        window.addEventListener('keydown', this.pressKeyboard);
-        window.addEventListener('keyup', this.releaseKeyboard);
+        window.addEventListener('keydown', this._pressKeyboard);
+        window.addEventListener('keyup', this._releaseKeyboard);
     }
 
     onDeactivate(): void {
         // Remove Keyboard Inputs Listeners
-        window.removeEventListener('keydown', this.pressKeyboard);
-        window.removeEventListener('keyup', this.releaseKeyboard);
+        window.removeEventListener('keydown', this._pressKeyboard);
+        window.removeEventListener('keyup', this._releaseKeyboard);
     }
 
     update() {
         // do not move if no input
         if (!this.up && !this.down && !this.left && !this.right) {
-            if (this.wasMoving) {
-                this.direction = [0, 0, 0];
-                this.wasMoving = false;
+            if (this._wasMoving) {
+                this._direction = [0, 0, 0];
+                this._wasMoving = false;
             }
             return;
         }
-        this.wasMoving = true;
+        this._wasMoving = true;
 
-        this.direction = [0, 0, 0];
+        this._direction = [0, 0, 0];
 
         if (this.up) {
-            this.direction[2] = -1.0;
+            this._direction[2] = -1.0;
         }
         if (this.down) {
-            this.direction[2] = 1.0;
+            this._direction[2] = 1.0;
         }
         if (this.left) {
-            this.direction[0] = -1.0;
+            this._direction[0] = -1.0;
         }
         if (this.right) {
-            this.direction[0] = 1.0;
+            this._direction[0] = 1.0;
         }
     }
 
-    private pressKeyboard = (input: KeyboardEvent) => {
+    private _pressKeyboard = (input: KeyboardEvent) => {
         const direction = keyMap[input.code];
 
         if (direction) {
@@ -108,7 +110,7 @@ export class ControlsKeyboard extends Component {
         }
     };
 
-    private releaseKeyboard = (input: KeyboardEvent) => {
+    private _releaseKeyboard = (input: KeyboardEvent) => {
         const direction = keyMap[input.code];
 
         if (direction) {

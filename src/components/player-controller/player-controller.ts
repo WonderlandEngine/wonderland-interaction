@@ -29,11 +29,11 @@ const tempPlayerVec = vec3.create();
 export class PlayerController extends Component {
     static TypeName = typename('player-controller');
 
-    private physxComponent!: PhysXComponent;
-    private headForward: vec3 = [0, 0, 0];
-    private activeCamera!: ActiveCamera;
-    private isRotating = false;
-    private locomotionSelector!: LocomotionSelector;
+    private _physxComponent!: PhysXComponent;
+    private _headForward: vec3 = [0, 0, 0];
+    private _activeCamera!: ActiveCamera;
+    private _isRotating = false;
+    private _locomotionSelector!: LocomotionSelector;
 
     start() {
         const tempPhysx = this.object.getComponent(PhysXComponent);
@@ -42,7 +42,7 @@ export class PlayerController extends Component {
                 `player-controller(${this.object.name}): object does not have a Physx`
             );
         }
-        this.physxComponent = tempPhysx;
+        this._physxComponent = tempPhysx;
 
         const tempActiveCamera = this.object.getComponent(ActiveCamera);
         if (!tempActiveCamera) {
@@ -50,7 +50,7 @@ export class PlayerController extends Component {
                 `player-controller(${this.object.name}): object does not have a ActiveCamera`
             );
         }
-        this.activeCamera = tempActiveCamera;
+        this._activeCamera = tempActiveCamera;
 
         const tempLocomotionSelector = this.object.getComponent(LocomotionSelector);
         if (!tempLocomotionSelector) {
@@ -58,9 +58,9 @@ export class PlayerController extends Component {
                 `player-controller(${this.object.name}): object does not have a LocomotionSelector`
             );
         }
-        this.locomotionSelector = tempLocomotionSelector;
+        this._locomotionSelector = tempLocomotionSelector;
 
-        this.physxComponent.kinematic = this.locomotionSelector.isKinematic;
+        this._physxComponent.kinematic = this._locomotionSelector.isKinematic;
     }
 
     /**
@@ -81,7 +81,7 @@ export class PlayerController extends Component {
      * @param movement The direction to move in.
      */
     move(movement: vec3) {
-        if (this.isRotating || this.physxComponent.kinematic) {
+        if (this._isRotating || this._physxComponent.kinematic) {
             // for now, don't move while rotating or when kinematic is on.
             // Because we use physics to move, we need to switch to kinematic mode
             // during rotation.
@@ -89,8 +89,8 @@ export class PlayerController extends Component {
         }
 
         // Move according to headObject Forward Direction
-        const currentCamera = this.activeCamera.current;
-        currentCamera.getForwardWorld(this.headForward);
+        const currentCamera = this._activeCamera.current;
+        currentCamera.getForwardWorld(this._headForward);
 
         // Combine direction with headObject
         vec3.transformQuat(movement, movement, currentCamera.getTransformWorld());
@@ -99,7 +99,7 @@ export class PlayerController extends Component {
         movement[1] = 0;
 
         // Add force to Physx Component to move the player
-        this.physxComponent.addForce(movement);
+        this._physxComponent.addForce(movement);
     }
 
     /**
@@ -107,17 +107,17 @@ export class PlayerController extends Component {
      * Can be called every frame.
      */
     rotate(angle: number) {
-        if (this.physxComponent.kinematic) {
+        if (this._physxComponent.kinematic) {
             this.object.rotateAxisAngleDegObject([0, 1, 0], -angle);
         } else {
             this.queue.push(() => {
-                this.isRotating = true;
-                this.physxComponent.kinematic = true;
+                this._isRotating = true;
+                this._physxComponent.kinematic = true;
                 this.object.rotateAxisAngleDegObject([0, 1, 0], -angle);
             });
             this.queue.push(() => {
-                this.isRotating = false;
-                this.physxComponent.kinematic = this.locomotionSelector.isKinematic;
+                this._isRotating = false;
+                this._physxComponent.kinematic = this._locomotionSelector.isKinematic;
             });
         }
     }
@@ -132,7 +132,7 @@ export class PlayerController extends Component {
         this.object.rotateAxisAngleRadObject([0, 1, 0], rotation);
 
         // Correct for room scale
-        this.activeCamera.getPositionWorld(tempCameraVec);
+        this._activeCamera.getPositionWorld(tempCameraVec);
         this.object.getPositionWorld(tempPlayerVec);
 
         vec3.sub(tempPlayerVec, tempCameraVec, tempPlayerVec);

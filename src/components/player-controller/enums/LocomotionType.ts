@@ -2,6 +2,7 @@
  * The type of locomotion to use for the player
  */
 
+// @todo: Use integer values in enum for performance.
 export enum LocomotionType {
     /**
      * Teleportation locomotion is the most comfortable for most people.

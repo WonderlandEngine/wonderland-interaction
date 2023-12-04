@@ -50,23 +50,23 @@ export class TeleportLocomotion extends Component {
     @property.float(100.0)
     maxDistance = 100.0;
 
-    private playerController!: PlayerController;
-    private inputBridge!: InputBridge;
-    private activeCamera!: ActiveCamera;
+    private _playerController!: PlayerController;
+    private _inputBridge!: InputBridge;
+    private _activeCamera!: ActiveCamera;
 
-    private hitSpot = vec3.create();
-    private extraRotation = 0;
-    private currentStickAxes = vec2.create();
-    private isIndicating = false;
-    private wasIndicating = false;
-    private indicatorHidden = true;
-    private prevThumbstickAxes = vec2.create();
-    private hasHit = false;
-    private tempVec1 = vec3.create();
-    private tempVec2 = vec3.create();
-    private tempVec3 = vec3.create();
-    private tempVec4 = vec3.create();
-    private tempQuat1 = quat.create();
+    private _hitSpot = vec3.create();
+    private _extraRotation = 0;
+    private _currentStickAxes = vec2.create();
+    private _isIndicating = false;
+    private _wasIndicating = false;
+    private _indicatorHidden = true;
+    private _prevThumbstickAxes = vec2.create();
+    private _hasHit = false;
+    private _tempVec1 = vec3.create();
+    private _tempVec2 = vec3.create();
+    private _tempVec3 = vec3.create();
+    private _tempVec4 = vec3.create();
+    private _tempQuat1 = quat.create();
 
     private currentIndicatorRotation = 0;
 
@@ -77,7 +77,7 @@ export class TeleportLocomotion extends Component {
                 `teleport-locomotion(${this.object.name}): object does not have a PlayerController. This is required.`
             );
         }
-        this.playerController = tempPlayerController;
+        this._playerController = tempPlayerController;
 
         const tempInputBridge =
             this.inputBridgeObject?.getComponent(InputBridge) ||
@@ -87,7 +87,7 @@ export class TeleportLocomotion extends Component {
                 `teleport-locomotion(${this.object.name}): object does not have a InputBridge and the inputBridgeObject parameter is not defined. One of these is required.`
             );
         }
-        this.inputBridge = tempInputBridge;
+        this._inputBridge = tempInputBridge;
 
         const tempActiveCamera = this.object.getComponent(ActiveCamera);
         if (!tempActiveCamera) {
@@ -95,7 +95,7 @@ export class TeleportLocomotion extends Component {
                 `teleport-locomotion(${this.object.name}): object does not have a ActiveCamera`
             );
         }
-        this.activeCamera = tempActiveCamera;
+        this._activeCamera = tempActiveCamera;
 
         this.teleportIndicatorMeshObject.active = false;
         setComponentsActive(this.teleportIndicatorMeshObject, false);
@@ -104,79 +104,79 @@ export class TeleportLocomotion extends Component {
     update(): void {
         this.getTeleportButton();
 
-        if (this.isIndicating) {
+        if (this._isIndicating) {
             this.getTarget();
         } else {
-            if (this.wasIndicating) {
+            if (this._wasIndicating) {
                 this.teleportIndicatorMeshObject.active = false;
                 setComponentsActive(this.teleportIndicatorMeshObject, false);
-                if (this.hasHit) {
-                    this.doTeleport(this.hitSpot, this.currentIndicatorRotation);
+                if (this._hasHit) {
+                    this.doTeleport(this._hitSpot, this.currentIndicatorRotation);
                 }
             }
         }
 
-        this.wasIndicating = this.isIndicating;
+        this._wasIndicating = this._isIndicating;
     }
 
     private getTeleportButton() {
-        const axes = this.inputBridge.getMovementAxis();
-        vec2.set(this.currentStickAxes, axes[0], axes[2]);
+        const axes = this._inputBridge.getMovementAxis();
+        vec2.set(this._currentStickAxes, axes[0], axes[2]);
         const inputLength = Math.abs(axes[0]) + Math.abs(axes[2]);
 
         // TODO: add more 'keys' to initiate teleport
         if (
-            !this.isIndicating &&
-            this.prevThumbstickAxes[1] >= this.thumbstickActivationThreshhold &&
-            this.currentStickAxes[1] < this.thumbstickActivationThreshhold
+            !this._isIndicating &&
+            this._prevThumbstickAxes[1] >= this.thumbstickActivationThreshhold &&
+            this._currentStickAxes[1] < this.thumbstickActivationThreshhold
         ) {
-            this.isIndicating = true;
+            this._isIndicating = true;
         } else if (
-            this.isIndicating &&
+            this._isIndicating &&
             inputLength < this.thumbstickDeactivationThreshhold
         ) {
-            this.isIndicating = false;
+            this._isIndicating = false;
             this.teleportIndicatorMeshObject.active = false;
         }
-        vec2.copy(this.prevThumbstickAxes, this.currentStickAxes);
+        vec2.copy(this._prevThumbstickAxes, this._currentStickAxes);
     }
 
     private getTarget() {
-        if (!this.isIndicating || !this.teleportIndicatorMeshObject) {
+        if (!this._isIndicating || !this.teleportIndicatorMeshObject) {
             return;
         }
 
         // get the current hand position, or use the camera position for non VR.
-        if (!this.inputBridge.getControllerPosition(this.tempVec1, Handedness.Left)) {
-            this.activeCamera.current.getPositionWorld(this.tempVec1);
+        if (!this._inputBridge.getControllerPosition(this._tempVec1, Handedness.Left)) {
+            this._activeCamera.current.getPositionWorld(this._tempVec1);
         }
 
-        if (!this.inputBridge.getControllerForward(this.tempVec2, Handedness.Left)) {
-            this.activeCamera.current.getForwardWorld(this.tempVec2);
+        if (!this._inputBridge.getControllerForward(this._tempVec2, Handedness.Left)) {
+            this._activeCamera.current.getForwardWorld(this._tempVec2);
         }
 
         const rayHit = this.engine.physics!.rayCast(
-            this.tempVec1,
-            this.tempVec2,
+            this._tempVec1,
+            this._tempVec2,
             1 << this.floorGroup,
             this.maxDistance
         );
 
         if (rayHit.hitCount > 0) {
-            this.indicatorHidden = false;
+            this._indicatorHidden = false;
 
             if (this.indicatorRotation) {
-                this.extraRotation =
+                this._extraRotation =
                     Math.PI +
-                    Math.atan2(this.currentStickAxes[0], this.currentStickAxes[1]);
+                    Math.atan2(this._currentStickAxes[0], this._currentStickAxes[1]);
 
                 this.currentIndicatorRotation =
-                    this.getCamRotation() + (this.extraRotation - Math.PI);
+                    this.getCamRotation() + (this._extraRotation - Math.PI);
             } else {
-                rayHit.objects[0]?.getRotationWorld(this.tempQuat1);
+                rayHit.objects[0]?.getRotationWorld(this._tempQuat1);
                 // rotatin in degrees
-                quat.getAxisAngle(this.tempVec3, this.tempQuat1);
-                this.currentIndicatorRotation = this.tempVec3[1];
+                quat.getAxisAngle(this._tempVec3, this._tempQuat1);
+                this.currentIndicatorRotation = this._tempVec3[1];
             }
 
             this.teleportIndicatorMeshObject.resetPositionRotation();
@@ -186,12 +186,12 @@ export class TeleportLocomotion extends Component {
             );
 
             if (this.teleportToTarget) {
-                rayHit.objects[0]?.getPositionWorld(this.hitSpot);
+                rayHit.objects[0]?.getPositionWorld(this._hitSpot);
             } else {
-                vec3.copy(this.hitSpot, rayHit.locations[0]);
+                vec3.copy(this._hitSpot, rayHit.locations[0]);
             }
 
-            this.teleportIndicatorMeshObject.translateWorld(this.hitSpot);
+            this.teleportIndicatorMeshObject.translateWorld(this._hitSpot);
             this.teleportIndicatorMeshObject.translateWorld([
                 0.0,
                 this.indicatorYOffset,
@@ -199,26 +199,26 @@ export class TeleportLocomotion extends Component {
             ]);
             setComponentsActive(this.teleportIndicatorMeshObject, true);
             this.teleportIndicatorMeshObject.active = true;
-            this.hasHit = true;
+            this._hasHit = true;
         } else {
-            if (!this.indicatorHidden) {
+            if (!this._indicatorHidden) {
                 this.teleportIndicatorMeshObject.active = false;
                 setComponentsActive(this.teleportIndicatorMeshObject, false);
-                this.indicatorHidden = true;
-                this.hasHit = false;
+                this._indicatorHidden = true;
+                this._hasHit = false;
             }
         }
     }
 
     private doTeleport(location: vec3, rotation: number) {
-        this.playerController.setPositionRotation(location, rotation);
+        this._playerController.setPositionRotation(location, rotation);
     }
 
     /* Get current camera Y rotation */
     private getCamRotation() {
-        this.activeCamera.current.getForwardWorld(this.tempVec3);
-        this.tempVec3[1] = 0;
-        vec3.normalize(this.tempVec3, this.tempVec3);
-        return Math.atan2(this.tempVec3[0], this.tempVec3[2]);
+        this._activeCamera.current.getForwardWorld(this._tempVec3);
+        this._tempVec3[1] = 0;
+        vec3.normalize(this._tempVec3, this._tempVec3);
+        return Math.atan2(this._tempVec3[0], this._tempVec3[2]);
     }
 }

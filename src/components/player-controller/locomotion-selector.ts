@@ -36,8 +36,8 @@ export class LocomotionSelector extends Component {
     // /** @hidden */
     // private _locomotionType = LocomotionType.Teleport;
 
-    private smoothLocomotion?: SmoothLocomotion | null;
-    private teleportLocomotion?: TeleportLocomotion | null;
+    private _smoothLocomotion?: SmoothLocomotion | null;
+    private _teleportLocomotion?: TeleportLocomotion | null;
 
     public get isKinematic(): boolean {
         return this.locomotionType === LocomotionType.Teleport;
@@ -50,7 +50,7 @@ export class LocomotionSelector extends Component {
                 `player-controller(${this.object.name}): object does not have a SmoothLocomotion. To use smooth locomotion, make sure the component is on the ${this.object.name} object.`
             );
         }
-        this.smoothLocomotion = tempSmoothLocomotion;
+        this._smoothLocomotion = tempSmoothLocomotion;
 
         const tempTeleportLocomotion = this.object.getComponent(TeleportLocomotion);
         if (!tempTeleportLocomotion) {
@@ -58,7 +58,7 @@ export class LocomotionSelector extends Component {
                 `player-controller(${this.object.name}): object does not have a TeleportLocomotion. To use teleport locomotion, make sure the component is on the ${this.object.name} object.`
             );
         }
-        this.teleportLocomotion = tempTeleportLocomotion;
+        this._teleportLocomotion = tempTeleportLocomotion;
 
         this.setLocomotion();
     }
@@ -69,8 +69,8 @@ export class LocomotionSelector extends Component {
     }
 
     toggleSmoothLocomotion(enabled: boolean) {
-        if (this.smoothLocomotion) {
-            this.smoothLocomotion.active = enabled;
+        if (this._smoothLocomotion) {
+            this._smoothLocomotion.active = enabled;
         } else {
             console.warn(
                 `locomotion-selector(${this.object.name}) doesn't smoothLocomotion set.`
@@ -79,8 +79,8 @@ export class LocomotionSelector extends Component {
     }
 
     toggleTeleport(enabled: boolean) {
-        if (this.teleportLocomotion) {
-            this.teleportLocomotion.active = enabled;
+        if (this._teleportLocomotion) {
+            this._teleportLocomotion.active = enabled;
         } else {
             console.warn(
                 `locomotion-selector(${this.object.name}) doesn't teleportLocomotion set.`
