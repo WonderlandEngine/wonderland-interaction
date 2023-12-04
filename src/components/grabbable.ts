@@ -295,14 +295,12 @@ export class Grabbable extends Component {
             return;
         }
 
-        const secondaryGrab = index === 0 ? this._grabData[1] : this._grabData[0];
-        if (secondaryGrab) {
-            /* Compute the delta rotation between the interactable and the grabbable. */
-            // quatDelta(
-            //     secondaryGrab.rot,
-            //     secondaryGrab.interactor.object.getRotationWorld(_quatA),
-            //     this.object.getRotationWorld(_quatB)
-            // );
+        const otherGrab = index === 0 ? this._grabData[1] : this._grabData[0];
+        if (otherGrab) {
+            /* If only one handle is released, we need to store the current transform
+             * into the remaining grab data to avoid having an inconsistent single grab. */
+            const interactor = otherGrab.interactor.object;
+            computeRelativeTransform(this.object, interactor, otherGrab.transform);
         }
 
         this._grabData[index] = null;
