@@ -72,9 +72,10 @@
             ],
             "scaling": [
                 4.0,
-                4.0,
-                4.0
-            ]
+                3.9999995,
+                3.9999995
+            ],
+            "parent": "241"
         },
         "17": {
             "name": "NonVrCamera",
@@ -201,7 +202,8 @@
                 1.0,
                 1.0,
                 1.0
-            ]
+            ],
+            "parent": "241"
         },
         "23": {
             "name": "Light.000",
@@ -228,7 +230,8 @@
                 1.0,
                 1.0,
                 1.0
-            ]
+            ],
+            "parent": "241"
         },
         "53": {
             "link": {
@@ -1075,20 +1078,20 @@
             ],
             "parent": null,
             "translation": [
-                -0.2381033,
-                0.672035,
-                0.1044664
+                0.0147822,
+                0.6720348,
+                0.1044657
             ],
             "rotation": [
-                -0.5001489,
-                0.50015,
-                -0.4998522,
-                -0.4998486
+                -0.5001483,
+                0.5001506,
+                -0.4998518,
+                -0.499849
             ],
             "scaling": [
-                0.9999407,
-                0.9999424,
-                0.9999988
+                0.9999395,
+                0.9999421,
+                0.9999976
             ]
         },
         "238": {
@@ -1110,7 +1113,8 @@
                     "type": "interactable",
                     "active": true,
                     "interactable": {
-                        "snap": false
+                        "snap": false,
+                        "shouldSnap": false
                     }
                 },
                 {
@@ -1132,6 +1136,28 @@
                         "trigger": false,
                         "allowSimulation": true,
                         "kinematic": false
+                    },
+                    "active": false
+                },
+                {
+                    "type": "collision",
+                    "collision": {
+                        "collider": "box",
+                        "aabb": {
+                            "extents": [
+                                0.0199999,
+                                0.025,
+                                0.1
+                            ]
+                        },
+                        "groups": 128,
+                        "box": {
+                            "extents": [
+                                0.1,
+                                0.025,
+                                0.0199999
+                            ]
+                        }
                     }
                 }
             ],
@@ -1250,19 +1276,19 @@
         "243": {
             "name": "Weapon Double Hand",
             "translation": [
-                0.2825264,
-                1.0467165,
-                0.3617782
+                0.3969199,
+                0.6557073,
+                0.3617781
             ],
             "rotation": [
                 0.0,
                 0.0,
-                0.7071063,
-                0.7071071
+                0.7071062,
+                0.7071073
             ],
             "scaling": [
-                0.9999582,
-                0.9999581,
+                0.9999322,
+                0.9999321,
                 1.0
             ],
             "components": [
@@ -1590,6 +1616,101 @@
                 0.0,
                 0.0,
                 0.7071068
+            ]
+        },
+        "282": {
+            "name": "WeaponBar",
+            "components": [
+                {
+                    "type": "grabbable",
+                    "grabbable": {
+                        "handle": "286",
+                        "throwLinearIntensity": 1.0,
+                        "useControllerVelocityData": true
+                    }
+                },
+                {
+                    "type": "physx",
+                    "physx": {
+                        "shape": "box",
+                        "box": {
+                            "extents": [
+                                0.025,
+                                0.025,
+                                0.3499999
+                            ]
+                        },
+                        "simulate": true,
+                        "kinematic": false,
+                        "groups": 255,
+                        "mass": 5.0,
+                        "linearDamping": 1.0,
+                        "bounciness": 0.0,
+                        "angularDamping": 1.0
+                    },
+                    "active": true
+                },
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "mesh": "8",
+                        "material": "26"
+                    },
+                    "active": true
+                }
+            ],
+            "parent": null,
+            "translation": [
+                -0.3806658,
+                0.6720359,
+                0.2721869
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                0.025,
+                0.025,
+                0.3499999
+            ]
+        },
+        "286": {
+            "name": "Grab",
+            "parent": "282",
+            "components": [
+                {
+                    "type": "collision",
+                    "collision": {
+                        "collider": "box",
+                        "aabb": {
+                            "extents": [
+                                0.025,
+                                0.025,
+                                0.3499999
+                            ]
+                        },
+                        "groups": 128,
+                        "box": {
+                            "extents": [
+                                0.025,
+                                0.025,
+                                0.3499999
+                            ]
+                        }
+                    },
+                    "active": true
+                },
+                {
+                    "type": "interactable",
+                    "active": true,
+                    "interactable": {
+                        "snap": false,
+                        "shouldSnap": false
+                    }
+                }
             ]
         }
     },
@@ -2432,13 +2553,13 @@
             "esbuildFlags": "--format=esm --target=es2022"
         },
         "runtime": {
-            "visualizeColliders": false,
+            "visualizeColliders": true,
             "webxr": {
                 "optionalFeatures": {
                     "local-floor": true
                 }
             },
-            "visualizePhysX": false
+            "visualizePhysX": true
         },
         "physx": {
             "enable": true,
