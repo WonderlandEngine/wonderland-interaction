@@ -1,5 +1,11 @@
 import {vec3, quat2, quat} from 'gl-matrix';
-import {Component, Emitter, Object3D, PhysXComponent} from '@wonderlandengine/api';
+import {
+    Component,
+    Emitter,
+    ForceMode,
+    Object3D,
+    PhysXComponent,
+} from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
 
 import {Interactor} from './interactor.js';
@@ -20,6 +26,7 @@ const _pointB = vec3.create();
 const _pointC = vec3.create();
 const _vectorA = vec3.create();
 const _vectorB = vec3.create();
+const _vectorC = vec3.create();
 const _rotation = quat.create();
 const _transform = quat2.create();
 
@@ -212,7 +219,7 @@ export class Grabbable extends Component {
      *
      * @returns
      */
-    throw(): void {
+    throw(interactor: Interactor): void {
         if (!this._physx) {
             return;
         }
@@ -223,6 +230,14 @@ export class Grabbable extends Component {
 
         const velocity = this._history.velocity(_vectorB);
         vec3.scale(velocity, velocity, this.throwLinearIntensity);
+
+        const radius = vec3.subtract(
+            _vectorC,
+            this.object.getPositionWorld(_pointA),
+            interactor.object.getPositionWorld(_pointB)
+        );
+        vec3.cross(radius, angular, radius);
+        vec3.add(velocity, velocity, radius);
 
         this._physx.angularVelocity = angular;
         this._physx.linearVelocity = velocity;
@@ -307,7 +322,7 @@ export class Grabbable extends Component {
         this._maxSqDistance = null;
 
         if (this.canThrow && !this.isGrabbed) {
-            this.throw();
+            this.throw(interactor);
         }
 
         this._released(interactor, this._interactable[index]);
