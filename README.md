@@ -49,10 +49,3 @@ npm i path/to/weil
 
 For more information about how to use the components, please refer to the [./DOC.md](documentation).
 
-## ToDo List
-
-* [ ] Disable distance grabbing when a double-hand grabbable is only grabbed with one hand
-* [ ] Emulate angular velocity
-* [ ] Improve throwing speed uniformity between emulated and native
-* [ ] Find a way to improve performance for collision check (distance grab)
-* [ ] Interaction mapping for selection / shoot etc...
