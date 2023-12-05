@@ -1,11 +1,5 @@
 import {vec3, quat2, quat} from 'gl-matrix';
-import {
-    Component,
-    Emitter,
-    ForceMode,
-    Object3D,
-    PhysXComponent,
-} from '@wonderlandengine/api';
+import {Component, Emitter, Object3D, PhysXComponent} from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
 
 import {Interactor} from './interactor.js';
