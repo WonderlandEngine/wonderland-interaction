@@ -1142,7 +1142,7 @@
                 {
                     "type": "collision",
                     "collision": {
-                        "collider": "aabb",
+                        "collider": "box",
                         "aabb": {
                             "extents": [
                                 0.0199999,
@@ -1150,7 +1150,14 @@
                                 0.1
                             ]
                         },
-                        "groups": 128
+                        "groups": 128,
+                        "box": {
+                            "extents": [
+                                0.1,
+                                0.025,
+                                0.0199999
+                            ]
+                        }
                     }
                 }
             ],
@@ -1677,16 +1684,24 @@
                 {
                     "type": "collision",
                     "collision": {
-                        "collider": "aabb",
+                        "collider": "box",
                         "aabb": {
                             "extents": [
-                                1.0,
-                                1.0,
-                                1.0
+                                0.025,
+                                0.025,
+                                0.3499999
                             ]
                         },
-                        "groups": 128
-                    }
+                        "groups": 128,
+                        "box": {
+                            "extents": [
+                                0.025,
+                                0.025,
+                                0.3499999
+                            ]
+                        }
+                    },
+                    "active": true
                 },
                 {
                     "type": "interactable",
@@ -2538,13 +2553,13 @@
             "esbuildFlags": "--format=esm --target=es2022"
         },
         "runtime": {
-            "visualizeColliders": false,
+            "visualizeColliders": true,
             "webxr": {
                 "optionalFeatures": {
                     "local-floor": true
                 }
             },
-            "visualizePhysX": false
+            "visualizePhysX": true
         },
         "physx": {
             "enable": true,
