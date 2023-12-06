@@ -30,8 +30,8 @@ export class Interactable extends Component {
      * As a example, the {@link Grabbable} component will use the transformation
      * of the object containing this interactable as an anchor point / rotation.
      */
-    @property.bool(true)
-    public shouldSnap = true;
+    @property.bool(false)
+    public shouldSnap = false;
 
     /** Private Attributes. */
 

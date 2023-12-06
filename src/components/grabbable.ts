@@ -1,5 +1,11 @@
 import {vec3, quat2, quat} from 'gl-matrix';
-import {Component, Emitter, Object3D, PhysXComponent} from '@wonderlandengine/api';
+import {
+    Component,
+    Emitter,
+    Object3D,
+    PhysXComponent,
+    WonderlandEngine,
+} from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
 
 import {Interactor} from './interactor.js';
@@ -31,14 +37,21 @@ export class Grabbable extends Component {
     /** @override */
     static TypeName = 'grabbable';
 
+    static onRegister(engine: WonderlandEngine) {
+        engine.registerComponent(Interactable);
+    }
+
     /** Properties. */
 
     /**
      * Main handle.
      *
+     * @note If no handle is provided, this component will treat the component
+     * it's attached to as the {@link Interactable}.
+     *
      * This is an Object3D containing an {@link Interactable} component.
      */
-    @property.object({required: true})
+    @property.object()
     public handle: Object3D = null!;
 
     /**
@@ -127,11 +140,13 @@ export class Grabbable extends Component {
 
     /** @hidden */
     start(): void {
+        if (!this.handle) {
+            this.handle = this.object;
+        }
+
         this._interactable[0] = this.handle.getComponent(Interactable)!;
         if (!this._interactable[0]) {
-            throw new Error(
-                `Grabbable.start(): 'handle' must have an Interactable component.`
-            );
+            this._interactable[0] = this.handle.addComponent(Interactable)!;
         }
 
         /* The second handle is optional. */

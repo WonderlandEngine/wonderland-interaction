@@ -1393,12 +1393,6 @@
                             "radius": 0.1
                         }
                     }
-                },
-                {
-                    "type": "interactable",
-                    "interactable": {
-                        "shouldSnap": false
-                    }
                 }
             ],
             "translation": [
@@ -1759,12 +1753,6 @@
                             "radius": 0.1
                         }
                     }
-                },
-                {
-                    "type": "interactable",
-                    "interactable": {
-                        "shouldSnap": false
-                    }
                 }
             ],
             "translation": [
@@ -1832,12 +1820,6 @@
                         "sphere": {
                             "radius": 0.1
                         }
-                    }
-                },
-                {
-                    "type": "interactable",
-                    "interactable": {
-                        "shouldSnap": false
                     }
                 }
             ],
