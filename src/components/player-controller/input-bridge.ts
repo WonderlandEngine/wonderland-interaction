@@ -1,102 +1,116 @@
-import {Component, Object3D} from '@wonderlandengine/api';
+import {Component, NumberArray, Object3D} from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
 import {typename} from '../../constants.js';
 import {ControlsKeyboard} from './controls-keyboard.js';
 import {vec3} from 'gl-matrix';
 import {ControlsVR} from './controls-vr.js';
 import {Handedness} from '../interactor.js';
+import { absMaxVec3 } from '../../utils/math.js';
+
+export const InputBridgeTypename = typename('input-bridge');
 
 /**
- * A proxy for handling input from various input providers, such as keyboard, mouse, touch,
+ * A proxy for handling input.
+ */
+export interface InputBridge extends Component {
+    /**
+     * Get the rotation axis.
+     *
+     * @param out The destination array.
+     * @returns The `out` parameter;
+     */
+    getRotationAxis<T extends NumberArray>(out: T): T;
+    /**
+     * Get the movement axis.
+     *
+     * @param out The destination array.
+     * @returns The `out` parameter;
+     */
+    getMovementAxis<T extends NumberArray>(out: T): T;
+
+    /**
+     * Get the position of the VR controller
+     *
+     * @param out The destination array.
+     * @param handedness the handedness of the controller.
+     * @returns true if the controller is active, false otherwise.
+     */
+    getControllerPosition(out: NumberArray, handedness: Handedness): boolean;
+
+    /**
+     * Get the forward direction of the VR controller.
+     *
+     * @param out The destination array.
+     * @param handedness the handedness of the controller.
+     * @returns true if the controller is active, false otherwise.
+     */
+    getControllerForward(out: NumberArray, handedness: Handedness): boolean;
+}
+
+/**
+ * Default bridge handling providers, such as keyboard, mouse, touch,
  * VR controllers or game controllers.
  */
-export class InputBridge extends Component {
-    static TypeName = typename('input-bridge');
-
-    private static movementAxis = vec3.create();
-    private static rotationAxis = vec3.create();
+export class DefaultInputBridge extends Component implements InputBridge {
+    static TypeName = InputBridgeTypename;
 
     @property.object({required: true})
     inputs!: Object3D;
 
-    private _keyboardController?: ControlsKeyboard | null;
-    private _vrController?: ControlsVR | null;
+    private _keyboardController: ControlsKeyboard | null = null;
+    private _vrController: ControlsVR | null = null;
 
     start(): void {
         this._keyboardController = this.inputs.getComponent(ControlsKeyboard);
         this._vrController = this.inputs.getComponent(ControlsVR);
     }
 
-    getRotationAxis(): vec3 {
-        vec3.zero(InputBridge.rotationAxis);
-
-        if (this._vrController && this._vrController.active) {
-            this.maxAbs(
-                InputBridge.rotationAxis,
-                InputBridge.rotationAxis,
-                this._vrController.getAxisRotation()
-            );
+    /** @override */
+    getRotationAxis<T extends NumberArray>(out: T): T {
+        const dest = out as unknown as vec3;
+        vec3.zero(dest);
+        if (this._vrController?.active) {
+            vec3.copy(dest, this._vrController.getAxisRotation());
         }
-
-        return InputBridge.rotationAxis;
+        return out;
     }
 
-    getMovementAxis(): vec3 {
-        vec3.zero(InputBridge.movementAxis);
+    /** @override */
+    getMovementAxis<T extends NumberArray>(out: T): T {
+        const dest = out as unknown as vec3;
+        vec3.zero(dest);
 
         // determine the movement axis with the highest values
         if (this._keyboardController && this._keyboardController.active) {
-            this.maxAbs(
-                InputBridge.movementAxis,
-                InputBridge.movementAxis,
-                this._keyboardController.getAxis()
-            );
+            vec3.copy(dest, this._keyboardController.getAxis());
         }
 
         if (this._vrController && this._vrController.active) {
-            this.maxAbs(
-                InputBridge.movementAxis,
-                InputBridge.movementAxis,
-                this._vrController.getAxisMove()
-            );
+            absMaxVec3(dest, dest, this._vrController.getAxisMove());
         }
 
-        return InputBridge.movementAxis;
+        return out;
     }
 
-    /**
-     * get the position of the VR controller
-     * @param position the position to write to
-     * @param handedness the handedness of the controller
-     * @returns true if the controller is active, false otherwise
-     */
-    getControllerPosition(position: vec3, handedness: Handedness | null = null): boolean {
+    /** @override */
+    getControllerPosition(position: NumberArray, handedness: Handedness): boolean {
         if (this._vrController && this._vrController.active) {
             this._vrController
-                .getObject(handedness ?? Handedness.Left)
+                .getObject(handedness)
                 .getPositionWorld(position);
             return true;
         }
         return false;
     }
 
-    getControllerForward(forward: vec3, handedness: Handedness | null = null): boolean {
+    /** @override */
+    getControllerForward(forward: NumberArray, handedness: Handedness): boolean {
         if (this._vrController && this._vrController.active) {
             this._vrController
-                .getObject(handedness ?? Handedness.Left)
+                .getObject(handedness)
                 .getForwardWorld(forward);
             return true;
         }
         return false;
-    }
-
-    private maxAbs(out: vec3, a: vec3, b: vec3) {
-        const v1 = Math.abs(a[0]) + Math.abs(a[1]) + Math.abs(a[2]);
-        const v2 = Math.abs(b[0]) + Math.abs(b[1]) + Math.abs(b[2]);
-
-        if (v1 > v2) {
-            return vec3.copy(out, a);
-        }
-        return vec3.copy(out, b);
     }
 }

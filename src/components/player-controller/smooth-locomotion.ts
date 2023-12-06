@@ -3,7 +3,7 @@ import {property} from '@wonderlandengine/api/decorators.js';
 import {typename} from '../../constants.js';
 import {vec3} from 'gl-matrix';
 import {InputBridge} from './input-bridge.js';
-import {PlayerController} from './player-controller.js';
+import {PlayerController, getRequiredComponents} from './player-controller.js';
 
 export class SmoothLocomotion extends Component {
     static TypeName = typename('smooth-locomotion');
@@ -18,7 +18,7 @@ export class SmoothLocomotion extends Component {
     speed = 10;
 
     @property.object()
-    inputBridgeObject?: Object3D;
+    inputBridgeObject: Object3D | null = null;
 
     private _playerController!: PlayerController;
 
@@ -28,23 +28,9 @@ export class SmoothLocomotion extends Component {
     private _moving = false;
 
     start(): void {
-        const tempPlayerController = this.object.getComponent(PlayerController);
-        if (!tempPlayerController) {
-            throw new Error(
-                `player-controller(${this.object.name}): object does not have a PlayerController. This is required.`
-            );
-        }
-        this._playerController = tempPlayerController;
-
-        const tempInputBridge =
-            this.inputBridgeObject?.getComponent(InputBridge) ||
-            this.object.getComponent(InputBridge);
-        if (!tempInputBridge) {
-            throw new Error(
-                `player-controller(${this.object.name}): object does not have a InputBridge and the inputBridgeObject parameter is not defined. One of these is required.`
-            );
-        }
-        this._inputBridge = tempInputBridge;
+        const {inputBridge, player} = getRequiredComponents(this.object, this.inputBridgeObject);
+        this._inputBridge = inputBridge;
+        this._playerController = player;
     }
 
     update() {
@@ -59,7 +45,7 @@ export class SmoothLocomotion extends Component {
             return;
         }
 
-        vec3.copy(this._movement, this._inputBridge.getMovementAxis());
+        this._inputBridge.getMovementAxis(this._movement);
         this._moving =
             this._movement[0] !== 0 || this._movement[1] !== 0 || this._movement[2] !== 0;
         vec3.scale(this._movement, this._movement, this.speed);

@@ -1,12 +1,15 @@
 import {Component, Object3D} from '@wonderlandengine/api';
 import {typename} from '../../constants.js';
-import {PlayerController} from './player-controller.js';
+import {PlayerController, getRequiredComponents} from './player-controller.js';
 import {property} from '@wonderlandengine/api/decorators.js';
 import {InputBridge} from './input-bridge.js';
 import {quat, vec2, vec3} from 'gl-matrix';
 import {ActiveCamera} from '../helpers/active-camera.js';
 import {Handedness} from '../interactor.js';
 import {setComponentsActive} from '../../utils/activate-children.js';
+
+/* Temporaries. */
+const _axis = vec3.create();
 
 export class TeleportLocomotion extends Component {
     static TypeName = typename('teleport-locomotion');
@@ -71,23 +74,9 @@ export class TeleportLocomotion extends Component {
     private currentIndicatorRotation = 0;
 
     start(): void {
-        const tempPlayerController = this.object.getComponent(PlayerController);
-        if (!tempPlayerController) {
-            throw new Error(
-                `teleport-locomotion(${this.object.name}): object does not have a PlayerController. This is required.`
-            );
-        }
-        this._playerController = tempPlayerController;
-
-        const tempInputBridge =
-            this.inputBridgeObject?.getComponent(InputBridge) ||
-            this.object.getComponent(InputBridge);
-        if (!tempInputBridge) {
-            throw new Error(
-                `teleport-locomotion(${this.object.name}): object does not have a InputBridge and the inputBridgeObject parameter is not defined. One of these is required.`
-            );
-        }
-        this._inputBridge = tempInputBridge;
+        const {inputBridge, player} = getRequiredComponents(this.object, this.inputBridgeObject);
+        this._inputBridge = inputBridge;
+        this._playerController = player;
 
         const tempActiveCamera = this.object.getComponent(ActiveCamera);
         if (!tempActiveCamera) {
@@ -120,8 +109,11 @@ export class TeleportLocomotion extends Component {
     }
 
     private getTeleportButton() {
-        const axes = this._inputBridge.getMovementAxis();
+        const axes = this._inputBridge.getMovementAxis(_axis);
         vec2.set(this._currentStickAxes, axes[0], axes[2]);
+
+        // @todo: Doesn't represent the real magnitude. Would be better
+        // to use an euclidian distance instead.
         const inputLength = Math.abs(axes[0]) + Math.abs(axes[2]);
 
         // TODO: add more 'keys' to initiate teleport
