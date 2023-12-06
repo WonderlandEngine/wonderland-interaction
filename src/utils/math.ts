@@ -1,4 +1,4 @@
-import {Object3D} from '@wonderlandengine/api';
+import {NumberArray, Object3D} from '@wonderlandengine/api';
 import {quat, quat2, vec3} from 'gl-matrix';
 
 /** Temporaries. */
@@ -55,4 +55,14 @@ export function computeRelativeTransform(
 
     quat2.fromRotationTranslation(out, rot, position);
     return out;
+}
+
+export function absMaxVec3(out: vec3, a: vec3, b: vec3): vec3 {
+    const v1 = Math.abs(a[0]) + Math.abs(a[1]) + Math.abs(a[2]);
+    const v2 = Math.abs(b[0]) + Math.abs(b[1]) + Math.abs(b[2]);
+
+    if (v1 > v2) {
+        return vec3.copy(out, a);
+    }
+    return vec3.copy(out, b);
 }

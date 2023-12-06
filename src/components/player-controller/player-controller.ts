@@ -1,11 +1,32 @@
-import {Component, PhysXComponent} from '@wonderlandengine/api';
+import {Component, Object3D, PhysXComponent} from '@wonderlandengine/api';
 import {typename} from '../../constants.js';
 import {vec3} from 'gl-matrix';
 import {ActiveCamera} from '../helpers/active-camera.js';
 import {LocomotionSelector} from './locomotion-selector.js';
+import { InputBridge, InputBridgeTypename } from './input-bridge.js';
 
 const tempCameraVec = vec3.create();
 const tempPlayerVec = vec3.create();
+
+export function getRequiredComponents(object: Object3D, inputBridgeObject: Object3D | null): {player: PlayerController, inputBridge: InputBridge} {
+    const player = object.getComponent(PlayerController);
+    if (!player) {
+        throw new Error(
+            `player-controller(${object.name}): object does not have a PlayerController. This is required.`
+        );
+    }
+
+    const inputBridge =
+        inputBridgeObject?.getComponent(InputBridgeTypename) ||
+        object.getComponent(InputBridgeTypename);
+    if (!inputBridge) {
+        throw new Error(
+            `player-controller(${object.name}): object does not have a InputBridge and the inputBridgeObject parameter is not defined. One of these is required.`
+        );
+    }
+
+    return {player, inputBridge: inputBridge as InputBridge};
+}
 
 /**
  * This component is attached to the player object and is responsible for

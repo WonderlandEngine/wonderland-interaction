@@ -3,7 +3,7 @@ import {property} from '@wonderlandengine/api/decorators.js';
 import {typename} from '../../constants.js';
 import {PlayerController} from './player-controller.js';
 import {RotationType} from './enums/RotationType.js';
-import {InputBridge} from './input-bridge.js';
+import {InputBridge, InputBridgeTypename} from './input-bridge.js';
 import {vec3} from 'gl-matrix';
 
 export class PlayerRotate extends Component {
@@ -51,14 +51,14 @@ export class PlayerRotate extends Component {
         this._playerController = tempPlayerController;
 
         const tempInputBridge =
-            this.inputBridgeObject?.getComponent(InputBridge) ||
-            this.object.getComponent(InputBridge);
+            this.inputBridgeObject?.getComponent(InputBridgeTypename) ||
+            this.object.getComponent(InputBridgeTypename);
         if (!tempInputBridge) {
             throw new Error(
                 `player-controller(${this.object.name}): object does not have a InputBridge and the inputBridgeObject parameter is not defined. One of these is required.`
             );
         }
-        this._inputBridge = tempInputBridge;
+        this._inputBridge = tempInputBridge as InputBridge;
     }
 
     update(dt: number) {
@@ -77,7 +77,7 @@ export class PlayerRotate extends Component {
             return;
         }
 
-        vec3.copy(this._rotation, this._inputBridge.getRotationAxis());
+        this._inputBridge.getRotationAxis(this._rotation);
     }
 
     private rotatePlayerSnap() {
