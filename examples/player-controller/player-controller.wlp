@@ -25,7 +25,7 @@
                 {
                     "type": "wlei:locomotion-selector",
                     "wlei:locomotion-selector": {
-                        "locomotionType": "Teleport"
+                        "locomotionType": "SmoothLocomotion"
                     },
                     "active": true
                 },
@@ -53,7 +53,8 @@
                             1.0
                         ],
                         "kinematic": false
-                    }
+                    },
+                    "active": true
                 },
                 {
                     "type": "wlei:smooth-locomotion",
@@ -86,7 +87,7 @@
                 {
                     "type": "wlei:player-rotate",
                     "wlei:player-rotate": {
-                        "rotationType": "Snap",
+                        "rotationType": "Smooth",
                         "rotationSpeed": 10.0
                     }
                 }
