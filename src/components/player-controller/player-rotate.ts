@@ -1,4 +1,4 @@
-import {Component, Object3D} from '@wonderlandengine/api';
+import {Component, LockAxis, Object3D} from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
 import {EPSILON, typename} from '../../constants.js';
 import {PlayerController} from './player-controller.js';
@@ -41,6 +41,9 @@ export class PlayerRotate extends Component {
     private _lowThreshold = 0.2;
     private _highThreshold = 0.5;
 
+    /** @hidden */
+    private _previousType: RotationType = null!;
+
     start(): void {
         const tempPlayerController = this.object.getComponent(PlayerController);
         if (!tempPlayerController) {
@@ -62,22 +65,27 @@ export class PlayerRotate extends Component {
     }
 
     update(dt: number) {
-        this.updateInputs();
+        vec3.zero(this._rotation);
+        if (!this.allowRotation) {
+            return;
+        }
+        this._inputBridge.getRotationAxis(this._rotation);
+
+        if (this._previousType !== this.rotationType) {
+            /** @todo: Remove at 1.2.0, when the runtime supports updating
+             * lock axis in real time. */
+            const lockY = this.rotationType === RotationType.Smooth ? 0 : LockAxis.Y;
+            this._playerController.physx.angularLockAxis = LockAxis.X | lockY | LockAxis.Z;
+            this._playerController.physx.active = false;
+            this._playerController.physx.active = true;
+            this._previousType = this.rotationType;
+        }
+
         if (this.rotationType === RotationType.Snap) {
             this._rotatePlayerSnap();
         } else if (this.rotationType === RotationType.Smooth) {
             this._rotatePlayerSmooth(dt);
         }
-    }
-
-    private updateInputs() {
-        vec3.zero(this._rotation);
-
-        if (!this.allowRotation) {
-            return;
-        }
-
-        this._inputBridge.getRotationAxis(this._rotation);
     }
 
     private _rotatePlayerSnap() {
@@ -105,6 +113,7 @@ export class PlayerRotate extends Component {
             return;
         }
         const radians = this._rotation[0] * this.rotationSpeed * dt * 100;
+        console.log(radians);
         this._playerController.rotateSmooth(radians);
     }
 }

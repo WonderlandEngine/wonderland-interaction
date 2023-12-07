@@ -103,7 +103,6 @@ export class PlayerController extends Component {
          * the line below should be uncommented at version 1.2.0 */
         // this._physxComponent.angularLockAxis = LockAxis.X | LockAxis.Y | LockAxis.Z;
         this._physxComponent.kinematic = this._locomotionSelector.isKinematic;
-        this._rotateState = RotateState.None;
         this._isRotating = false;
         this._rotateState = RotateState.None;
     }
@@ -149,7 +148,9 @@ export class PlayerController extends Component {
     }
 
     rotateSmooth(angle: number) {
-        this._physxComponent.angularLockAxis = LockAxis.X | LockAxis.Z;
+        /** @todo: Axis need to be unlocked before rotation.
+         * the line below should be uncommented at version 1.2.0 */
+        // this._physxComponent.angularLockAxis = LockAxis.X | LockAxis.Z;
         const rot = vec3.set(_vectorA, 0, -toRad(angle), 0);
         this._physxComponent.addTorque(rot, ForceMode.VelocityChange);
         this._rotateState = RotateState.Reset;
@@ -174,5 +175,9 @@ export class PlayerController extends Component {
         tempPlayerVec[2] += location[2];
 
         this.object.setPositionWorld(location);
+    }
+
+    get physx() {
+        return this._physxComponent;
     }
 }

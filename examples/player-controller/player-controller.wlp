@@ -25,7 +25,7 @@
                 {
                     "type": "wlei:locomotion-selector",
                     "wlei:locomotion-selector": {
-                        "locomotionType": "Teleport"
+                        "locomotionType": "SmoothLocomotion"
                     },
                     "active": true
                 },
@@ -41,7 +41,7 @@
                             0.0
                         ],
                         "angularDamping": 10.0,
-                        "lockAxis": 40,
+                        "lockAxis": 56,
                         "linearDamping": 5.0,
                         "staticFriction": 0.0,
                         "dynamicFriction": 0.001,
@@ -87,7 +87,7 @@
                 {
                     "type": "wlei:player-rotate",
                     "wlei:player-rotate": {
-                        "rotationType": "Snap",
+                        "rotationType": "Smooth",
                         "rotationSpeed": 10.0
                     }
                 }
