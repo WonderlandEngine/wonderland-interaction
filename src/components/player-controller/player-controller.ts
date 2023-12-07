@@ -6,8 +6,11 @@ import {LocomotionSelector} from './locomotion-selector.js';
 import { InputBridge, InputBridgeTypename } from './input-bridge.js';
 import { toRad } from '../../utils/math.js';
 
+/* Temporaries */
+
 const tempCameraVec = vec3.create();
 const tempPlayerVec = vec3.create();
+const _vectorA = vec3.create();
 
 export function getRequiredComponents(object: Object3D, inputBridgeObject: Object3D | null): {player: PlayerController, inputBridge: InputBridge} {
     const player = object.getComponent(PlayerController);
@@ -31,7 +34,7 @@ export function getRequiredComponents(object: Object3D, inputBridgeObject: Objec
 
 enum RotateState {
     None = 0,
-    Reset = 2,
+    Reset = 1,
 }
 
 /**
@@ -102,6 +105,7 @@ export class PlayerController extends Component {
         this._physxComponent.kinematic = this._locomotionSelector.isKinematic;
         this._rotateState = RotateState.None;
         this._isRotating = false;
+        this._rotateState = RotateState.None;
     }
 
     /**
@@ -140,13 +144,14 @@ export class PlayerController extends Component {
             this._physxComponent.kinematic = true;
             this._rotateState = RotateState.Reset;
         }
-        this.object.rotateAxisAngleDegObject([0, 1, 0], -angle);
+        const rot = vec3.set(_vectorA, 0, 1, 0);
+        this.object.rotateAxisAngleDegObject(rot, -angle);
     }
 
     rotateSmooth(angle: number) {
         this._physxComponent.angularLockAxis = LockAxis.X | LockAxis.Z;
-        const rad = toRad(angle);
-        this._physxComponent.addTorque([0, -rad, 0], ForceMode.VelocityChange);
+        const rot = vec3.set(_vectorA, 0, -toRad(angle), 0);
+        this._physxComponent.addTorque(rot, ForceMode.VelocityChange);
         this._rotateState = RotateState.Reset;
     }
 
