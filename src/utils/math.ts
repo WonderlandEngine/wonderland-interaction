@@ -7,6 +7,10 @@ const _pointB = vec3.create();
 const _rotationA = quat.create();
 const _rotationB = quat.create();
 
+export function toRad(degrees: number) {
+    return (degrees * Math.PI) / 180.0;
+}
+
 /**
  * Compute the delta between `src` and the `dst` quaternion.
  *

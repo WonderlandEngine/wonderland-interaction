@@ -1,6 +1,6 @@
 import {Component, Object3D} from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
-import {typename} from '../../constants.js';
+import {EPSILON, typename} from '../../constants.js';
 import {PlayerController} from './player-controller.js';
 import {RotationType} from './enums/RotationType.js';
 import {InputBridge, InputBridgeTypename} from './input-bridge.js';
@@ -64,9 +64,9 @@ export class PlayerRotate extends Component {
     update(dt: number) {
         this.updateInputs();
         if (this.rotationType === RotationType.Snap) {
-            this.rotatePlayerSnap();
+            this._rotatePlayerSnap();
         } else if (this.rotationType === RotationType.Smooth) {
-            this.rotatePlayerSmooth(dt);
+            this._rotatePlayerSmooth(dt);
         }
     }
 
@@ -80,7 +80,7 @@ export class PlayerRotate extends Component {
         this._inputBridge.getRotationAxis(this._rotation);
     }
 
-    private rotatePlayerSnap() {
+    private _rotatePlayerSnap() {
         const currentAxis = this._rotation[0];
 
         if (Math.abs(currentAxis) < this._lowThreshold) {
@@ -97,16 +97,14 @@ export class PlayerRotate extends Component {
         if (currentAxis < 0) {
             rotation *= -1;
         }
-        this._playerController.rotate(rotation);
+        this._playerController.rotateSnap(rotation);
     }
 
-    private rotatePlayerSmooth(dt: number) {
-        // TODO: Can't do smooth rotation without kinematic mode. This needs to be solved first.
-        // if (!this.isRotating) {
-        //     return;
-        // }
-        // let currentAxis = this.rotation[0];
-        // currentAxis *= this.rotationSpeed * dt;
-        // this.playerController.rotate(currentAxis);
+    private _rotatePlayerSmooth(dt: number) {
+        if (Math.abs(this._rotation[0]) < EPSILON) {
+            return;
+        }
+        const radians = this._rotation[0] * this.rotationSpeed * dt * 100;
+        this._playerController.rotateSmooth(radians);
     }
 }

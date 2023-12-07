@@ -41,7 +41,7 @@
                             0.0
                         ],
                         "angularDamping": 10.0,
-                        "lockAxis": 56,
+                        "lockAxis": 40,
                         "linearDamping": 5.0,
                         "staticFriction": 0.0,
                         "dynamicFriction": 0.001,
@@ -53,7 +53,8 @@
                             1.0
                         ],
                         "kinematic": false
-                    }
+                    },
+                    "active": true
                 },
                 {
                     "type": "wlei:smooth-locomotion",

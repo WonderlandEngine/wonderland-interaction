@@ -1,9 +1,10 @@
-import {Component, Object3D, PhysXComponent} from '@wonderlandengine/api';
+import {Component, ForceMode, LockAxis, Object3D, PhysXComponent} from '@wonderlandengine/api';
 import {typename} from '../../constants.js';
 import {vec3} from 'gl-matrix';
 import {ActiveCamera} from '../helpers/active-camera.js';
 import {LocomotionSelector} from './locomotion-selector.js';
 import { InputBridge, InputBridgeTypename } from './input-bridge.js';
+import { toRad } from '../../utils/math.js';
 
 const tempCameraVec = vec3.create();
 const tempPlayerVec = vec3.create();
@@ -26,6 +27,11 @@ export function getRequiredComponents(object: Object3D, inputBridgeObject: Objec
     }
 
     return {player, inputBridge: inputBridge as InputBridge};
+}
+
+enum RotateState {
+    None = 0,
+    Reset = 2,
 }
 
 /**
@@ -55,6 +61,7 @@ export class PlayerController extends Component {
     private _activeCamera!: ActiveCamera;
     private _isRotating = false;
     private _locomotionSelector!: LocomotionSelector;
+    private _rotateState = RotateState.None;
 
     start() {
         const tempPhysx = this.object.getComponent(PhysXComponent);
@@ -84,17 +91,17 @@ export class PlayerController extends Component {
         this._physxComponent.kinematic = this._locomotionSelector.isKinematic;
     }
 
-    /**
-     * Queues a function to be executed on the next update.
-     * This way we can can set kinematic mode and disable it the next frame.
-     */
-    private queue = new Array<() => void>();
-
     update(): void {
-        const exec = this.queue.shift(); // get the first item from the queue
-        if (exec) {
-            exec();
+        if (this._rotateState !== RotateState.Reset) {
+            return;
         }
+        /** @todo: Axis need to be locked after a rotation to prevent torque
+         * when hitting walls. Wonderland Engine doesn't yet update axis lock on the fly,
+         * the line below should be uncommented at version 1.2.0 */
+        // this._physxComponent.angularLockAxis = LockAxis.X | LockAxis.Y | LockAxis.Z;
+        this._physxComponent.kinematic = this._locomotionSelector.isKinematic;
+        this._rotateState = RotateState.None;
+        this._isRotating = false;
     }
 
     /**
@@ -127,20 +134,20 @@ export class PlayerController extends Component {
      * Rotates the player on the Y axis for the given amount of degrees.
      * Can be called every frame.
      */
-    rotate(angle: number) {
-        if (this._physxComponent.kinematic) {
-            this.object.rotateAxisAngleDegObject([0, 1, 0], -angle);
-        } else {
-            this.queue.push(() => {
-                this._isRotating = true;
-                this._physxComponent.kinematic = true;
-                this.object.rotateAxisAngleDegObject([0, 1, 0], -angle);
-            });
-            this.queue.push(() => {
-                this._isRotating = false;
-                this._physxComponent.kinematic = this._locomotionSelector.isKinematic;
-            });
+    rotateSnap(angle: number) {
+        if (!this._physxComponent.kinematic) {
+            this._isRotating = true;
+            this._physxComponent.kinematic = true;
+            this._rotateState = RotateState.Reset;
         }
+        this.object.rotateAxisAngleDegObject([0, 1, 0], -angle);
+    }
+
+    rotateSmooth(angle: number) {
+        this._physxComponent.angularLockAxis = LockAxis.X | LockAxis.Z;
+        const rad = toRad(angle);
+        this._physxComponent.addTorque([0, -rad, 0], ForceMode.VelocityChange);
+        this._rotateState = RotateState.Reset;
     }
 
     /**
