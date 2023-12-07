@@ -113,7 +113,6 @@ export class PlayerRotate extends Component {
             return;
         }
         const radians = this._rotation[0] * this.rotationSpeed * dt * 100;
-        console.log(radians);
         this._playerController.rotateSmooth(radians);
     }
 }
