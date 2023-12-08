@@ -3,4 +3,5 @@
 tsconfig.json
 .eslintrc.json
 .prettierrc.json
+.github
 TODO
