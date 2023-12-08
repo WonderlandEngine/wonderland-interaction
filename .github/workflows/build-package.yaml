@@ -26,9 +26,12 @@ jobs:
 
     - name: Compile TypeScript
       run: npm run build  
-
+    
+    - name: Create Package
+      run: npm pack
+    
     - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:
-        name: dist
-        path: ./dist
+        name: package
+        path: ./*.tgz
