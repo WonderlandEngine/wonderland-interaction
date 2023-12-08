@@ -26,12 +26,9 @@ jobs:
 
     - name: Compile TypeScript
       run: npm run build  
-    
-    - name: Create Package
-      run: npm pack
-    
+
     - name: Upload artifact
-      uses: actions/upload-tartifact@v2
+      uses: actions/upload-artifact@v2
       with:
         name: package
         path: .
