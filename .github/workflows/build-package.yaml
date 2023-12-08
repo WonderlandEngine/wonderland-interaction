@@ -31,7 +31,22 @@ jobs:
       run: npm pack
     
     - name: Upload artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-tartifact@v2
       with:
         name: package
-        path: ./*.tgz
+        path: .
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://npm.pkg.github.com'
+      - run: npm ci
+      - run: npm run build
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}

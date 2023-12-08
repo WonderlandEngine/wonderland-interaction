@@ -1,13 +1,36 @@
 {
-    "name": "wle-interaction",
+    "name": "@wonderlandengine/interaction",
     "version": "1.0.0-alpha.0",
-    "description": "Interaction library",
-    "type": "module",
-    "main": "dist/index.js",
-    "module": "dist/index.js",
-    "types": "dist/index.d.ts",
+    "description": "Wonderland Engine's official interaction library.",
+    "author": "Wonderland GmbH",
     "license": "MIT",
+    "type": "module",
+    "main": "./dist/index.js",
+    "module": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/WonderlandEngine/wonderland-interaction.git"
+    },
+    "keywords": [
+        "webxr",
+        "wonderland",
+        "interaction"
+    ],
+    "bugs": {
+        "url": "https://github.com/WonderlandEngine/wonderland-interaction/issues"
+    },
+    "homepage": "https://github.com/WonderlandEngine/wonderland-interaction#readme",
     "wonderlandengine": {},
+    "files": [
+        "dist/*.js",
+        "dist/utils/*.js",
+        "dist/components/*.js",
+        "dist/*.d.ts",
+        "dist/utils/*.d.ts",
+        "dist/components/*.d.ts"
+    ],
+    
     "scripts": {
         "build": "tsc",
         "build:watch": "tsc --watch",
