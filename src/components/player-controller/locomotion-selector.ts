@@ -8,7 +8,6 @@ import {LocomotionType} from './enums/LocomotionType.js';
 /**
  * A component that allows easy selecting the type of locomotion to use.
  */
-
 export class LocomotionSelector extends Component {
     static TypeName = typename('locomotion-selector');
 
@@ -20,7 +19,7 @@ export class LocomotionSelector extends Component {
     )
     locomotionType = LocomotionType.Teleport;
 
-    // TK: This is the proposed way to do it, but it doesn't work yet.
+    // TODO TK: This is the proposed way to do it, but it doesn't work yet.
     //     I'm keeping it here for now so we can continue development and revisit it later.
     // get locomotionType(): LocomotionType {
     //     return this._locomotionType;

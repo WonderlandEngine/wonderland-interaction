@@ -1,18 +1,20 @@
-import {Component, ForceMode, LockAxis, Object3D, PhysXComponent} from '@wonderlandengine/api';
+import {Component, ForceMode, Object3D, PhysXComponent} from '@wonderlandengine/api';
 import {typename} from '../../constants.js';
 import {vec3} from 'gl-matrix';
 import {ActiveCamera} from '../helpers/active-camera.js';
 import {LocomotionSelector} from './locomotion-selector.js';
-import { InputBridge, InputBridgeTypename } from './input-bridge.js';
-import { toRad } from '../../utils/math.js';
+import {InputBridge, InputBridgeTypename} from './input-bridge.js';
+import {toRad} from '../../utils/math.js';
 
 /* Temporaries */
-
 const tempCameraVec = vec3.create();
 const tempPlayerVec = vec3.create();
 const _vectorA = vec3.create();
 
-export function getRequiredComponents(object: Object3D, inputBridgeObject: Object3D | null): {player: PlayerController, inputBridge: InputBridge} {
+export function getRequiredComponents(
+    object: Object3D,
+    inputBridgeObject: Object3D | null
+): {player: PlayerController; inputBridge: InputBridge} {
     const player = object.getComponent(PlayerController);
     if (!player) {
         throw new Error(
@@ -32,7 +34,7 @@ export function getRequiredComponents(object: Object3D, inputBridgeObject: Objec
     return {player, inputBridge: inputBridge as InputBridge};
 }
 
-enum RotateState {
+export enum RotateState {
     None = 0,
     Reset = 1,
 }
@@ -109,7 +111,7 @@ export class PlayerController extends Component {
 
     /**
      * Moves the player in the given direction.
-     * @param movement The direction to move in.
+     * @param movement - The direction to move in.
      */
     move(movement: vec3) {
         if (this._isRotating || this._physxComponent.kinematic) {
@@ -158,8 +160,8 @@ export class PlayerController extends Component {
 
     /**
      * Sets the player's position and rotation.
-     * @param location the location to move to
-     * @param rotation the rotation to rotate to in radians
+     * @param location - the location to move to
+     * @param rotation - the rotation to rotate to in radians
      */
     setPositionRotation(location: vec3, rotation: number) {
         this.object.resetRotation();

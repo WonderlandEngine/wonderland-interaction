@@ -1,0 +1,10 @@
+{
+    "$schema": "https://typedoc.org/schema.json",
+    "entryPoints": ["./src/index.ts"],
+    "entryPointStrategy": "expand",
+    "visibilityFilters": {
+        "protected": true,
+        "private": true,
+        "inherited": true
+    }
+}

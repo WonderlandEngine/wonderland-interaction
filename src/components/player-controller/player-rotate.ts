@@ -40,8 +40,6 @@ export class PlayerRotate extends Component {
     private _snapped = false;
     private _lowThreshold = 0.2;
     private _highThreshold = 0.5;
-
-    /** @hidden */
     private _previousType: RotationType = null!;
 
     start(): void {

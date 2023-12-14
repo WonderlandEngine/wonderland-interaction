@@ -1,4 +1,5 @@
 import { Component, Type } from '@wonderlandengine/api';
+import { Grabbable } from 'wle-interaction';
 
 export class DebugComponent extends Component {
     static TypeName = 'debug-component';

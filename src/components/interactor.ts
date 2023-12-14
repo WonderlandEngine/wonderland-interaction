@@ -26,7 +26,6 @@ export const HandednessValues = Object.values(Handedness);
  * mesh controller is, but this is not mandatory.
  */
 export class Interactor extends Component {
-    /** @overload */
     static TypeName = 'interactor';
 
     /** Properties. */
@@ -45,23 +44,22 @@ export class Interactor extends Component {
 
     /** Private Attributes. */
 
-    /** Collision component of this object. @hidden */
+    /** Collision component of this object. */
     private _collision: CollisionComponent = null!;
-    /** Collision component of this object. @hidden */
+    /** Collision component of this object. */
     private _physx: PhysXComponent = null!;
 
-    /** Cached interactable after it's gripped. @hidden */
+    /** Cached interactable after it's gripped. */
     private _interactable: Interactable | null = null;
 
-    /** Previous loaded scene. @hidden */
+    /** Previous loaded scene. */
     private _previousScene: Scene | null = null;
 
-    /** Grip start emitter. @hidden */
+    /** Grip start emitter. */
     private readonly _onGripStart: Emitter<[Interactable]> = new Emitter();
-    /** Grip end emitter. @hidden */
+    /** Grip end emitter. */
     private readonly _onGripEnd: Emitter<[Interactable]> = new Emitter();
 
-    /** @hidden */
     private readonly _onPreRender = () => {
         if (
             this.engine.xr &&
@@ -76,7 +74,7 @@ export class Interactor extends Component {
             this.#xrPose = pose ?? null;
         }
     };
-    /** @hidden */
+
     private readonly _onSceneLoaded = () => {
         const scene = this.engine.scene;
         if (this._previousScene) {
@@ -98,14 +96,14 @@ export class Interactor extends Component {
     #onSessionStart = this._startSession.bind(this);
     /** @hidden */
     #onSessionEnd = this._endSession.bind(this);
-
+    /** @hidden */
     #currentlyCollidingWith: PhysXComponent | null = null;
 
     /**
      * Set the collision component needed to perform
      * grab interaction
      *
-     * @param collision The collision component
+     * @param collision - The collision component
      *
      * @returns This instance, for chaining
      */
@@ -123,13 +121,11 @@ export class Interactor extends Component {
         this._onSceneLoaded();
     }
 
-    /** @overload */
     onActivate(): void {
         this.engine.onXRSessionStart.add(this.#onSessionStart);
         this.engine.onXRSessionEnd.add(this.#onSessionEnd);
     }
 
-    /** @overload */
     onDeactivate(): void {
         this.engine.onXRSessionStart.add(this.#onSessionStart);
         this.engine.onXRSessionEnd.add(this.#onSessionEnd);
@@ -205,7 +201,8 @@ export class Interactor extends Component {
     /**
      * Current [XR pose](https://developer.mozilla.org/en-US/docs/Web/API/XRPose).
      *
-     * @note This is only available when a session is started **and** during a frame, i.e.,
+     * @remarks
+     * This is only available when a session is started **and** during a frame, i.e.,
      * during the update phase.
      */
     get xrPose(): XRPose | null {
@@ -220,7 +217,6 @@ export class Interactor extends Component {
         return this._interactable;
     }
 
-    /** @hidden */
     private _startSession(session: XRSession) {
         this.#referenceSpace = this.engine.xr!.referenceSpaceForType('local');
 

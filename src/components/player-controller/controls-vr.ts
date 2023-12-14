@@ -1,7 +1,7 @@
 import {Component, InputComponent, Object3D} from '@wonderlandengine/api';
 import {typename} from '../../constants.js';
 import {property} from '@wonderlandengine/api/decorators.js';
-import {mat4, vec3} from 'gl-matrix';
+import {vec3} from 'gl-matrix';
 import {Handedness} from '../interactor.js';
 
 const tempVectorAxisLeft = vec3.create();
@@ -10,7 +10,7 @@ const tempVectorAxisRight = vec3.create();
 /**
  * Movement with VR controllers.
  *
- * Todo:
+ * @todo
  * - Add button presses
  * - Add selection for the type of movements, like:
  *   - walk and rotate with both controller

@@ -68,13 +68,15 @@ export class TeleportLocomotion extends Component {
     private _tempVec1 = vec3.create();
     private _tempVec2 = vec3.create();
     private _tempVec3 = vec3.create();
-    private _tempVec4 = vec3.create();
     private _tempQuat1 = quat.create();
 
     private currentIndicatorRotation = 0;
 
     start(): void {
-        const {inputBridge, player} = getRequiredComponents(this.object, this.inputBridgeObject);
+        const {inputBridge, player} = getRequiredComponents(
+            this.object,
+            this.inputBridgeObject
+        );
         this._inputBridge = inputBridge;
         this._playerController = player;
 

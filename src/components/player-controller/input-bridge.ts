@@ -5,7 +5,7 @@ import {ControlsKeyboard} from './controls-keyboard.js';
 import {vec3} from 'gl-matrix';
 import {ControlsVR} from './controls-vr.js';
 import {Handedness} from '../interactor.js';
-import { absMaxVec3 } from '../../utils/math.js';
+import {absMaxVec3} from '../../utils/math.js';
 
 export const InputBridgeTypename = typename('input-bridge');
 
@@ -16,14 +16,14 @@ export interface InputBridge extends Component {
     /**
      * Get the rotation axis.
      *
-     * @param out The destination array.
+     * @param out - The destination array.
      * @returns The `out` parameter;
      */
     getRotationAxis<T extends NumberArray>(out: T): T;
     /**
      * Get the movement axis.
      *
-     * @param out The destination array.
+     * @param out - The destination array.
      * @returns The `out` parameter;
      */
     getMovementAxis<T extends NumberArray>(out: T): T;
@@ -31,8 +31,8 @@ export interface InputBridge extends Component {
     /**
      * Get the position of the VR controller
      *
-     * @param out The destination array.
-     * @param handedness the handedness of the controller.
+     * @param out - The destination array.
+     * @param handedness - the handedness of the controller.
      * @returns true if the controller is active, false otherwise.
      */
     getControllerPosition(out: NumberArray, handedness: Handedness): boolean;
@@ -40,8 +40,8 @@ export interface InputBridge extends Component {
     /**
      * Get the forward direction of the VR controller.
      *
-     * @param out The destination array.
-     * @param handedness the handedness of the controller.
+     * @param out - The destination array.
+     * @param handedness - the handedness of the controller.
      * @returns true if the controller is active, false otherwise.
      */
     getControllerForward(out: NumberArray, handedness: Handedness): boolean;
@@ -95,9 +95,7 @@ export class DefaultInputBridge extends Component implements InputBridge {
     /** @override */
     getControllerPosition(position: NumberArray, handedness: Handedness): boolean {
         if (this._vrController && this._vrController.active) {
-            this._vrController
-                .getObject(handedness)
-                .getPositionWorld(position);
+            this._vrController.getObject(handedness).getPositionWorld(position);
             return true;
         }
         return false;
@@ -106,9 +104,7 @@ export class DefaultInputBridge extends Component implements InputBridge {
     /** @override */
     getControllerForward(forward: NumberArray, handedness: Handedness): boolean {
         if (this._vrController && this._vrController.active) {
-            this._vrController
-                .getObject(handedness)
-                .getForwardWorld(forward);
+            this._vrController.getObject(handedness).getForwardWorld(forward);
             return true;
         }
         return false;

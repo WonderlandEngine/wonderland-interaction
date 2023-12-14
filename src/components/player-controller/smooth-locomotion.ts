@@ -21,14 +21,15 @@ export class SmoothLocomotion extends Component {
     inputBridgeObject: Object3D | null = null;
 
     private _playerController!: PlayerController;
-
     private _movement = vec3.create();
-
     private _inputBridge!: InputBridge;
     private _moving = false;
 
     start(): void {
-        const {inputBridge, player} = getRequiredComponents(this.object, this.inputBridgeObject);
+        const {inputBridge, player} = getRequiredComponents(
+            this.object,
+            this.inputBridgeObject
+        );
         this._inputBridge = inputBridge;
         this._playerController = player;
     }
