@@ -136,7 +136,7 @@ export class HistoryTracker {
      * please use only once per frame or after the object is rotated.
      *
      * @param out The output angular velocity.
-     * @returns vec3 - The `out` parameter.
+     * @returns vec3 The `out` parameter.
      */
     angular(out: vec3): vec3 {
         vec3.zero(out);
