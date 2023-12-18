@@ -14,9 +14,9 @@ export function toRad(degrees: number) {
 /**
  * Compute the delta between `src` and the `dst` quaternion.
  *
- * @param out - The output.
- * @param src - The source quaternion.
- * @param dst - The destination quaternion.
+ * @param out The output.
+ * @param src The source quaternion.
+ * @param dst The destination quaternion.
  *
  * @returns The `out` parameter.
  */
@@ -34,9 +34,9 @@ export function quatDelta(out: quat, src: quat, dst: quat): quat {
  * - In order to get the world transform of `source`, the target's world
  *   transform will need to be multiplied by the result of this function.
  *
- * @param source - The source object.
- * @param target - The target object.
- * @param out - The destination.
+ * @param source The source object.
+ * @param target The target object.
+ * @param out The destination.
  * @returns The `out` parameter.
  */
 export function computeRelativeTransform(

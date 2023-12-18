@@ -7,23 +7,25 @@ import {
     Scene,
 } from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
-
 import {Interactable} from './interactable.js';
 
-/** Handedness for left / right hands. */
+/** Represents whether the user's left or right hand is being used. */
 export enum Handedness {
     Right = 'right',
     Left = 'left',
 }
+
+/** An array of available handedness values. */
 export const HandednessValues = Object.values(Handedness);
 
 /**
- * An interactor represents a controller that can:
- *     - Grip {@link Interactable}
- *     - Trigger
+ * Manages interaction capabilities of a VR controller or a similar input device.
  *
- * The interactor is most likely attached to the object onto which the
- * mesh controller is, but this is not mandatory.
+ * The `Interactor` class enables an entity to grip or interact with objects that
+ * implement the {@link Interactable} interface. It typically gets attached to a VR
+ * controller model or any entity that represents a point of interaction in the scene.
+ * While commonly associated with VR controllers, the `Interactor` is flexible and can
+ * be used with various input devices or in different interaction contexts.
  */
 export class Interactor extends Component {
     static TypeName = 'interactor';
@@ -103,7 +105,7 @@ export class Interactor extends Component {
      * Set the collision component needed to perform
      * grab interaction
      *
-     * @param collision - The collision component
+     * @param collision The collision component
      *
      * @returns This instance, for chaining
      */
@@ -134,7 +136,7 @@ export class Interactor extends Component {
     /**
      * Force this interactor to start interacting with the given interactable.
      *
-     * @param interactable - The interactable to process.
+     * @param interactable The interactable to process.
      */
     public startInteraction(interactable: Interactable) {
         this._interactable = interactable;

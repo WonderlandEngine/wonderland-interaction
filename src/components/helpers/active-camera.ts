@@ -33,7 +33,7 @@ export class ActiveCamera extends Component {
      * Depending on the current XR session (is VR active or not),
      * returns the position of the active camera. For VR this is the average
      * of the left and right eye.
-     * @param position - The position to write the result to.
+     * @param position The position to write the result to.
      * @returns The world position of the active camera.
      */
     getPositionWorld(out: vec3 = new Float32Array(3)): NumberArray {

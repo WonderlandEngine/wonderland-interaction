@@ -5,6 +5,22 @@ import {MeshComponent, Object3D} from '@wonderlandengine/api';
 const _vectorA = vec3.create();
 const _boundingSphere = vec4.create();
 
+/**
+ * Merges two bounding spheres into one that encompasses both.
+ *
+ * This function calculates the smallest bounding sphere that contains both the 'out'
+ * and 'other' bounding spheres. It updates the 'out' bounding sphere to be this
+ * encompassing sphere.
+ *
+ * @param out The bounding sphere to merge into and to be updated.
+ * @param other The bounding sphere to merge from.
+ * @returns The updated 'out' bounding sphere.
+ *
+ * @example
+ * const sphereA = vec4.fromValues(0, 0, 0, 1); // Center at origin with radius 1
+ * const sphereB = vec4.fromValues(2, 0, 0, 1); // Center at (2, 0, 0) with radius 1
+ * joinBoundingSphere(sphereA, sphereB); // sphereA now encompasses both spheres
+ */
 function joinBoundingSphere(out: vec4, other: vec4): vec4 {
     if (other[3] <= 0.00001) {
         return out;
@@ -43,6 +59,23 @@ function joinBoundingSphere(out: vec4, other: vec4): vec4 {
     return out;
 }
 
+/**
+ * Recursively computes the bounding sphere of an Object3D hierarchy.
+ *
+ * The function traverses the hierarchy of the target Object3D and calculates a bounding sphere
+ * that includes all the MeshComponents in the hierarchy. The result is a sphere in world space
+ * that encloses the entire object hierarchy.
+ *
+ * @param out The resulting bounding sphere that will be updated to include the target.
+ * @param target The root Object3D of the hierarchy to compute the bounding sphere from.
+ * @returns The updated 'out' bounding sphere that contains the entire hierarchy.
+ *
+ * @example
+ * // Assuming 'rootObject' is the root of your Object3D hierarchy with MeshComponents
+ * const boundingSphere = vec4.create();
+ * radiusHierarchyRec(boundingSphere, rootObject);
+ * console.log(`Bounding sphere radius: ${boundingSphere[3]}`);
+ */
 function radiusHierarchyRec(out: vec4, target: Object3D): vec4 {
     const children = target.children;
     for (const child of children) {
@@ -63,10 +96,19 @@ function radiusHierarchyRec(out: vec4, target: Object3D): vec4 {
 }
 
 /**
- * Compute the World Space radius of an Object3D hierarchy.
+ * Calculates the world space radius of an Object3D hierarchy.
  *
- * @param object - The root to start computing from.
- * @returns The world radius.
+ * The function returns the radius of a bounding sphere that encloses all MeshComponents
+ * in the hierarchy of the provided Object3D. This can be useful for visibility testing,
+ * collision detection, or spatial queries within a 3D environment.
+ *
+ * @param object The root Object3D of the hierarchy to calculate the world space radius for.
+ * @returns The radius of the world space bounding sphere.
+ *
+ * @example
+ * // Assuming 'rootObject' is the root of your Object3D hierarchy with MeshComponents
+ * const worldRadius = radiusHierarchy(rootObject);
+ * console.log(`World space radius: ${worldRadius}`);
  */
 export const radiusHierarchy = (function () {
     const temp = vec4.create();

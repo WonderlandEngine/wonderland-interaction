@@ -31,7 +31,12 @@ const _rotation = quat.create();
 const _transform = quat2.create();
 
 /**
- * Grabbable object.
+ * Enables objects to be interactively grabbed and manipulated in a virtual environment.
+ *
+ * The `Grabbable` class extends the basic functionality provided by the {@link Interactable}
+ * component to allow objects to be picked up, held, and potentially thrown by the user. It
+ * facilitates the creation of immersive and interactive experiences by providing an intuitive
+ * interface for object manipulation within a 3D scene.
  */
 export class Grabbable extends Component {
     /** @override */
@@ -252,8 +257,8 @@ export class Grabbable extends Component {
      * In general, you will not call this method but rather rely on collision
      * checks between the {@link Interactor} and the {@link Interactable}.
      *
-     * @param interactor - The interactor issuing the interaction.
-     * @param interactable - The interactable undergoing the action.
+     * @param interactor The interactor issuing the interaction.
+     * @param interactable The interactable undergoing the action.
      */
     grab = (interactor: Interactor, interactable: Interactable) => {
         const index = this._interactable.indexOf(interactable);
@@ -297,8 +302,8 @@ export class Grabbable extends Component {
      * In general, you will not call this method but rather rely on collision
      * checks between the {@link Interactor} and the {@link Interactable}.
      *
-     * @param interactor - The interactor issuing the interaction.
-     * @param interactable - The interactable undergoing the action.
+     * @param interactor The interactor issuing the interaction.
+     * @param interactable The interactable undergoing the action.
      */
     release = (interactor: Interactor, interactable: Interactable | number) => {
         const index =
@@ -336,7 +341,7 @@ export class Grabbable extends Component {
      * @remarks
      * This method returns `undefined` for anything outside the range [0; 1].
      *
-     * @param index - The index to retrieve
+     * @param index The index to retrieve
      * @returns The interactable.
      */
     getInteractable(index: number): Interactable {
@@ -371,7 +376,7 @@ export class Grabbable extends Component {
     /**
      * Called just after the interactable is grabbed.
      *
-     * @param interactable - The grabbed interactable.
+     * @param interactable The grabbed interactable.
      */
     protected _grabbed(interactor: Interactor, interactable: Interactable) {
         this._onGrabStart.notify(interactor, interactable, this);
@@ -380,7 +385,7 @@ export class Grabbable extends Component {
     /**
      * Called just after the interactable is released.
      *
-     * @param interactable - The released interactable.
+     * @param interactable The released interactable.
      */
     protected _released(interactor: Interactor, interactable: Interactable) {
         this._onGrabEnd.notify(interactor, interactable, this);
@@ -389,7 +394,7 @@ export class Grabbable extends Component {
     /**
      * Compute the transform of this grabbable based on a single handle.
      *
-     * @param index - The index of the handle to update the transform from.
+     * @param index The index of the handle to update the transform from.
      */
     private _updateTransformSingleHand(index: number) {
         const grab = this._grabData[index]!;

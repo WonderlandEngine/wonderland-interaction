@@ -111,7 +111,7 @@ export class PlayerController extends Component {
 
     /**
      * Moves the player in the given direction.
-     * @param movement - The direction to move in.
+     * @param movement The direction to move in.
      */
     move(movement: vec3) {
         if (this._isRotating || this._physxComponent.kinematic) {
@@ -160,8 +160,8 @@ export class PlayerController extends Component {
 
     /**
      * Sets the player's position and rotation.
-     * @param location - the location to move to
-     * @param rotation - the rotation to rotate to in radians
+     * @param location the location to move to
+     * @param rotation the rotation to rotate to in radians
      */
     setPositionRotation(location: vec3, rotation: number) {
         this.object.resetRotation();

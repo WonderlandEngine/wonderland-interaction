@@ -19,8 +19,8 @@ enum InteractionType {
 /**
  * Find the closest grabbable enclosed by the given collision shape.
  *
- * @param target - Origin position.
- * @param collision - The collision to query from.
+ * @param target Origin position.
+ * @param collision The collision to query from.
  * @returns The closest grabbable, or `null` if none is found.
  */
 const search = (function () {

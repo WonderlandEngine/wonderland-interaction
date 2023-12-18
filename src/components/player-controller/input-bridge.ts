@@ -10,20 +10,27 @@ import {absMaxVec3} from '../../utils/math.js';
 export const InputBridgeTypename = typename('input-bridge');
 
 /**
- * A proxy for handling input.
+ * Defines an interface for bridging various input methods into a unified control scheme.
+ *
+ * The `InputBridge` serves as an abstraction layer that enables an application to
+ * process input data from different sources such as keyboards, game controllers,
+ * and VR controllers in a consistent manner. Implementations of this interface should
+ * provide mechanisms to interpret and translate these diverse inputs into a set
+ * of standardized movement and rotation vectors that the application can easily use
+ * for navigation and interaction within a 3D environment.
  */
 export interface InputBridge extends Component {
     /**
      * Get the rotation axis.
      *
-     * @param out - The destination array.
+     * @param out The destination array.
      * @returns The `out` parameter;
      */
     getRotationAxis<T extends NumberArray>(out: T): T;
     /**
      * Get the movement axis.
      *
-     * @param out - The destination array.
+     * @param out The destination array.
      * @returns The `out` parameter;
      */
     getMovementAxis<T extends NumberArray>(out: T): T;
@@ -31,8 +38,8 @@ export interface InputBridge extends Component {
     /**
      * Get the position of the VR controller
      *
-     * @param out - The destination array.
-     * @param handedness - the handedness of the controller.
+     * @param out The destination array.
+     * @param handedness the handedness of the controller.
      * @returns true if the controller is active, false otherwise.
      */
     getControllerPosition(out: NumberArray, handedness: Handedness): boolean;
@@ -40,16 +47,23 @@ export interface InputBridge extends Component {
     /**
      * Get the forward direction of the VR controller.
      *
-     * @param out - The destination array.
-     * @param handedness - the handedness of the controller.
+     * @param out The destination array.
+     * @param handedness the handedness of the controller.
      * @returns true if the controller is active, false otherwise.
      */
     getControllerForward(out: NumberArray, handedness: Handedness): boolean;
 }
 
 /**
- * Default bridge handling providers, such as keyboard, mouse, touch,
- * VR controllers or game controllers.
+ * A default implementation of `InputBridge` that handles input from
+ * default providers like keyboards, mice, touch devices, VR controllers,
+ * and game controllers.
+ *
+ * `DefaultInputBridge` integrates with the underlying input systems provided by
+ * Wonderland Engine, gathering input data and converting it into a consistent format.
+ * This class allows you to query for movement and rotation data, as well as the
+ * position and forward direction of VR controllers, offering a seamless input experience
+ * regardless of the hardware used.
  */
 export class DefaultInputBridge extends Component implements InputBridge {
     static TypeName = InputBridgeTypename;

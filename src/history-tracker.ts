@@ -38,8 +38,8 @@ export class HistoryTracker {
     /**
      * Update the history with the given object.
      *
-     * @param target - The target object to update from.
-     * @param delta - The delta time.
+     * @param target The target object to update from.
+     * @param delta The delta time.
      */
     update(target: Object3D, delta: number) {
         this._curr = (this._curr + 1) % StackSize;
@@ -56,9 +56,9 @@ export class HistoryTracker {
      * @remarks
      * Please use this when available, as the velocities from the pose might be more accurate.
      *
-     * @param xrPose - The XR pose.
-     * @param target - The object to get the velocity from, in case the XR pose doesn't expose any.
-     * @param delta - The delta time.
+     * @param xrPose The XR pose.
+     * @param target The object to get the velocity from, in case the XR pose doesn't expose any.
+     * @param delta The delta time.
      */
     updateFromPose(xrPose: XRPose, target: Object3D, delta: number) {
         /* eslint-disable */
@@ -94,7 +94,7 @@ export class HistoryTracker {
      * This method needs a target because it resets the history based on
      * the position of the target.
      *
-     * @param target - The object that was tracked.
+     * @param target The object that was tracked.
      */
     reset(target: Object3D) {
         for (const v of this._linear) {
@@ -115,7 +115,7 @@ export class HistoryTracker {
      * This method isn't a simple getter and will perform computations,
      * please use only once per frame or after the object is moved.
      *
-     * @param out - The output velocity.
+     * @param out The output velocity.
      * @returns The `out` parameter.
      */
     velocity(out: vec3 = vec3.create()): vec3 {
@@ -135,7 +135,7 @@ export class HistoryTracker {
      * This method isn't a simple getter and will perform computations,
      * please use only once per frame or after the object is rotated.
      *
-     * @param out - The output angular velocity.
+     * @param out The output angular velocity.
      * @returns vec3 - The `out` parameter.
      */
     angular(out: vec3): vec3 {
@@ -155,7 +155,7 @@ export class HistoryTracker {
         vec3.copy(this._previousPosition, position);
     }
 
-    /** @ignore */
+    /** @ignore - Method not implemented */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     private _updateAngular(out: vec3, target: Object3D, delta: number): void {
         /* @todo: Handle angular velocity. */
