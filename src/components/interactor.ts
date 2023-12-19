@@ -22,10 +22,7 @@ export const HandednessValues = Object.values(Handedness);
  * Manages interaction capabilities of a VR controller or a similar input device.
  *
  * The `Interactor` class enables an entity to grip or interact with objects that
- * implement the {@link Interactable} interface. It typically gets attached to a VR
- * controller model or any entity that represents a point of interaction in the scene.
- * While commonly associated with VR controllers, the `Interactor` is flexible and can
- * be used with various input devices or in different interaction contexts.
+ * implement the {@link Interactable} interface.
  */
 export class Interactor extends Component {
     static TypeName = 'interactor';
@@ -48,7 +45,7 @@ export class Interactor extends Component {
 
     /** Collision component of this object. */
     private _collision: CollisionComponent = null!;
-    /** Collision component of this object. */
+    /** Physx component of this object. */
     private _physx: PhysXComponent = null!;
 
     /** Cached interactable after it's gripped. */
@@ -88,17 +85,11 @@ export class Interactor extends Component {
         this._previousScene = this.engine.scene;
     };
 
-    /** @hidden */
     #xrInputSource: XRInputSource | null = null;
-    /** @hidden */
     #referenceSpace: XRReferenceSpace | XRBoundedReferenceSpace | null = null;
-    /** @hidden */
     #xrPose: XRPose | null = null;
-    /** @hidden */
     #onSessionStart = this._startSession.bind(this);
-    /** @hidden */
     #onSessionEnd = this._endSession.bind(this);
-    /** @hidden */
     #currentlyCollidingWith: PhysXComponent | null = null;
 
     /**
@@ -204,8 +195,8 @@ export class Interactor extends Component {
      * Current [XR pose](https://developer.mozilla.org/en-US/docs/Web/API/XRPose).
      *
      * @remarks
-     * This is only available when a session is started **and** during a frame, i.e.,
-     * during the update phase.
+     * This is only available when a XR session is started **and** during a frame, i.e.,
+     * during a component's update phase.
      */
     get xrPose(): XRPose | null {
         return this.#xrPose;

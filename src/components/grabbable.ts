@@ -102,7 +102,7 @@ export class Grabbable extends Component {
      * When `false`, the linear and angular velocities will be emulated based on
      * the grabbable previous orientation and position.
      *
-     * For more information, please have a look at:
+     * For more information, have a look at:
      * - [linearVelocity](https://developer.mozilla.org/en-US/docs/Web/API/XRPose/linearVelocity)
      * - [angularVelocity](https://developer.mozilla.org/en-US/docs/Web/API/XRPose/angularVelocity)
      */
@@ -132,10 +132,25 @@ export class Grabbable extends Component {
     private _physx: PhysXComponent | null = null;
     private _enablePhysx = false;
 
-    /** Notified when an interactable is grabbed. */
+    /**
+     * Emitter for the grab start event.
+     * This event is triggered when an interactable object is grabbed.
+     *
+     * This property is a readonly backing field for {@link onGrabStart}.
+     *
+     * @remarks
+     * The notification occurs if any of the two interactables is grabbed
+     */
     private readonly _onGrabStart: Emitter<[Interactor, Interactable, this]> =
         new Emitter();
-    /** Notified when an interactable is released. */
+
+    /**
+     * Emitter for the grab end event.
+     * This event is triggered when an interactable object is released, thus the grabbing ended.
+     *
+     * This property is a readonly backing field for {@link onGrabEnd}.
+     *
+     */
     private readonly _onGrabEnd: Emitter<[Interactor, Interactable, this]> = new Emitter();
 
     start(): void {

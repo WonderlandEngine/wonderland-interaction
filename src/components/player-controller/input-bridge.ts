@@ -18,6 +18,35 @@ export const InputBridgeTypename = typename('input-bridge');
  * provide mechanisms to interpret and translate these diverse inputs into a set
  * of standardized movement and rotation vectors that the application can easily use
  * for navigation and interaction within a 3D environment.
+ *
+ * @example
+ * ```js
+ * export class CustomInputBridge extends Component implements InputBridge {
+ *   static TypeName = InputBridgeTypename;
+ *
+ *   \/** @override *\/
+ *   getRotationAxis<T extends NumberArray>(out: T): T {
+ *       // Always rotate by 10 degrees around the. You can input your own values here,
+ *       // coming from a keyboard, the network, etc...
+ *       out[1] = 10;
+ *       return out;
+ *   }
+ *
+ *   \/** @override *\/
+ *   getMovementAxis<T extends NumberArray>(out: T): T {
+ *       // Always move to the right. You can input your own values here,
+ *       // coming from a keyboard, the network, etc...
+ *       out[0] = 1;
+ *       return out;
+ *   }
+ *   getControllerPosition(position: NumberArray, handedness: Handedness): boolean {
+ *       return false;
+ *   }
+ *   getControllerForward(forward: NumberArray, handedness: Handedness): boolean {
+ *       return false;
+ *   }
+ *}
+ *```
  */
 export interface InputBridge extends Component {
     /**
@@ -56,9 +85,11 @@ export interface InputBridge extends Component {
 
 /**
  * A default implementation of `InputBridge` that handles input from
- * default providers like keyboards, mice, touch devices, VR controllers,
- * and game controllers.
+ * default providers:
+ * - Keyboard component {@link ControlsKeyboard}
+ * - VR controller component {@link ControlsVR}
  *
+ * @remarks
  * `DefaultInputBridge` integrates with the underlying input systems provided by
  * Wonderland Engine, gathering input data and converting it into a consistent format.
  * This class allows you to query for movement and rotation data, as well as the

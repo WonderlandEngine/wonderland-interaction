@@ -23,9 +23,9 @@ export class HistoryTracker {
 
     /** Current position in the ring buffer.  */
     private _curr = -1;
-    /** previous world space position of the object. */
+    /** Previous world space position of the object. */
     private _previousPosition: vec3 = vec3.create();
-    /** previous world space rotation of the object. */
+    /** Previous world space rotation of the object. */
     private _previousRotation: quat = quat.create();
 
     constructor() {
@@ -54,7 +54,7 @@ export class HistoryTracker {
      * Update the history with the given [XR pose](https://developer.mozilla.org/en-US/docs/Web/API/XRPose).
      *
      * @remarks
-     * Please use this when available, as the velocities from the pose might be more accurate.
+     * Use this when available, because the velocities from the XR Pose are more accurate.
      *
      * @param xrPose The XR pose.
      * @param target The object to get the velocity from, in case the XR pose doesn't expose any.
@@ -113,7 +113,7 @@ export class HistoryTracker {
      *
      * @remarks
      * This method isn't a simple getter and will perform computations,
-     * please use only once per frame or after the object is moved.
+     * Only use this once per frame or after the object is moved.
      *
      * @param out The output velocity.
      * @returns The `out` parameter.
@@ -133,7 +133,7 @@ export class HistoryTracker {
      *
      * @remarks
      * This method isn't a simple getter and will perform computations,
-     * please use only once per frame or after the object is rotated.
+     * Only use once per frame or after the object is rotated.
      *
      * @param out The output angular velocity.
      * @returns vec3 The `out` parameter.

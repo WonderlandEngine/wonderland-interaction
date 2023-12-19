@@ -20,6 +20,8 @@ const _boundingSphere = vec4.create();
  * const sphereA = vec4.fromValues(0, 0, 0, 1); // Center at origin with radius 1
  * const sphereB = vec4.fromValues(2, 0, 0, 1); // Center at (2, 0, 0) with radius 1
  * joinBoundingSphere(sphereA, sphereB); // sphereA now encompasses both spheres
+ *
+ * @internal
  */
 function joinBoundingSphere(out: vec4, other: vec4): vec4 {
     if (other[3] <= 0.00001) {
@@ -75,6 +77,8 @@ function joinBoundingSphere(out: vec4, other: vec4): vec4 {
  * const boundingSphere = vec4.create();
  * radiusHierarchyRec(boundingSphere, rootObject);
  * console.log(`Bounding sphere radius: ${boundingSphere[3]}`);
+ *
+ * @internal
  */
 function radiusHierarchyRec(out: vec4, target: Object3D): vec4 {
     const children = target.children;

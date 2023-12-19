@@ -15,7 +15,7 @@ import {LocomotionType} from './enums/LocomotionType.js';
  * selected locomotion type.
  *
  * @example
- * ```
+ * ```js
  * const locomotionSelector = playerObject.getComponent(LocomotionSelector);
  * locomotionSelector.locomotionType = LocomotionType.Teleport; // Sets teleportation as the active locomotion method.
  * ```
