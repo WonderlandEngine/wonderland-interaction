@@ -102,7 +102,7 @@ function radiusHierarchyRec(out: vec4, target: Object3D): vec4 {
 /**
  * Calculates the world space radius of an Object3D hierarchy.
  *
- * The function returns the radius of a bounding sphere that encloses all MeshComponents
+ * The function returns the radius of a bounding sphere that encloses all mesh components
  * in the hierarchy of the provided Object3D. This can be useful for visibility testing,
  * collision detection, or spatial queries within a 3D environment.
  *
@@ -110,7 +110,7 @@ function radiusHierarchyRec(out: vec4, target: Object3D): vec4 {
  * @returns The radius of the world space bounding sphere.
  *
  * @example
- * // Assuming 'rootObject' is the root of your Object3D hierarchy with MeshComponents
+ * // Assuming 'rootObject' is the root of your Object3D hierarchy with mesh components
  * const worldRadius = radiusHierarchy(rootObject);
  * console.log(`World space radius: ${worldRadius}`);
  */
