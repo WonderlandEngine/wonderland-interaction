@@ -16,16 +16,16 @@ const _vectorA = vec3.create();
 export class HistoryTracker {
     /* Private Attributes. */
 
-    /** List of linear velocities. @hidden */
+    /** List of linear velocities.  */
     private readonly _linear: vec3[] = new Array<vec3>(StackSize);
-    /** List of angular velocities. @hidden */
+    /** List of angular velocities.  */
     private readonly _angular: vec3[] = new Array<vec3>(StackSize);
 
-    /** Current position in the ring buffer. @hidden */
+    /** Current position in the ring buffer.  */
     private _curr = -1;
-    /** previous world space position of the object. @hidden */
+    /** Previous world space position of the object. */
     private _previousPosition: vec3 = vec3.create();
-    /** previous world space rotation of the object. @hidden */
+    /** Previous world space rotation of the object. */
     private _previousRotation: quat = quat.create();
 
     constructor() {
@@ -53,7 +53,8 @@ export class HistoryTracker {
     /**
      * Update the history with the given [XR pose](https://developer.mozilla.org/en-US/docs/Web/API/XRPose).
      *
-     * @note Please use this when available, as the velocities from the pose might be more accurate.
+     * @remarks
+     * Use this when available, because the velocities from the XR Pose are more accurate.
      *
      * @param xrPose The XR pose.
      * @param target The object to get the velocity from, in case the XR pose doesn't expose any.
@@ -89,7 +90,8 @@ export class HistoryTracker {
     /**
      * Resets the history tracker.
      *
-     * @note This method needs a target because it resets the history based on
+     * @remarks
+     * This method needs a target because it resets the history based on
      * the position of the target.
      *
      * @param target The object that was tracked.
@@ -109,8 +111,9 @@ export class HistoryTracker {
     /**
      * Computes the linear velocity based on the current history.
      *
-     * @note This method isn't a simple getter and will perform computations,
-     * please use only once per frame or after the object is moved.
+     * @remarks
+     * This method isn't a simple getter and will perform computations,
+     * Only use this once per frame or after the object is moved.
      *
      * @param out The output velocity.
      * @returns The `out` parameter.
@@ -128,11 +131,12 @@ export class HistoryTracker {
     /**
      * Computes the angular velocity based on the current history.
      *
-     * @note This method isn't a simple getter and will perform computations,
-     * please use only once per frame or after the object is rotated.
+     * @remarks
+     * This method isn't a simple getter and will perform computations,
+     * Only use once per frame or after the object is rotated.
      *
      * @param out The output angular velocity.
-     * @returns The `out` parameter.
+     * @returns vec3 The `out` parameter.
      */
     angular(out: vec3): vec3 {
         vec3.zero(out);
@@ -144,7 +148,6 @@ export class HistoryTracker {
         return out;
     }
 
-    /** @hidden */
     private _updateLinear(out: vec3, target: Object3D, delta: number): void {
         const position = target.getPositionWorld(_vectorA);
         vec3.subtract(out, position, this._previousPosition);
@@ -152,7 +155,7 @@ export class HistoryTracker {
         vec3.copy(this._previousPosition, position);
     }
 
-    /** @hidden */
+    /** @ignore - Method not implemented */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     private _updateAngular(out: vec3, target: Object3D, delta: number): void {
         /* @todo: Handle angular velocity. */

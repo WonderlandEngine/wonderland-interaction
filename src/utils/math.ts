@@ -1,4 +1,4 @@
-import {NumberArray, Object3D} from '@wonderlandengine/api';
+import {Object3D} from '@wonderlandengine/api';
 import {quat, quat2, vec3} from 'gl-matrix';
 
 /** Temporaries. */
@@ -29,10 +29,10 @@ export function quatDelta(out: quat, src: quat, dst: quat): quat {
 /**
  * Compute the relative transformation from source to target.
  *
- * @note The result transform is expressed in the target's space.
- *
- * @note In order to get the world transform of `source`, the target's world
- * transform will need to be multiplied by the result of this function.
+ * @remarks
+ * - The result transform is expressed in the target's space.
+ * - In order to get the world transform of `source`, the target's world
+ *   transform will need to be multiplied by the result of this function.
  *
  * @param source The source object.
  * @param target The target object.

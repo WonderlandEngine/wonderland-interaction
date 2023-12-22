@@ -1,9 +1,18 @@
 /**
  * The type of rotation to use when turning the player
  */
-
-// @todo: Use integer values in enum for performance.
 export enum RotationType {
-    Snap,
-    Smooth,
+    /**
+     * Snap will rotate by a fix amount of degrees in a row.
+     *
+     * It's the most comfortable for most people.
+     */
+    Snap = 0,
+
+    /**
+     * Smooth rotation over multiple frame.
+     *
+     * Smooth rotation is the most immersive, but can cause motion sickness.
+     */
+    Smooth = 1,
 }

@@ -7,26 +7,24 @@ import {
     Scene,
 } from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
-
 import {Interactable} from './interactable.js';
 
-/** Handedness for left / right hands. */
+/** Represents whether the user's left or right hand is being used. */
 export enum Handedness {
     Right = 'right',
     Left = 'left',
 }
+
+/** An array of available handedness values. */
 export const HandednessValues = Object.values(Handedness);
 
 /**
- * An interactor represents a controller that can:
- *     - Grip {@link Interactable}
- *     - Trigger
+ * Manages interaction capabilities of a VR controller or a similar input device.
  *
- * The interactor is most likely attached to the object onto which the
- * mesh controller is, but this is not mandatory.
+ * The `Interactor` class enables an entity to grip or interact with objects that
+ * implement the {@link Interactable} interface.
  */
 export class Interactor extends Component {
-    /** @overload */
     static TypeName = 'interactor';
 
     /** Properties. */
@@ -45,23 +43,22 @@ export class Interactor extends Component {
 
     /** Private Attributes. */
 
-    /** Collision component of this object. @hidden */
+    /** Collision component of this object. */
     private _collision: CollisionComponent = null!;
-    /** Collision component of this object. @hidden */
+    /** Physx component of this object. */
     private _physx: PhysXComponent = null!;
 
-    /** Cached interactable after it's gripped. @hidden */
+    /** Cached interactable after it's gripped. */
     private _interactable: Interactable | null = null;
 
-    /** Previous loaded scene. @hidden */
+    /** Previous loaded scene. */
     private _previousScene: Scene | null = null;
 
-    /** Grip start emitter. @hidden */
+    /** Grip start emitter. */
     private readonly _onGripStart: Emitter<[Interactable]> = new Emitter();
-    /** Grip end emitter. @hidden */
+    /** Grip end emitter. */
     private readonly _onGripEnd: Emitter<[Interactable]> = new Emitter();
 
-    /** @hidden */
     private readonly _onPreRender = () => {
         if (
             this.engine.xr &&
@@ -76,7 +73,7 @@ export class Interactor extends Component {
             this.#xrPose = pose ?? null;
         }
     };
-    /** @hidden */
+
     private readonly _onSceneLoaded = () => {
         const scene = this.engine.scene;
         if (this._previousScene) {
@@ -88,17 +85,11 @@ export class Interactor extends Component {
         this._previousScene = this.engine.scene;
     };
 
-    /** @hidden */
     #xrInputSource: XRInputSource | null = null;
-    /** @hidden */
     #referenceSpace: XRReferenceSpace | XRBoundedReferenceSpace | null = null;
-    /** @hidden */
     #xrPose: XRPose | null = null;
-    /** @hidden */
     #onSessionStart = this._startSession.bind(this);
-    /** @hidden */
     #onSessionEnd = this._endSession.bind(this);
-
     #currentlyCollidingWith: PhysXComponent | null = null;
 
     /**
@@ -123,13 +114,11 @@ export class Interactor extends Component {
         this._onSceneLoaded();
     }
 
-    /** @overload */
     onActivate(): void {
         this.engine.onXRSessionStart.add(this.#onSessionStart);
         this.engine.onXRSessionEnd.add(this.#onSessionEnd);
     }
 
-    /** @overload */
     onDeactivate(): void {
         this.engine.onXRSessionStart.add(this.#onSessionStart);
         this.engine.onXRSessionEnd.add(this.#onSessionEnd);
@@ -138,7 +127,7 @@ export class Interactor extends Component {
     /**
      * Force this interactor to start interacting with the given interactable.
      *
-     * @param interactable - The interactable to process.
+     * @param interactable The interactable to process.
      */
     public startInteraction(interactable: Interactable) {
         this._interactable = interactable;
@@ -205,8 +194,9 @@ export class Interactor extends Component {
     /**
      * Current [XR pose](https://developer.mozilla.org/en-US/docs/Web/API/XRPose).
      *
-     * @note This is only available when a session is started **and** during a frame, i.e.,
-     * during the update phase.
+     * @remarks
+     * This is only available when a XR session is started **and** during a frame, i.e.,
+     * during a component's update phase.
      */
     get xrPose(): XRPose | null {
         return this.#xrPose;
@@ -220,7 +210,6 @@ export class Interactor extends Component {
         return this._interactable;
     }
 
-    /** @hidden */
     private _startSession(session: XRSession) {
         this.#referenceSpace = this.engine.xr!.referenceSpaceForType('local');
 

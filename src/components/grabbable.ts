@@ -14,7 +14,7 @@ import {HistoryTracker} from '../history-tracker.js';
 import {computeRelativeTransform} from '../utils/math.js';
 
 /** Temporary info about grabbed target. */
-interface GrabData {
+export interface GrabData {
     interactor: Interactor;
     /** Local transform in **interactor** space */
     transform: quat2;
@@ -31,7 +31,12 @@ const _rotation = quat.create();
 const _transform = quat2.create();
 
 /**
- * Grabbable object.
+ * Enables objects to be interactively grabbed and manipulated in a virtual environment.
+ *
+ * The `Grabbable` class extends the basic functionality provided by the {@link Interactable}
+ * component to allow objects to be picked up, held, and potentially thrown by the user. It
+ * facilitates the creation of immersive and interactive experiences by providing an intuitive
+ * interface for object manipulation within a 3D scene.
  */
 export class Grabbable extends Component {
     /** @override */
@@ -46,7 +51,8 @@ export class Grabbable extends Component {
     /**
      * Main handle.
      *
-     * @note If no handle is provided, this component will treat the component
+     * @remarks
+     * If no handle is provided, this component will treat the component
      * it's attached to as the {@link Interactable}.
      *
      * This is an Object3D containing an {@link Interactable} component.
@@ -96,7 +102,7 @@ export class Grabbable extends Component {
      * When `false`, the linear and angular velocities will be emulated based on
      * the grabbable previous orientation and position.
      *
-     * For more information, please have a look at:
+     * For more information, have a look at:
      * - [linearVelocity](https://developer.mozilla.org/en-US/docs/Web/API/XRPose/linearVelocity)
      * - [angularVelocity](https://developer.mozilla.org/en-US/docs/Web/API/XRPose/angularVelocity)
      */
@@ -116,29 +122,37 @@ export class Grabbable extends Component {
 
     /** Private Attributes. */
 
-    /** Cached interactables. @hidden */
+    /** Cached interactables. */
     private _interactable: Interactable[] = new Array<Interactable>(2);
-    /** Cached currently grabbed data. @hidden */
+    /** Cached currently grabbed data. */
     private _grabData: (GrabData | null)[] = new Array<GrabData>(2);
     /** Squared distance between both handle cached when starting a double grab. */
     private _maxSqDistance: number | null = null;
-
-    /** @hidden */
     private _history: HistoryTracker = new HistoryTracker();
-
-    /** @hidden */
     private _physx: PhysXComponent | null = null;
-
-    /** @hidden */
     private _enablePhysx = false;
 
-    /** Notified when an interactable is grabbed. @hidden */
+    /**
+     * Emitter for the grab start event.
+     * This event is triggered when an interactable object is grabbed.
+     *
+     * This property is a readonly backing field for {@link onGrabStart}.
+     *
+     * @remarks
+     * The notification occurs if any of the two interactables is grabbed
+     */
     private readonly _onGrabStart: Emitter<[Interactor, Interactable, this]> =
         new Emitter();
-    /** Notified when an interactable is released. @hidden */
+
+    /**
+     * Emitter for the grab end event.
+     * This event is triggered when an interactable object is released, thus the grabbing ended.
+     *
+     * This property is a readonly backing field for {@link onGrabEnd}.
+     *
+     */
     private readonly _onGrabEnd: Emitter<[Interactor, Interactable, this]> = new Emitter();
 
-    /** @hidden */
     start(): void {
         if (!this.handle) {
             this.handle = this.object;
@@ -161,7 +175,6 @@ export class Grabbable extends Component {
         this._physx = this.object.getComponent('physx');
     }
 
-    /** @overload */
     onActivate(): void {
         for (let i = 0; i < 2; ++i) {
             const interactable = this._interactable[i];
@@ -174,7 +187,6 @@ export class Grabbable extends Component {
         this._enablePhysx = this._physx?.active ?? false;
     }
 
-    /** @overload */
     onDeactivate(): void {
         for (let i = 0; i < 2; ++i) {
             const interactable = this._interactable[i];
@@ -186,7 +198,6 @@ export class Grabbable extends Component {
         }
     }
 
-    /** @overload */
     update(dt: number): void {
         if (!this.isGrabbed) {
             return;
@@ -225,8 +236,6 @@ export class Grabbable extends Component {
 
     /**
      * Throws the grabbable.
-     *
-     * @returns
      */
     throw(interactor: Interactor): void {
         if (!this._physx) {
@@ -255,10 +264,11 @@ export class Grabbable extends Component {
     /**
      * Programmatically grab an interactable.
      *
-     * @note The interactable must be one of {@link Grabbable.handle}
+     * @remarks
+     * The interactable must be one of {@link Grabbable.handle}
      * or {@link Grabbable.handleSecondary}.
      *
-     * @note This method is useful for grab emulation for non-VR applications.
+     * This method is useful for grab emulation for non-VR applications.
      * In general, you will not call this method but rather rely on collision
      * checks between the {@link Interactor} and the {@link Interactable}.
      *
@@ -299,10 +309,11 @@ export class Grabbable extends Component {
     /**
      * Programmatically release an interactable.
      *
-     * @note The interactable must be one of {@link Grabbable.handle}
+     * @remarks
+     * The interactable must be one of {@link Grabbable.handle}
      * or {@link Grabbable.handleSecondary}.
      *
-     * @note This method is useful for grab emulation for non-VR applications.
+     * This method is useful for grab emulation for non-VR applications.
      * In general, you will not call this method but rather rely on collision
      * checks between the {@link Interactor} and the {@link Interactable}.
      *
@@ -342,7 +353,8 @@ export class Grabbable extends Component {
      *
      * Use `0` for {@link handle} and `1` for {@link handleSecondary}.
      *
-     * @note This method returns `undefined` for anything outside the range [0; 1].
+     * @remarks
+     * This method returns `undefined` for anything outside the range [0; 1].
      *
      * @param index The index to retrieve
      * @returns The interactable.
@@ -380,8 +392,6 @@ export class Grabbable extends Component {
      * Called just after the interactable is grabbed.
      *
      * @param interactable The grabbed interactable.
-     *
-     * @hidden
      */
     protected _grabbed(interactor: Interactor, interactable: Interactable) {
         this._onGrabStart.notify(interactor, interactable, this);
@@ -391,8 +401,6 @@ export class Grabbable extends Component {
      * Called just after the interactable is released.
      *
      * @param interactable The released interactable.
-     *
-     * @hidden
      */
     protected _released(interactor: Interactor, interactable: Interactable) {
         this._onGrabEnd.notify(interactor, interactable, this);
@@ -402,8 +410,6 @@ export class Grabbable extends Component {
      * Compute the transform of this grabbable based on a single handle.
      *
      * @param index The index of the handle to update the transform from.
-     *
-     * @hidden
      */
     private _updateTransformSingleHand(index: number) {
         const grab = this._grabData[index]!;
@@ -420,8 +426,6 @@ export class Grabbable extends Component {
 
     /**
      * Compute the transform of this grabbable based on both handles.
-     *
-     * @hidden
      */
     private _updateTransformDoubleHand() {
         const primaryInteractor = this._grabData[0]!.interactor;

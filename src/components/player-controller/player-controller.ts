@@ -1,18 +1,20 @@
-import {Component, ForceMode, LockAxis, Object3D, PhysXComponent} from '@wonderlandengine/api';
+import {Component, ForceMode, Object3D, PhysXComponent} from '@wonderlandengine/api';
 import {typename} from '../../constants.js';
 import {vec3} from 'gl-matrix';
 import {ActiveCamera} from '../helpers/active-camera.js';
 import {LocomotionSelector} from './locomotion-selector.js';
-import { InputBridge, InputBridgeTypename } from './input-bridge.js';
-import { toRad } from '../../utils/math.js';
+import {InputBridge, InputBridgeTypename} from './input-bridge.js';
+import {toRad} from '../../utils/math.js';
 
 /* Temporaries */
-
 const tempCameraVec = vec3.create();
 const tempPlayerVec = vec3.create();
 const _vectorA = vec3.create();
 
-export function getRequiredComponents(object: Object3D, inputBridgeObject: Object3D | null): {player: PlayerController, inputBridge: InputBridge} {
+export function getRequiredComponents(
+    object: Object3D,
+    inputBridgeObject: Object3D | null
+): {player: PlayerController; inputBridge: InputBridge} {
     const player = object.getComponent(PlayerController);
     if (!player) {
         throw new Error(
@@ -32,7 +34,7 @@ export function getRequiredComponents(object: Object3D, inputBridgeObject: Objec
     return {player, inputBridge: inputBridge as InputBridge};
 }
 
-enum RotateState {
+export enum RotateState {
     None = 0,
     Reset = 1,
 }

@@ -39,6 +39,7 @@ const search = (function () {
             if (!grabbable) {
                 continue;
             }
+
             const world = grabbable.object.getPositionWorld(temp);
             const dist = vec3.squaredDistance(target, world);
             if (dist < closestDistance) {

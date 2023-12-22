@@ -6,9 +6,20 @@ import {TeleportLocomotion} from './teleport-locomotion.js';
 import {LocomotionType} from './enums/LocomotionType.js';
 
 /**
- * A component that allows easy selecting the type of locomotion to use.
+ * Manages the selection and activation of different locomotion methods for a player.
+ *
+ * The `LocomotionSelector` class provides an interface for switching between various
+ * locomotion types, such as teleportation and smooth locomotion, ensuring that the
+ * player can interact with the virtual environment in a preferred manner. It toggles
+ * between the available locomotion components on the player object based on the
+ * selected locomotion type.
+ *
+ * @example
+ * ```js
+ * const locomotionSelector = playerObject.getComponent(LocomotionSelector);
+ * locomotionSelector.locomotionType = LocomotionType.Teleport; // Sets teleportation as the active locomotion method.
+ * ```
  */
-
 export class LocomotionSelector extends Component {
     static TypeName = typename('locomotion-selector');
 
@@ -20,7 +31,7 @@ export class LocomotionSelector extends Component {
     )
     locomotionType = LocomotionType.Teleport;
 
-    // TK: This is the proposed way to do it, but it doesn't work yet.
+    // TODO TK: This is the proposed way to do it, but it doesn't work yet.
     //     I'm keeping it here for now so we can continue development and revisit it later.
     // get locomotionType(): LocomotionType {
     //     return this._locomotionType;

@@ -8,5 +8,5 @@ export const EPSILON = 0.000001;
  * @returns The formatted name.
  */
 export function typename(name: string) {
-  return `wlei:${name}`;
+    return `wlei:${name}`;
 }

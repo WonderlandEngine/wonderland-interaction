@@ -19,7 +19,6 @@ import {Interactor} from './interactor.js';
  * instance to double grab an object.
  */
 export class Interactable extends Component {
-    /** @overload */
     static TypeName = 'interactable';
 
     /** Properties. */
@@ -35,12 +34,11 @@ export class Interactable extends Component {
 
     /** Private Attributes. */
 
-    /** Notified when an interactor selects this interactable. @hidden */
+    /** Notified when an interactor selects this interactable. */
     private readonly _onSelectStart: Emitter<[Interactor, this]> = new Emitter();
-    /** Notified when an interactor stops selecting this interactable. @hidden */
+    /** Notified when an interactor stops selecting this interactable. */
     private readonly _onSelectEnd: Emitter<[Interactor, this]> = new Emitter();
 
-    /** @overload */
     public start(): void {
         if (
             !this.object.getComponent(PhysXComponent) &&
