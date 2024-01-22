@@ -17,16 +17,6 @@
                 0.9999998,
                 1.0,
                 0.9999998
-            ],
-            "components": [
-                {
-                    "type": "debug-component",
-                    "debug-component": {
-                        "target": "233",
-                        "target1": "233",
-                        "target2": "243"
-                    }
-                }
             ]
         },
         "15": {
