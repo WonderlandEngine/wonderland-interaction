@@ -44,7 +44,6 @@ export class LocomotionSelector extends Component {
     //     this.setLocomotion();
     // }
 
-    // /** @hidden */
     // private _locomotionType = LocomotionType.Teleport;
 
     private _smoothLocomotion?: SmoothLocomotion | null;

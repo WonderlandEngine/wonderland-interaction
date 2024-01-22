@@ -110,21 +110,20 @@ export class DistanceInteractor extends Component {
     @property.float(0.0)
     searchDelay = 0.0;
 
-    /** Main interactor. @hidden */
+    /** Main interactor. */
     private _interactor: Interactor = null!;
-    /** Ray collision component. @hidden */
+    /** Ray collision component. */
     private _ray: CollisionComponent = null!;
-    /** Current interaction type. @hidden */
+    /** Current interaction type. */
     private _interaction: InteractionType = InteractionType.Searching;
-    /** Currently focused grabbable (fetching or looking at). @hidden */
+    /** Currently focused grabbable (fetching or looking at). */
     private _targetGrab: Grabbable | null = null;
-    /** Currently fetching interactable. @hidden */
+    /** Currently fetching interactable. */
     private _targetInteract: Interactable | null = null;
 
     /** Elapsed time to last search. */
     private _lastSearchElapsedTime = 0.0;
 
-    /** @hidden */
     private _onGripStart = () => {
         if (this._interaction !== InteractionType.Searching || !this._targetGrab) {
             return;
@@ -138,7 +137,6 @@ export class DistanceInteractor extends Component {
         this._targetGrab.disablePhysx();
     };
 
-    /** @hidden */
     private _onGripEnd = () => {
         if (this._interaction == InteractionType.Fetching && this._targetGrab) {
             this._targetGrab.enablePhysx();
@@ -149,7 +147,6 @@ export class DistanceInteractor extends Component {
         this._interaction = InteractionType.Searching;
     };
 
-    /** @overload */
     onActivate(): void {
         const interactor = (this.interactor ?? this.object).getComponent(Interactor);
         if (!interactor) {

@@ -245,7 +245,6 @@ export class Interactor extends Component {
         });
     }
 
-    /** @hidden */
     private _endSession() {
         this.#referenceSpace = null;
         this.#xrInputSource = null;

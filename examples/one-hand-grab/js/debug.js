@@ -18,6 +18,8 @@ export class DebugComponent extends Component {
             // @ts-ignore
             WL.onXRSessionStart.push(this._setup.bind(this));
         }
+        const grabbable = this.target1.getComponent(Grabbable);
+        Grabbable.TypeName
         // Original transformation.
         this._transform1 = [ ...this.target1.transformWorld ];
         this._transform2 = [ ...this.target2.transformWorld ];
