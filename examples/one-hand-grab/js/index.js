@@ -20,7 +20,6 @@ import {DistanceInteractor} from 'wle-interaction';
 import {Grabbable} from 'wle-interaction';
 import {Interactable} from 'wle-interaction';
 import {Interactor} from 'wle-interaction';
-import {DebugComponent} from './debug.js';
 /* wle:auto-imports:end */
 
 import {loadRuntime} from '@wonderlandengine/api';
@@ -92,7 +91,6 @@ engine.registerComponent(DistanceInteractor);
 engine.registerComponent(Grabbable);
 engine.registerComponent(Interactable);
 engine.registerComponent(Interactor);
-engine.registerComponent(DebugComponent);
 /* wle:auto-register:end */
 
 engine.scene.load(`${Constants.ProjectName}.bin`);
