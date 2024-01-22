@@ -39,7 +39,6 @@ const _transform = quat2.create();
  * interface for object manipulation within a 3D scene.
  */
 export class Grabbable extends Component {
-    /** @override Overides {@link Component.TypeName} :P */
     static TypeName = 'grabbable';
 
     static onRegister(engine: WonderlandEngine) {
