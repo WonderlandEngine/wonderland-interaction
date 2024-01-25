@@ -39,7 +39,6 @@ const _transform = quat2.create();
  * interface for object manipulation within a 3D scene.
  */
 export class Grabbable extends Component {
-    /** @override */
     static TypeName = 'grabbable';
 
     static onRegister(engine: WonderlandEngine) {
@@ -109,6 +108,9 @@ export class Grabbable extends Component {
     @property.bool(true)
     public useControllerVelocityData = true;
 
+    /**
+     * The distance marker to use when distance-grabbed.
+     */
     @property.object()
     public distanceMarker: Object3D | null = null;
 

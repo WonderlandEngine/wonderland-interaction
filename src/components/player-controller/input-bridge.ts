@@ -110,7 +110,6 @@ export class DefaultInputBridge extends Component implements InputBridge {
         this._vrController = this.inputs.getComponent(ControlsVR);
     }
 
-    /** @override */
     getRotationAxis<T extends NumberArray>(out: T): T {
         const dest = out as unknown as vec3;
         vec3.zero(dest);
@@ -120,7 +119,6 @@ export class DefaultInputBridge extends Component implements InputBridge {
         return out;
     }
 
-    /** @override */
     getMovementAxis<T extends NumberArray>(out: T): T {
         const dest = out as unknown as vec3;
         vec3.zero(dest);
@@ -137,7 +135,6 @@ export class DefaultInputBridge extends Component implements InputBridge {
         return out;
     }
 
-    /** @override */
     getControllerPosition(position: NumberArray, handedness: Handedness): boolean {
         if (this._vrController && this._vrController.active) {
             this._vrController.getObject(handedness).getPositionWorld(position);
@@ -146,7 +143,6 @@ export class DefaultInputBridge extends Component implements InputBridge {
         return false;
     }
 
-    /** @override */
     getControllerForward(forward: NumberArray, handedness: Handedness): boolean {
         if (this._vrController && this._vrController.active) {
             this._vrController.getObject(handedness).getForwardWorld(forward);
