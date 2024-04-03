@@ -1,10 +1,12 @@
-import {Component, ForceMode, Object3D, PhysXComponent} from '@wonderlandengine/api';
+import {Component, ForceMode, LockAxis, Object3D, PhysXComponent, WonderlandEngine} from '@wonderlandengine/api';
 import {typename} from '../../constants.js';
 import {vec3} from 'gl-matrix';
 import {ActiveCamera} from '../helpers/active-camera.js';
 import {LocomotionSelector} from './locomotion-selector.js';
 import {InputBridge, InputBridgeTypename} from './input-bridge.js';
 import {toRad} from '../../utils/math.js';
+import { SmoothLocomotion } from './smooth-locomotion.js';
+import { LocomotionType } from './index.js';
 
 /* Temporaries */
 const tempCameraVec = vec3.create();
@@ -68,15 +70,12 @@ export class PlayerController extends Component {
     private _locomotionSelector!: LocomotionSelector;
     private _rotateState = RotateState.None;
 
-    start() {
-        const tempPhysx = this.object.getComponent(PhysXComponent);
-        if (!tempPhysx) {
-            throw new Error(
-                `player-controller(${this.object.name}): object does not have a Physx`
-            );
-        }
-        this._physxComponent = tempPhysx;
+    static onRegister(engine: WonderlandEngine) {
+        engine.registerComponent(LocomotionSelector);
+        engine.registerComponent(SmoothLocomotion);
+    }
 
+    start() {
         const tempActiveCamera = this.object.getComponent(ActiveCamera);
         if (!tempActiveCamera) {
             throw new Error(
@@ -85,11 +84,34 @@ export class PlayerController extends Component {
         }
         this._activeCamera = tempActiveCamera;
 
-        const tempLocomotionSelector = this.object.getComponent(LocomotionSelector);
-        if (!tempLocomotionSelector) {
-            throw new Error(
-                `player-controller(${this.object.name}): object does not have a LocomotionSelector`
+        let tempPhysx = this.object.getComponent(PhysXComponent);
+        if (!tempPhysx) {
+            console.warn(
+                 `player-controller(${this.object.name}): object does not have a Physx. Default component is added.`
             );
+            tempPhysx = this.object.addComponent(PhysXComponent,{
+                radius: 0.15,
+                translation: [0, 0.15, 0],
+                mass: 1.0,
+                linearDamping: 5.0,
+                angularDamping: 10.0,
+                staticFriction: 0.0,
+                dynamicFriction: 0.001,
+                bounciness: 0.0,
+                lockAxis: LockAxis.X | LockAxis.Y | LockAxis.Z,
+            });
+        }
+        this._physxComponent = tempPhysx;
+
+        let tempLocomotionSelector = this.object.getComponent(LocomotionSelector);
+        if (!tempLocomotionSelector) {
+            console.warn(
+                `player-controller(${this.object.name}): object does not have a LocomotionSelector. Default component is added.`
+            );
+            this.object.addComponent(SmoothLocomotion);
+            tempLocomotionSelector= this.object.addComponent(LocomotionSelector,{
+                locomotionType: LocomotionType.Smooth
+            });
         }
         this._locomotionSelector = tempLocomotionSelector;
 
