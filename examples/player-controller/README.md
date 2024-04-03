@@ -68,21 +68,3 @@ Finally, we need to link our input handlers to the Input Bridge.
 ![Player](images/Player.png)
 
 And that concludes the basic setup for a player controller with XR and PhysX integration. Make sure to save your scene and test it to see everything in action. If you encounter any issues, review the steps to ensure all components have been added correctly. To prevent the player from walking into walls, you can add PhysX components to the walls. Make sure to set these to `static`.
-
----
-
-# Player Controller Tutorial
-
-- Add empty object to root as base - XrRig 
-- Place original player inside.
-- Enable PhysX in project settings
-- Remove collision compont from `FloorPlane` and add physx component, set its rotation to 0 -90 0
-- Add ActiveCamera component to Player
-- Add PlayerController component to Player
-- Add Input Bridge Component
-- Add object to XrRig `inputs` 
-    - Add controls-keyboard
-    - Add controls-vr
-- Set 'inputs' in previously added input Bridge.
-
-
