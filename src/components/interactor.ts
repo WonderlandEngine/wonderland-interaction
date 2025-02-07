@@ -3,20 +3,29 @@ import {
     CollisionEventType,
     Component,
     Emitter,
+    Object3D,
     PhysXComponent,
     Scene,
 } from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
 import {Interactable} from './interactable.js';
+import {quat} from 'gl-matrix';
+import {HandPoseStandardGrab} from '../hand-pose.js';
+import {HandAvatar} from './hand.js';
 
 /** Represents whether the user's left or right hand is being used. */
 export enum Handedness {
     Right = 'right',
     Left = 'left',
 }
-
 /** An array of available handedness values. */
 export const HandednessValues = Object.values(Handedness);
+
+export enum ControllerMirroring {
+    Transform = 'transform',
+}
+/** An array of available mirror values. */
+export const MirroringValues = Object.values(ControllerMirroring);
 
 /**
  * Manages interaction capabilities of a VR controller or a similar input device.
@@ -36,6 +45,12 @@ export class Interactor extends Component {
      */
     @property.bool(true)
     public useDefaultInputs = true;
+
+    @property.enum(MirroringValues, ControllerMirroring.Transform)
+    public mirroring!: number;
+
+    @property.object()
+    public collision!: Object3D;
 
     /** Handedness value. Compare against {@link Handedness}. */
     @property.enum(HandednessValues, Handedness.Right)
@@ -57,7 +72,9 @@ export class Interactor extends Component {
     private readonly _onGripEnd: Emitter<[Interactable]> = new Emitter();
 
     private readonly _onPreRender = () => {
-        if (!this.#xrInputSource!.gripSpace) {
+        if (!this.#xrInputSource) return;
+
+        if (!this.#xrInputSource.gripSpace) {
             this.#xrPose = null;
             return;
         }
@@ -84,8 +101,10 @@ export class Interactor extends Component {
      * @returns This instance, for chaining
      */
     start() {
-        this._collision = this.object.getComponent(CollisionComponent, 0)!;
-        this._physx = this.object.getComponent(PhysXComponent, 0)!;
+        const collision = this.collision ?? this.object;
+
+        this._collision = collision.getComponent(CollisionComponent, 0)!;
+        this._physx = collision.getComponent(PhysXComponent, 0)!;
 
         if (!this._collision && !this._physx) {
             throw new Error('grabber.start(): No collision or physx component found');
@@ -103,6 +122,30 @@ export class Interactor extends Component {
     onDeactivate(): void {
         this.engine.onXRSessionStart.add(this.#onSessionStart);
         this.engine.onXRSessionEnd.add(this.#onSessionEnd);
+    }
+
+    update(delta: number): void {
+        if (!this.#xrInputSource) return;
+
+        const pose = this.engine.xr!.frame!.getPose(
+            this.#xrInputSource.gripSpace!,
+            this.#referenceSpace!
+        )!;
+        // TODO: Remove alloc.
+        const pos = [
+            pose.transform.position.x,
+            pose.transform.position.y,
+            pose.transform.position.z,
+        ];
+        const controllerRot = new Float32Array([
+            pose.transform.orientation.x,
+            pose.transform.orientation.y,
+            pose.transform.orientation.z,
+            pose.transform.orientation.w,
+        ]);
+
+        this.object.setPositionLocal(pos);
+        this.object.setRotationLocal(controllerRot);
     }
 
     /**
@@ -192,7 +235,9 @@ export class Interactor extends Component {
     }
 
     private _startSession(session: XRSession) {
-        this.#referenceSpace = this.engine.xr!.referenceSpaceForType('local');
+        this.#referenceSpace =
+            this.engine.xr!.referenceSpaceForType('local-floor') ??
+            this.engine.xr!.referenceSpaceForType('local');
 
         session.addEventListener('inputsourceschange', (event) => {
             for (const item of event.removed) {
@@ -216,6 +261,7 @@ export class Interactor extends Component {
 
         session.addEventListener('selectstart', (event) => {
             if (this.#xrInputSource === event.inputSource) {
+                this.object.getComponent(HandAvatar)!.setPose(HandPoseStandardGrab);
                 this.checkForNearbyInteractables();
             }
         });

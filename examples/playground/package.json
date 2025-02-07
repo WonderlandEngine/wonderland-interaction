@@ -1,0 +1,21 @@
+{
+    "name": "interaction",
+    "version": "1.0.0",
+    "main": "index.js",
+    "license": "MIT",
+    "dependencies": {
+        "@wonderlandengine/api": ">=1.3.0 <1.4.0",
+        "@wonderlandengine/components": "^1.0.7",
+        "wle-interaction": "file:../.."
+    },
+    "scripts": {
+        "build": "esbuild ./js/index.js --sourcemap --bundle --outfile=\"deploy/Interaction-bundle.js\"",
+        "dev": "npm run build -- --watch"
+    },
+    "devDependencies": {
+        "esbuild": "^0.15.12"
+    },
+    "overrides": {
+        "@wonderlandengine/api": "$@wonderlandengine/api"
+    }
+}
