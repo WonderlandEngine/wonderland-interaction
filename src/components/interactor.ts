@@ -51,38 +51,21 @@ export class Interactor extends Component {
     /** Cached interactable after it's gripped. */
     private _interactable: Interactable | null = null;
 
-    /** Previous loaded scene. */
-    private _previousScene: Scene | null = null;
-
     /** Grip start emitter. */
     private readonly _onGripStart: Emitter<[Interactable]> = new Emitter();
     /** Grip end emitter. */
     private readonly _onGripEnd: Emitter<[Interactable]> = new Emitter();
 
     private readonly _onPreRender = () => {
-        if (
-            this.engine.xr &&
-            this.#xrInputSource &&
-            this.#xrInputSource.gripSpace &&
-            this.#referenceSpace
-        ) {
-            const pose = this.engine.xr.frame.getPose(
-                this.#xrInputSource.gripSpace,
-                this.#referenceSpace
-            );
-            this.#xrPose = pose ?? null;
+        if (!this.#xrInputSource!.gripSpace) {
+            this.#xrPose = null;
+            return;
         }
-    };
-
-    private readonly _onSceneLoaded = () => {
-        const scene = this.engine.scene;
-        if (this._previousScene) {
-            scene.onPreRender.remove(this._onPreRender);
-            this.engine.onSceneLoaded.remove(this._onSceneLoaded);
-        }
-        this.engine.onSceneLoaded.add(this._onSceneLoaded);
-        scene.onPreRender.add(this._onPreRender);
-        this._previousScene = this.engine.scene;
+        const pose = this.engine.xr!.frame!.getPose(
+            this.#xrInputSource!.gripSpace,
+            this.#referenceSpace!
+        );
+        this.#xrPose = pose ?? null;
     };
 
     #xrInputSource: XRInputSource | null = null;
@@ -110,8 +93,6 @@ export class Interactor extends Component {
         if (!this._collision) {
             this._physx.onCollision(this.onPhysxCollision);
         }
-
-        this._onSceneLoaded();
     }
 
     onActivate(): void {
@@ -243,11 +224,16 @@ export class Interactor extends Component {
                 this.stopInteraction();
             }
         });
+
+        const scene = this.scene as Scene;
+        scene.onPreRender.add(this._onPreRender);
     }
 
     private _endSession() {
         this.#referenceSpace = null;
         this.#xrInputSource = null;
         this.stopInteraction();
+        const scene = this.scene as Scene;
+        scene.onPreRender.remove(this._onPreRender);
     }
 }
