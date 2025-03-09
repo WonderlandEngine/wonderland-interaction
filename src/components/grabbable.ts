@@ -12,6 +12,8 @@ import {Interactor} from './interactor.js';
 import {Interactable} from './interactable.js';
 import {HistoryTracker} from '../history-tracker.js';
 import {computeRelativeTransform} from '../utils/math.js';
+import { GripPoses, Poses } from '../grip-poses.js';
+import { HandAvatarComponent } from './hand.js';
 
 /** Temporary info about grabbed target. */
 export interface GrabData {
@@ -305,6 +307,15 @@ export class Grabbable extends Component {
             );
         }
 
+        /* Grip pose snapping */
+        if (interactable.gripPose !== GripPoses.None) {
+            // @todo: Get component earlier
+            const hand = interactor.object.getComponent(HandAvatarComponent);
+            if (hand) {
+                hand.transition(Poses[interactable.gripPose], interactable.gripPoseWeight);
+            }
+        }
+
         this._grabbed(interactor, interactable);
     };
 
@@ -342,6 +353,13 @@ export class Grabbable extends Component {
 
         this._grabData[index] = null;
         this._maxSqDistance = null;
+
+        /* Grip pose snapping */
+        // @todo: Get component earlier
+        const hand = interactor.object.getComponent(HandAvatarComponent);
+        if (hand) {
+            hand.transition(Poses[GripPoses.Idle]);
+        }
 
         if (this.canThrow && !this.isGrabbed) {
             this.throw(interactor);

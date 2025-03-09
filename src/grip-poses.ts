@@ -45,7 +45,19 @@ function convert(json: Record<string, any>): Float32Array[] {
 
 /* Idle */
 
-export const IdlePose = convert({
+export const enum GripPoses {
+    None = 0,
+    Idle = 1,
+    GrabBall,
+
+    Count
+}
+
+export const Poses = new Array(GripPoses.Count);
+export const PosesNames = ['none', 'idle', 'grab-ball'];
+
+/* Idle */
+Poses[GripPoses.Idle] = convert({
     "wrist": [
         0,
         0,
@@ -297,10 +309,8 @@ export const IdlePose = convert({
         -0.010389408096671104
     ]
 });
-
-/* Ball grab */
-
-export const GrabPose = convert({
+/* Ball */
+Poses[GripPoses.GrabBall] = convert({
     "wrist": [
         0,
         0,

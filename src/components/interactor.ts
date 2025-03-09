@@ -10,7 +10,6 @@ import {
 import {property} from '@wonderlandengine/api/decorators.js';
 import {Interactable} from './interactable.js';
 import {HandAvatarComponent} from './hand.js';
-import {GrabPose} from '../hand-pose.js';
 
 /** Represents whether the user's left or right hand is being used. */
 export enum Handedness {

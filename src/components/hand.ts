@@ -1,7 +1,7 @@
 import {Component, Object3D, Skin} from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
 import {quat2} from 'gl-matrix';
-import {HandAvatar, IdlePose} from '../hand-pose.js';
+import {GripPoses, HandAvatar, Poses} from '../grip-poses.js';
 import {Interactor, TrackingType} from './interactor.js';
 
 const _transform = quat2.create();
@@ -65,11 +65,12 @@ export class HandAvatarComponent extends Component {
 
     update(dt: number): void {
         const pose = this._transitionPose;
+        const speed = this._transitionSpeed * 10.0;
         for (let i = 0; i < pose.length; ++i) {
             const joint = this._joints[i];
             if (!joint) continue;
             joint.getTransformLocal(_transform);
-            quat2.lerp(_transform, _transform, pose[i], this._transitionSpeed * dt);
+            quat2.lerp(_transform, _transform, pose[i], speed * dt);
             joint.setTransformLocal(_transform);
         }
     }
@@ -94,7 +95,7 @@ export class HandAvatarComponent extends Component {
         const interactor = this.object.getComponent(Interactor);
         interactor?.onTrackingChanged.add(this._onTrackingChange);
 
-        this.setPose(IdlePose);
+        this.setPose(Poses[GripPoses.Idle]);
     }
 
     onDeactivate(): void {
