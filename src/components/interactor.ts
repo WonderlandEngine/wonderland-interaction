@@ -9,17 +9,22 @@ import {
 } from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
 import {Interactable} from './interactable.js';
-import {quat} from 'gl-matrix';
-import {HandPoseStandardGrab} from '../hand-pose.js';
-import {HandAvatar} from './hand.js';
+import {HandAvatarComponent} from './hand.js';
+import {GrabPose} from '../hand-pose.js';
 
 /** Represents whether the user's left or right hand is being used. */
 export enum Handedness {
-    Right = 'right',
-    Left = 'left',
+    Left = 0,
+    Right,
 }
 /** An array of available handedness values. */
-export const HandednessValues = Object.values(Handedness);
+export const HandednessValues = ['left', 'right'];
+
+export const enum TrackingType {
+    None = 0,
+    Controller,
+    Hand,
+}
 
 export enum ControllerMirroring {
     Transform = 'transform',
@@ -56,6 +61,11 @@ export class Interactor extends Component {
     @property.enum(HandednessValues, Handedness.Right)
     public handedness!: number;
 
+    /** Public Attributes. */
+
+    public readonly onTrackingChanged: Emitter<[TrackingType, TrackingType]> =
+        new Emitter();
+
     /** Private Attributes. */
 
     /** Collision component of this object. */
@@ -65,6 +75,8 @@ export class Interactor extends Component {
 
     /** Cached interactable after it's gripped. */
     private _interactable: Interactable | null = null;
+
+    private _trackingType: TrackingType = TrackingType.None;
 
     /** Grip start emitter. */
     private readonly _onGripStart: Emitter<[Interactable]> = new Emitter();
@@ -120,30 +132,52 @@ export class Interactor extends Component {
     }
 
     onDeactivate(): void {
-        this.engine.onXRSessionStart.add(this.#onSessionStart);
-        this.engine.onXRSessionEnd.add(this.#onSessionEnd);
+        this._trackingType = TrackingType.None;
+        this.engine.onXRSessionStart.remove(this.#onSessionStart);
+        this.engine.onXRSessionEnd.remove(this.#onSessionEnd);
     }
 
     update(delta: number): void {
         if (!this.#xrInputSource) return;
 
-        const pose = this.engine.xr!.frame!.getPose(
-            this.#xrInputSource.gripSpace!,
-            this.#referenceSpace!
-        )!;
+        const frame = this.engine.xr!.frame;
+        if (!frame) return;
+
+        let rigidTransform: XRRigidTransform | null = null;
+        if (this.#xrInputSource.hand) {
+            /* Hand tracking path */
+            const wristSpace = this.#xrInputSource.hand.get('wrist');
+            if (wristSpace) {
+                const p = frame.getJointPose!(
+                    wristSpace,
+                    this.engine.xr!.currentReferenceSpace
+                );
+                if (p?.transform) {
+                    rigidTransform = p.transform;
+                }
+            }
+        } else {
+            const pose = frame.getPose(
+                this.#xrInputSource.gripSpace!,
+                this.#referenceSpace!
+            )!;
+            rigidTransform = pose.transform;
+        }
+
+        if (rigidTransform === null) return;
+
         // TODO: Remove alloc.
         const pos = [
-            pose.transform.position.x,
-            pose.transform.position.y,
-            pose.transform.position.z,
+            rigidTransform.position.x,
+            rigidTransform.position.y,
+            rigidTransform.position.z,
         ];
         const controllerRot = new Float32Array([
-            pose.transform.orientation.x,
-            pose.transform.orientation.y,
-            pose.transform.orientation.z,
-            pose.transform.orientation.w,
+            rigidTransform.orientation.x,
+            rigidTransform.orientation.y,
+            rigidTransform.orientation.z,
+            rigidTransform.orientation.w,
         ]);
-
         this.object.setPositionLocal(pos);
         this.object.setRotationLocal(controllerRot);
     }
@@ -253,6 +287,17 @@ export class Interactor extends Component {
                     break;
                 }
             }
+
+            const prevType = this._trackingType;
+            const newType = this.#xrInputSource
+                ? this.#xrInputSource.hand
+                    ? TrackingType.Hand
+                    : TrackingType.Controller
+                : TrackingType.None;
+            if (this._trackingType !== newType) {
+                this._trackingType = newType;
+                this.onTrackingChanged.notify(prevType, newType);
+            }
         });
 
         if (!this.useDefaultInputs) {
@@ -261,7 +306,7 @@ export class Interactor extends Component {
 
         session.addEventListener('selectstart', (event) => {
             if (this.#xrInputSource === event.inputSource) {
-                this.object.getComponent(HandAvatar)!.setPose(HandPoseStandardGrab);
+                const test = this.object.getComponent(HandAvatarComponent);
                 this.checkForNearbyInteractables();
             }
         });

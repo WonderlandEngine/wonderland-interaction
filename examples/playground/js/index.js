@@ -14,7 +14,8 @@ import {HowlerAudioListener} from '@wonderlandengine/components';
 import {MouseLookComponent} from '@wonderlandengine/components';
 import {PlayerHeight} from '@wonderlandengine/components';
 import {Grabbable} from 'wle-interaction';
-import {HandAvatar} from 'wle-interaction';
+import {HandAvatarComponent} from 'wle-interaction';
+import {HandPoser} from 'wle-interaction';
 import {Interactable} from 'wle-interaction';
 import {Interactor} from 'wle-interaction';
 /* wle:auto-imports:end */
@@ -26,7 +27,8 @@ engine.registerComponent(HowlerAudioListener);
 engine.registerComponent(MouseLookComponent);
 engine.registerComponent(PlayerHeight);
 engine.registerComponent(Grabbable);
-engine.registerComponent(HandAvatar);
+engine.registerComponent(HandAvatarComponent);
+engine.registerComponent(HandPoser);
 engine.registerComponent(Interactable);
 engine.registerComponent(Interactor);
 /* wle:auto-register:end */
