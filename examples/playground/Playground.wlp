@@ -895,10 +895,10 @@
                     "active": true
                 }
             ],
-            "parent": null,
+            "parent": "426",
             "translation": [
                 -0.3806658,
-                0.6720359,
+                0.6720358,
                 0.2721869
             ],
             "rotation": [
@@ -1099,14 +1099,14 @@
                     "active": false
                 }
             ],
-            "parent": null,
+            "parent": "426",
             "translation": [
                 0.0147822,
                 0.6720348,
-                0.1044657
+                0.1044656
             ],
             "rotation": [
-                -0.5001483,
+                -0.5001482,
                 0.5001506,
                 -0.4998518,
                 -0.499849
@@ -1299,9 +1299,9 @@
         "243": {
             "name": "Weapon Double Hand",
             "translation": [
-                0.3969199,
-                0.6557073,
-                0.3617781
+                0.3969198,
+                0.6557072,
+                0.361778
             ],
             "rotation": [
                 0.0,
@@ -1374,7 +1374,8 @@
                     },
                     "active": false
                 }
-            ]
+            ],
+            "parent": "426"
         },
         "244": {
             "name": "Base",
@@ -2224,6 +2225,56 @@
                 1.0000023,
                 0.9999986,
                 0.9999966
+            ]
+        },
+        "426": {
+            "name": "Interactables"
+        },
+        "427": {
+            "name": "Ball",
+            "parent": "426",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "mesh": "9",
+                        "material": "22"
+                    }
+                },
+                {
+                    "type": "grabbable"
+                },
+                {
+                    "type": "collision",
+                    "collision": {
+                        "sphere": {
+                            "radius": 0.0549999
+                        },
+                        "groups": 128
+                    }
+                },
+                {
+                    "type": "interactable",
+                    "interactable": {
+                        "gripPose": "grab-ball"
+                    }
+                }
+            ],
+            "scaling": [
+                0.05,
+                0.05,
+                0.05
+            ],
+            "translation": [
+                0.2077961,
+                0.6739909,
+                0.4043524
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
             ]
         }
     },
