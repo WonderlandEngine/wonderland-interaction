@@ -3,10 +3,12 @@ import {
     CollisionComponent,
     Emitter,
     PhysXComponent,
+    Object3D,
 } from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
 
 import {Interactor} from './interactor.js';
+import {HandGripPose, HandGripPoseNames} from '../hand-avatar.js';
 
 /**
  * Base class for any interactable.
@@ -31,6 +33,16 @@ export class Interactable extends Component {
      */
     @property.bool(false)
     public shouldSnap = false;
+
+    @property.object()
+    gripPoseSnap: Object3D | null = null;
+
+    // TODO: Make an array of record.
+    @property.enum(HandGripPoseNames, HandGripPose.Idle)
+    gripPose!: number;
+
+    @property.float(1.0)
+    gripPoseWeight!: number;
 
     /** Private Attributes. */
 

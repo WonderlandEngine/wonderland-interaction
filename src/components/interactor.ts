@@ -3,20 +3,38 @@ import {
     CollisionEventType,
     Component,
     Emitter,
+    Object3D,
     PhysXComponent,
     Scene,
 } from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
 import {Interactable} from './interactable.js';
+import {HandPoser} from './hand/hand-poser.js';
+import {quat, vec3} from 'gl-matrix';
 
 /** Represents whether the user's left or right hand is being used. */
 export enum Handedness {
-    Right = 'right',
-    Left = 'left',
+    Left = 0,
+    Right,
+}
+/** An array of available handedness values. */
+export const HandednessValues = ['left', 'right'];
+
+export const enum TrackingType {
+    None = 0,
+    Controller,
+    Hand,
 }
 
-/** An array of available handedness values. */
-export const HandednessValues = Object.values(Handedness);
+export enum ControllerMirroring {
+    Transform = 'transform',
+}
+/** An array of available mirror values. */
+export const MirroringValues = Object.values(ControllerMirroring);
+
+/** Temporaries */
+const _point = vec3.create();
+const _rotation = quat.create();
 
 /**
  * Manages interaction capabilities of a VR controller or a similar input device.
@@ -37,9 +55,17 @@ export class Interactor extends Component {
     @property.bool(true)
     public useDefaultInputs = true;
 
+    @property.object()
+    public collision!: Object3D;
+
     /** Handedness value. Compare against {@link Handedness}. */
     @property.enum(HandednessValues, Handedness.Right)
     public handedness!: number;
+
+    /** Public Attributes. */
+
+    public readonly onTrackingChanged: Emitter<[TrackingType, TrackingType]> =
+        new Emitter();
 
     /** Private Attributes. */
 
@@ -51,13 +77,17 @@ export class Interactor extends Component {
     /** Cached interactable after it's gripped. */
     private _interactable: Interactable | null = null;
 
+    private _trackingType: TrackingType = TrackingType.None;
+
     /** Grip start emitter. */
     private readonly _onGripStart: Emitter<[Interactable]> = new Emitter();
     /** Grip end emitter. */
     private readonly _onGripEnd: Emitter<[Interactable]> = new Emitter();
 
     private readonly _onPreRender = () => {
-        if (!this.#xrInputSource!.gripSpace) {
+        if (!this.#xrInputSource) return;
+
+        if (!this.#xrInputSource.gripSpace) {
             this.#xrPose = null;
             return;
         }
@@ -84,8 +114,10 @@ export class Interactor extends Component {
      * @returns This instance, for chaining
      */
     start() {
-        this._collision = this.object.getComponent(CollisionComponent, 0)!;
-        this._physx = this.object.getComponent(PhysXComponent, 0)!;
+        const collision = this.collision ?? this.object;
+
+        this._collision = collision.getComponent(CollisionComponent, 0)!;
+        this._physx = collision.getComponent(PhysXComponent, 0)!;
 
         if (!this._collision && !this._physx) {
             throw new Error('grabber.start(): No collision or physx component found');
@@ -101,8 +133,50 @@ export class Interactor extends Component {
     }
 
     onDeactivate(): void {
-        this.engine.onXRSessionStart.add(this.#onSessionStart);
-        this.engine.onXRSessionEnd.add(this.#onSessionEnd);
+        this._trackingType = TrackingType.None;
+        this.engine.onXRSessionStart.remove(this.#onSessionStart);
+        this.engine.onXRSessionEnd.remove(this.#onSessionEnd);
+    }
+
+    update(): void {
+        if (!this.#xrInputSource) return;
+
+        const frame = this.engine.xr!.frame;
+        if (!frame) return;
+
+        let rigidTransform: XRRigidTransform | null = null;
+        if (this.#xrInputSource.hand) {
+            /* Hand tracking path */
+            const wristSpace = this.#xrInputSource.hand.get('wrist');
+            if (wristSpace) {
+                const p = frame.getJointPose!(
+                    wristSpace,
+                    this.engine.xr!.currentReferenceSpace
+                );
+                if (p?.transform) {
+                    rigidTransform = p.transform;
+                }
+            }
+        } else {
+            const pose = frame.getPose(
+                this.#xrInputSource.gripSpace!,
+                this.#referenceSpace!
+            )!;
+            rigidTransform = pose.transform;
+        }
+
+        if (rigidTransform === null) return;
+
+        _point[0] = rigidTransform.position.x;
+        _point[1] = rigidTransform.position.y;
+        _point[2] = rigidTransform.position.z;
+        this.object.setPositionLocal(_point);
+
+        _rotation[0] = rigidTransform.orientation.x;
+        _rotation[1] = rigidTransform.orientation.y;
+        _rotation[2] = rigidTransform.orientation.z;
+        _rotation[3] = rigidTransform.orientation.w;
+        this.object.setRotationLocal(_rotation);
     }
 
     /**
@@ -192,7 +266,9 @@ export class Interactor extends Component {
     }
 
     private _startSession(session: XRSession) {
-        this.#referenceSpace = this.engine.xr!.referenceSpaceForType('local');
+        this.#referenceSpace =
+            this.engine.xr!.referenceSpaceForType('local-floor') ??
+            this.engine.xr!.referenceSpaceForType('local');
 
         session.addEventListener('inputsourceschange', (event) => {
             for (const item of event.removed) {
@@ -208,6 +284,17 @@ export class Interactor extends Component {
                     break;
                 }
             }
+
+            const prevType = this._trackingType;
+            const newType = this.#xrInputSource
+                ? this.#xrInputSource.hand
+                    ? TrackingType.Hand
+                    : TrackingType.Controller
+                : TrackingType.None;
+            if (this._trackingType !== newType) {
+                this._trackingType = newType;
+                this.onTrackingChanged.notify(prevType, newType);
+            }
         });
 
         if (!this.useDefaultInputs) {
@@ -216,6 +303,7 @@ export class Interactor extends Component {
 
         session.addEventListener('selectstart', (event) => {
             if (this.#xrInputSource === event.inputSource) {
+                const test = this.object.getComponent(HandPoser);
                 this.checkForNearbyInteractables();
             }
         });

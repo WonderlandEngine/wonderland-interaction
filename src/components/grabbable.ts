@@ -12,6 +12,8 @@ import {Interactor} from './interactor.js';
 import {Interactable} from './interactable.js';
 import {HistoryTracker} from '../history-tracker.js';
 import {computeRelativeTransform} from '../utils/math.js';
+import {HandGripPose, HandGripPoses} from '../hand-avatar.js';
+import {HandPoser} from './hand/hand-poser.js';
 
 /** Temporary info about grabbed target. */
 export interface GrabData {
@@ -286,7 +288,15 @@ export class Grabbable extends Component {
         const grab: GrabData = {interactor, transform: quat2.create()};
 
         if (interactable.shouldSnap) {
-            computeRelativeTransform(this.object, interactable.object, grab.transform);
+            if (interactable.gripPoseSnap) {
+                computeRelativeTransform(
+                    this.object,
+                    interactable.gripPoseSnap,
+                    grab.transform
+                );
+            } else {
+                computeRelativeTransform(this.object, interactable.object, grab.transform);
+            }
         } else {
             computeRelativeTransform(this.object, interactor.object, grab.transform);
         }
@@ -303,6 +313,18 @@ export class Grabbable extends Component {
                 this._interactable[0].object.getPositionWorld(_pointA),
                 this._interactable[1].object.getPositionWorld(_pointB)
             );
+        }
+
+        /* Grip pose snapping */
+        if (interactable.gripPose !== HandGripPose.None) {
+            // @todo: Get component earlier
+            const hand = interactor.object.getComponent(HandPoser);
+            if (hand) {
+                hand.transition(
+                    HandGripPoses[interactable.gripPose],
+                    interactable.gripPoseWeight
+                );
+            }
         }
 
         this._grabbed(interactor, interactable);
@@ -342,6 +364,13 @@ export class Grabbable extends Component {
 
         this._grabData[index] = null;
         this._maxSqDistance = null;
+
+        /* Grip pose snapping */
+        // @todo: Get component earlier
+        const hand = interactor.object.getComponent(HandPoser);
+        if (hand) {
+            hand.transition(HandGripPoses[HandGripPose.Idle]);
+        }
 
         if (this.canThrow && !this.isGrabbed) {
             this.throw(interactor);
