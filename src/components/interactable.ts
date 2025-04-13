@@ -8,7 +8,7 @@ import {
 import {property} from '@wonderlandengine/api/decorators.js';
 
 import {Interactor} from './interactor.js';
-import { GripPoses, Poses, PosesNames } from '../grip-poses.js';
+import {HandGripPose, HandGripPoseNames} from '../hand-avatar.js';
 
 /**
  * Base class for any interactable.
@@ -38,7 +38,7 @@ export class Interactable extends Component {
     gripPoseSnap: Object3D | null = null;
 
     // TODO: Make an array of record.
-    @property.enum(PosesNames, GripPoses.Idle)
+    @property.enum(HandGripPoseNames, HandGripPose.Idle)
     gripPose!: number;
 
     @property.float(1.0)

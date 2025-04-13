@@ -1,8 +1,8 @@
 export * from './history-tracker.js';
 
 export * from './components/grabbable.js';
-export * from './components/hand.js';
 export * from './components/hand/hand-poser.js';
+export * from './components/hand/hand-poser-snapshot.js';
 export * from './components/interactor.js';
 export * from './components/distance-interactor.js';
 export * from './components/interactable.js';

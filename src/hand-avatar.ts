@@ -1,36 +1,55 @@
 /** Set of standard poses for the default  */
 
+/**
+ * Hand avatar definition.
+ *
+ * Maps a joint name to the avatar index.
+ */
 export enum HandAvatar {
-    "wrist" = 0,
-    "thumb-metacarpal",
-    "thumb-phalanx-proximal",
-    "thumb-phalanx-distal",
-    "thumb-tip",
-    "index-finger-metacarpal",
-    "index-finger-phalanx-proximal",
-    "index-finger-phalanx-intermediate",
-    "index-finger-phalanx-distal",
-    "index-finger-tip",
-    "middle-finger-metacarpal",
-    "middle-finger-phalanx-proximal",
-    "middle-finger-phalanx-intermediate",
-    "middle-finger-phalanx-distal",
-    "middle-finger-tip",
-    "ring-finger-metacarpal",
-    "ring-finger-phalanx-proximal",
-    "ring-finger-phalanx-intermediate",
-    "ring-finger-phalanx-distal",
-    "ring-finger-tip",
-    "pinky-finger-metacarpal",
-    "pinky-finger-phalanx-proximal",
-    "pinky-finger-phalanx-intermediate",
-    "pinky-finger-phalanx-distal",
-    "pinky-finger-tip",
+    'wrist' = 0,
+    'thumb-metacarpal',
+    'thumb-phalanx-proximal',
+    'thumb-phalanx-distal',
+    'thumb-tip',
+    'index-finger-metacarpal',
+    'index-finger-phalanx-proximal',
+    'index-finger-phalanx-intermediate',
+    'index-finger-phalanx-distal',
+    'index-finger-tip',
+    'middle-finger-metacarpal',
+    'middle-finger-phalanx-proximal',
+    'middle-finger-phalanx-intermediate',
+    'middle-finger-phalanx-distal',
+    'middle-finger-tip',
+    'ring-finger-metacarpal',
+    'ring-finger-phalanx-proximal',
+    'ring-finger-phalanx-intermediate',
+    'ring-finger-phalanx-distal',
+    'ring-finger-tip',
+    'pinky-finger-metacarpal',
+    'pinky-finger-phalanx-proximal',
+    'pinky-finger-phalanx-intermediate',
+    'pinky-finger-phalanx-distal',
+    'pinky-finger-tip',
 
     Count
 }
 
-function convert(json: Record<string, any>): Float32Array[] {
+/**
+ * Default hand grip poses exposed by the library.
+ */
+export const enum HandGripPose {
+    None = 0,
+    Idle = 1,
+    GrabStandard,
+    GrabBall,
+
+    Count
+}
+export const HandGripPoses = new Array(HandGripPose.Count);
+export const HandGripPoseNames = ['none', 'idle', 'grab-standard', 'grab-ball'];
+
+function handPoseJsonToAvatar(json: Record<string, any>): Float32Array[] {
     const result: Float32Array[] = new Array(HandAvatar.Count);
     for(const key in json) {
         const array = new Float32Array(8);
@@ -44,20 +63,7 @@ function convert(json: Record<string, any>): Float32Array[] {
 }
 
 /* Idle */
-
-export const enum GripPoses {
-    None = 0,
-    Idle = 1,
-    GrabBall,
-
-    Count
-}
-
-export const Poses = new Array(GripPoses.Count);
-export const PosesNames = ['none', 'idle', 'grab-ball'];
-
-/* Idle */
-Poses[GripPoses.Idle] = convert({
+HandGripPoses[HandGripPose.Idle] = handPoseJsonToAvatar({
     "wrist": [
         0,
         0,
@@ -309,8 +315,262 @@ Poses[GripPoses.Idle] = convert({
         -0.010389408096671104
     ]
 });
+
+HandGripPoses[HandGripPose.GrabStandard] = handPoseJsonToAvatar({
+    "wrist": [
+        1.862645149230957e-9,
+        7.450580596923828e-9,
+        0,
+        1,
+        -3.563479733514896e-9,
+        2.615468730482462e-8,
+        -2.0333636996383575e-8,
+        -1.8823010999346378e-16
+    ],
+    "thumb-metacarpal": [
+        -0.07456926256418228,
+        0.3778180778026581,
+        0.671323835849762,
+        0.6332592368125916,
+        -0.008343605324625969,
+        0.003049950348213315,
+        -0.01736888661980629,
+        0.015610738657414913
+    ],
+    "thumb-phalanx-proximal": [
+        -0.1658046990633011,
+        0.2243298590183258,
+        0.670743465423584,
+        0.6872323155403137,
+        -0.020095540210604668,
+        0.003448508447036147,
+        -0.028267592191696167,
+        0.021615346893668175
+    ],
+    "thumb-phalanx-distal": [
+        -0.2180403470993042,
+        0.24211159348487854,
+        0.7240702509880066,
+        0.6079167127609253,
+        -0.023063749074935913,
+        0.006389118731021881,
+        -0.038275979459285736,
+        0.034772515296936035
+    ],
+    "thumb-tip": [
+        -0.2180403470993042,
+        0.24211159348487854,
+        0.7240702509880066,
+        0.6079167127609253,
+        -0.026208646595478058,
+        0.004263084381818771,
+        -0.04594365879893303,
+        0.043623991310596466
+    ],
+    "index-finger-metacarpal": [
+        1.862645149230957e-9,
+        7.450580596923828e-9,
+        0,
+        1,
+        -0.008719749748706818,
+        -0.006163155660033226,
+        -0.01887659542262554,
+        6.216088754840143e-11
+    ],
+    "index-finger-phalanx-proximal": [
+        -0.17663802206516266,
+        -0.0711745023727417,
+        0.02594979666173458,
+        0.9813560843467712,
+        -0.015066981315612793,
+        0.005193858873099089,
+        -0.046911340206861496,
+        -0.0010948032140731812
+    ],
+    "index-finger-phalanx-intermediate": [
+        -0.6363890767097473,
+        -0.07272543013095856,
+        -0.038284722715616226,
+        0.7669774293899536,
+        -0.011246971786022186,
+        0.03360113129019737,
+        -0.056119538843631744,
+        -0.008947217836976051
+    ],
+    "index-finger-phalanx-distal": [
+        -0.7740877270698547,
+        -0.09172610938549042,
+        -0.05074313282966614,
+        0.6243394613265991,
+        -0.010207565501332283,
+        0.03824850171804428,
+        -0.05866015702486038,
+        -0.011804098263382912
+    ],
+    "index-finger-tip": [
+        -0.7740877270698547,
+        -0.09172610938549042,
+        -0.05074313282966614,
+        0.6243394613265991,
+        -0.009063624776899815,
+        0.02990538254380226,
+        -0.06602451205253601,
+        -0.012210067361593246
+    ],
+    "middle-finger-metacarpal": [
+        1.862645149230957e-9,
+        7.450580596923828e-9,
+        0,
+        1,
+        -0.0006150396075099707,
+        -0.004529003985226154,
+        -0.017795367166399956,
+        3.4889310190910905e-11
+    ],
+    "middle-finger-phalanx-proximal": [
+        -0.3776012659072876,
+        -0.07217701524496078,
+        -0.03330168128013611,
+        0.9225502014160156,
+        -0.004205512814223766,
+        0.01685633882880211,
+        -0.044537272304296494,
+        -0.0020102241542190313
+    ],
+    "middle-finger-phalanx-intermediate": [
+        -0.8008180260658264,
+        -0.047308653593063354,
+        -0.07868987321853638,
+        0.5918280482292175,
+        -0.0008313467842526734,
+        0.04085633531212807,
+        -0.05039627104997635,
+        -0.004559729248285294
+    ],
+    "middle-finger-phalanx-distal": [
+        -0.9289270639419556,
+        -0.0717325359582901,
+        -0.13918593525886536,
+        0.3355239927768707,
+        0.000037699439417338,
+        0.044969767332077026,
+        -0.04721943661570549,
+        -0.009869535453617573
+    ],
+    "middle-finger-tip": [
+        -0.9289270639419556,
+        -0.0717325359582901,
+        -0.13918593525886536,
+        0.3355239927768707,
+        0.0010640299879014492,
+        0.03354378044605255,
+        -0.051924776285886765,
+        -0.011422766372561455
+    ],
+    "ring-finger-metacarpal": [
+        1.862645149230957e-9,
+        7.450580596923828e-9,
+        0,
+        1,
+        0.00749615952372551,
+        -0.0030078666750341654,
+        -0.017387788742780685,
+        8.4476592387972e-12
+    ],
+    "ring-finger-phalanx-proximal": [
+        -0.49334561824798584,
+        -0.08423031866550446,
+        -0.09866179525852203,
+        0.8601053953170776,
+        0.004097719676792622,
+        0.019932011142373085,
+        -0.04048915207386017,
+        -0.0003421218425501138
+    ],
+    "ring-finger-phalanx-intermediate": [
+        -0.8640902042388916,
+        -0.028019875288009644,
+        -0.1712806522846222,
+        0.4724680185317993,
+        0.006497534923255444,
+        0.03886840119957924,
+        -0.043219566345214844,
+        -0.0014797444455325603
+    ],
+    "ring-finger-phalanx-distal": [
+        -0.9715462923049927,
+        0.03245493769645691,
+        -0.20459304749965668,
+        0.11483147740364075,
+        0.008605005219578743,
+        0.043821174651384354,
+        -0.03548431769013405,
+        -0.0028032194823026657
+    ],
+    "ring-finger-tip": [
+        -0.9715462923049927,
+        0.03245493769645691,
+        -0.20459304749965668,
+        0.11483147740364075,
+        0.00838957354426384,
+        0.03207014873623848,
+        -0.03766641393303871,
+        -0.005192500073462725
+    ],
+    "pinky-finger-metacarpal": [
+        -0.018311865627765656,
+        -0.1403428316116333,
+        -0.20703592896461487,
+        0.968041718006134,
+        0.009715905413031578,
+        -0.001866625272668898,
+        -0.01819242164492607,
+        -0.003977655433118343
+    ],
+    "pinky-finger-phalanx-proximal": [
+        -0.4782381057739258,
+        -0.07800076901912689,
+        -0.19287726283073425,
+        0.8532307147979736,
+        0.013236981816589832,
+        0.016166117042303085,
+        -0.03787250444293022,
+        0.00033596341381780803
+    ],
+    "pinky-finger-phalanx-intermediate": [
+        -0.8279861807823181,
+        -0.02640557289123535,
+        -0.2623569071292877,
+        0.4948844015598297,
+        0.012245711870491505,
+        0.03356535732746124,
+        -0.04017845541238785,
+        0.0009790111798793077
+    ],
+    "pinky-finger-phalanx-distal": [
+        -0.9418359994888306,
+        0.10036244988441467,
+        -0.2884669899940491,
+        0.14021152257919312,
+        0.014277826063334942,
+        0.04045597463846207,
+        -0.031469326466321945,
+        0.002205579075962305
+    ],
+    "pinky-finger-tip": [
+        -0.9418359994888306,
+        0.10036244988441467,
+        -0.2884669899940491,
+        0.14021152257919312,
+        0.01333585288375616,
+        0.030253136530518532,
+        -0.033566512167453766,
+        -0.0011334576411172748
+    ]
+});
+
 /* Ball */
-Poses[GripPoses.GrabBall] = convert({
+HandGripPoses[HandGripPose.GrabBall] = handPoseJsonToAvatar({
     "wrist": [
         0,
         0,

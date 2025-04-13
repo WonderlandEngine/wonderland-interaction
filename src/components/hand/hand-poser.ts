@@ -1,99 +1,143 @@
-import {Alignment, Component, Material, property, Skin, TextComponent, Type, WonderlandEngine} from '@wonderlandengine/api';
-import { HandTracking } from '@wonderlandengine/components';
+import {Component, Object3D, Skin} from '@wonderlandengine/api';
+import {property} from '@wonderlandengine/api/decorators.js';
+import {quat2} from 'gl-matrix';
+import {HandGripPose, HandAvatar, HandGripPoses} from '../../hand-avatar.js';
+import {Interactor, TrackingType} from '../interactor.js';
 
-import {Interactor} from '../interactor.js';
+const _transform = quat2.create();
 
-import {quat, quat2} from 'gl-matrix';
-import { HandAvatarComponent } from '../hand.js';
-
-enum State {
-    Waiting,
-    Timeout,
-}
-
+/**
+ * Component animating a skinned hand mesh into specified poses.
+ */
 export class HandPoser extends Component {
     static TypeName = 'hand-poser';
 
-    static onRegister(engine: WonderlandEngine) {
-        engine.registerComponent(HandTracking);
-    }
+    /** Properties. */
 
-    @property.material({required: true})
-    materialText!: Material;
+    @property.skin({required: true})
+    skin!: Skin;
 
-    tracking: HandTracking = null!;
+    @property.object()
+    skinRoot!: Object3D | null;
 
-    private _timeout: number = 0.0;
-    private _state = State.Waiting;
+    /** Private Attributes. */
 
-    private _text!: TextComponent;
+    /** Hand avatar joint to idle transform */
+    private _transforms: quat2[] = new Array();
+    /** Hand avatar joint to object3d */
+    private _joints: Object3D[] = new Array();
+    private _rootBoneTransform = quat2.create();
 
-    start() {
-        const object3D = this.object.addChild();
-        object3D.translateLocal([0, 0, -0.05]);
-        object3D.setScalingLocal([0.25, 0.25, 0.25]);
-        this._text = object3D.addComponent(TextComponent);
-        this._text.alignment = Alignment.Center;
-        this._text.text = 'Grab To Snapshot';
-    }
+    private _defaultSkinRootTransform = quat2.create();
 
-    onActivate() {
-        const hand = this.object.getComponent(HandAvatarComponent)!;
-        if(hand.skinRoot) {
-            hand.skinRoot.resetTransform();
+    /** Target hand pose */
+    private _transitionPose: quat2[] = [];
+    private _transitionSpeed: number = 1.0;
+
+    private readonly _onTrackingChange = (_: TrackingType, newType: TrackingType) => {
+        if (!this.skinRoot) return;
+
+        this.skinRoot.resetTransform();
+        if (newType === TrackingType.Controller) {
+            const transform = quat2.create();
+            quat2.multiply(
+                transform,
+                this._defaultSkinRootTransform,
+                this._rootBoneTransform
+            );
+            this.skinRoot.setTransformLocal(transform);
+        }
+    };
+
+    init() {
+        this._joints = new Array(HandAvatar.Count);
+        const joindIds = this.skin.jointIds;
+        for (let i = 0; i < joindIds.length; ++i) {
+            const object3d = this.scene.wrap(joindIds[i]);
+            const index = HandAvatar[object3d.name as any] as unknown as number;
+            if (index === undefined) continue;
+            this._joints[index] = object3d;
         }
 
-        const interactor = this.object.getComponent(Interactor)!;
-        interactor.active = false;
+        const rootBone = this._joints[HandAvatar.wrist];
+        if (rootBone) {
+            rootBone.getTransformLocal(this._rootBoneTransform);
+        }
 
-        this.tracking = this.object.getComponent(HandTracking) ?? this.object.addComponent(HandTracking, {active: false});
-        this.tracking.handSkin = hand.skin;
-        this.tracking.handedness = interactor.handedness === 0 ? 'left' : 'right';
-        this.tracking.active = true;
-
-        this._text.active = true;
-        this._text.material = this.materialText;
-
-        this._state = State.Waiting;
-    }
-
-    onDeactivate() {
-        const interactor = this.object.getComponent(Interactor)!;
-        interactor.active = true;
-        this.tracking.active = false;
-        this._text.active = false;
-    }
-
-    update(dt: number) {
-        switch (this._state) {
-            case State.Waiting:  {
-                if(this.tracking.isGrabbing()) {
-                    this._timeout = 3.0;
-                    this._state = State.Timeout;
-                }
-            } break;
-            case State.Timeout: {
-                this._text.text = `${this._timeout.toFixed(2)}`;
-                this._timeout -= dt;
-                if (this._timeout <= 0) {
-                    this._text.text = 'Grab To Snapshot';
-                    this._state = State.Waiting;
-                    const snapshot = JSON.stringify(this.snapshot(), null, 4);
-                    navigator.clipboard.writeText(snapshot);
-                    console.log('HandPoser: Snapshot copied to clipboard!');
-                    console.log(snapshot);
-                }
-            } break;
+        if (this.skinRoot) {
+            this.skinRoot.getTransformLocal(this._defaultSkinRootTransform);
         }
     }
 
-    snapshot() {
-        const hand = this.object.getComponent(HandAvatarComponent)!;
-        const snapshot: Record<string, number[]> = {};
-        for (const o of hand.joints) {
-            if(!o) continue;
-            snapshot[o.name] = o.getTransformLocal(new Array(8));
+    update(dt: number): void {
+        const pose = this._transitionPose;
+        const speed = this._transitionSpeed * 10.0;
+        for (let i = 0; i < pose.length; ++i) {
+            const joint = this._joints[i];
+            if (!joint) continue;
+            joint.getTransformLocal(_transform);
+            quat2.lerp(_transform, _transform, pose[i], speed * dt);
+            joint.setTransformLocal(_transform);
         }
-        return snapshot;
+    }
+
+    onActivate(): void {
+        /* Reset all rotations based on the wriste root bone */
+        const invTransform = quat2.create();
+        this._joints[HandAvatar.wrist].getTransformLocal(invTransform);
+        quat2.invert(invTransform, invTransform);
+
+        this.skinRoot?.setTransformLocal(invTransform);
+
+        this._transforms = new Array(HandAvatar.Count);
+        for (let i = 0; i < this._joints.length; ++i) {
+            const joint = this._joints[i];
+            if (!joint) continue;
+
+            const transform = joint.getTransformLocal();
+            this._transforms[i] = transform;
+        }
+
+        const interactor = this.object.getComponent(Interactor);
+        interactor?.onTrackingChanged.add(this._onTrackingChange);
+
+        this.setPose(HandGripPoses[HandGripPose.Idle]);
+    }
+
+    onDeactivate(): void {
+        const interactor = this.object.getComponent(Interactor);
+        interactor?.onTrackingChanged.remove(this._onTrackingChange);
+    }
+
+    setPose(pose: Float32Array[]) {
+        this._transitionPose = pose;
+        this._transitionSpeed = 1.0;
+        for (let i = 0; i < pose.length; ++i) {
+            const joint = this._joints[i];
+            if (joint) {
+                joint.setTransformLocal(pose[i]);
+            }
+        }
+    }
+
+    transition(pose: Float32Array[], weight = 1.0, speed = 1.0) {
+        this._transitionSpeed = speed;
+
+        this._transitionPose = new Array(pose.length);
+        for (let i = 0; i < pose.length; ++i) {
+            const joint = this._joints[i];
+            const transform = quat2.create();
+            if (joint) {
+                joint.getTransformLocal(transform);
+                quat2.lerp(transform, transform, pose[i], weight);
+            } else {
+                quat2.copy(transform, pose[i]);
+            }
+            this._transitionPose[i] = transform;
+        }
+    }
+
+    get joints() {
+        return this._joints;
     }
 }

@@ -9,7 +9,8 @@ import {
 } from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
 import {Interactable} from './interactable.js';
-import {HandAvatarComponent} from './hand.js';
+import {HandPoser} from './hand/hand-poser.js';
+import {quat, vec3} from 'gl-matrix';
 
 /** Represents whether the user's left or right hand is being used. */
 export enum Handedness {
@@ -31,6 +32,10 @@ export enum ControllerMirroring {
 /** An array of available mirror values. */
 export const MirroringValues = Object.values(ControllerMirroring);
 
+/** Temporaries */
+const _point = vec3.create();
+const _rotation = quat.create();
+
 /**
  * Manages interaction capabilities of a VR controller or a similar input device.
  *
@@ -49,9 +54,6 @@ export class Interactor extends Component {
      */
     @property.bool(true)
     public useDefaultInputs = true;
-
-    @property.enum(MirroringValues, ControllerMirroring.Transform)
-    public mirroring!: number;
 
     @property.object()
     public collision!: Object3D;
@@ -136,7 +138,7 @@ export class Interactor extends Component {
         this.engine.onXRSessionEnd.remove(this.#onSessionEnd);
     }
 
-    update(delta: number): void {
+    update(): void {
         if (!this.#xrInputSource) return;
 
         const frame = this.engine.xr!.frame;
@@ -165,20 +167,16 @@ export class Interactor extends Component {
 
         if (rigidTransform === null) return;
 
-        // TODO: Remove alloc.
-        const pos = [
-            rigidTransform.position.x,
-            rigidTransform.position.y,
-            rigidTransform.position.z,
-        ];
-        const controllerRot = new Float32Array([
-            rigidTransform.orientation.x,
-            rigidTransform.orientation.y,
-            rigidTransform.orientation.z,
-            rigidTransform.orientation.w,
-        ]);
-        this.object.setPositionLocal(pos);
-        this.object.setRotationLocal(controllerRot);
+        _point[0] = rigidTransform.position.x;
+        _point[1] = rigidTransform.position.y;
+        _point[2] = rigidTransform.position.z;
+        this.object.setPositionLocal(_point);
+
+        _rotation[0] = rigidTransform.orientation.x;
+        _rotation[1] = rigidTransform.orientation.y;
+        _rotation[2] = rigidTransform.orientation.z;
+        _rotation[3] = rigidTransform.orientation.w;
+        this.object.setRotationLocal(_rotation);
     }
 
     /**
@@ -305,7 +303,7 @@ export class Interactor extends Component {
 
         session.addEventListener('selectstart', (event) => {
             if (this.#xrInputSource === event.inputSource) {
-                const test = this.object.getComponent(HandAvatarComponent);
+                const test = this.object.getComponent(HandPoser);
                 this.checkForNearbyInteractables();
             }
         });
