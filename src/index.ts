@@ -1,6 +1,6 @@
 export * from './history-tracker.js';
 
-export * from './components/interaction/handle.js';
+export * from './components/interaction/grab-point.js';
 
 export * from './components/grabbable.js';
 export * from './components/interactor.js';

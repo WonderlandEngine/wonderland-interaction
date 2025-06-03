@@ -5,8 +5,8 @@ export enum GrabSearchMode {
     Overlap = 1
 }
 
-export class Handle extends Component {
-    static TypeName = 'handle';
+export class GrabPoint extends Component {
+    static TypeName = 'grab-point';
 
     @property.bool(true)
     shouldSnap: boolean = true;

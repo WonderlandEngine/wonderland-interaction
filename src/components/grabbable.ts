@@ -13,7 +13,7 @@ import {property} from '@wonderlandengine/api/decorators.js';
 import {Interactor} from './interactor.js';
  import {HistoryTracker} from '../history-tracker.js';
 import {computeRelativeTransform} from '../utils/math.js';
-import { Handle } from './interaction/handle.js';
+import { GrabPoint } from './interaction/grab-point.js';
 
 /** Temporary info about grabbed target. */
 export interface GrabData {
@@ -47,7 +47,7 @@ export class Grabbable extends Component {
     static TypeName = 'grabbable';
 
     static onRegister(engine: WonderlandEngine) {
-        engine.registerComponent(Handle);
+        engine.registerComponent(GrabPoint);
     }
 
     /** Properties. */
@@ -117,7 +117,7 @@ export class Grabbable extends Component {
     @property.int(0)
     public distanceHandle = 0;
 
-    handles: Handle[] = [];
+    handles: GrabPoint[] = [];
 
     /** Private Attributes. */
 
@@ -152,9 +152,9 @@ export class Grabbable extends Component {
     private readonly _onGrabEnd: Emitter<[this]> = new Emitter();
 
     init() {
-        this.handles = this.handleObjects.map(o => o.getComponent(Handle)!);
+        this.handles = this.handleObjects.map(o => o.getComponent(GrabPoint)!);
         if(this.handles.length === 0) {
-            const handle = this.object.getComponent(Handle) ?? this.object.addComponent(Handle);
+            const handle = this.object.getComponent(GrabPoint) ?? this.object.addComponent(GrabPoint);
             this.handles.push(handle);
         }
     }

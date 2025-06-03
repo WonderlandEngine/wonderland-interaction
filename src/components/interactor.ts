@@ -8,7 +8,7 @@ import {
 } from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
 import { Grabbable } from './grabbable.js';
-import { GrabSearchMode, Handle } from './interaction/handle.js';
+import { GrabSearchMode, GrabPoint } from './interaction/grab-point.js';
 import { vec3 } from 'gl-matrix';
 
 /** Represents whether the user's left or right hand is being used. */
@@ -138,20 +138,19 @@ export class Interactor extends Component {
         // 2 grabbables.
 
         const overlaps = this._collision ? this._collision.queryOverlaps() : null;
-        let overlapHandle: Handle | null = null;
+        let overlapHandle: GrabPoint | null = null;
         if(overlaps) {
             /** @todo: The API should instead allow to check for overlap on given objects. */
             const overlaps = this._collision.queryOverlaps();
             for (const overlap of overlaps) {
-                overlapHandle = overlap.object.getComponent(Handle);
+                overlapHandle = overlap.object.getComponent(GrabPoint);
                 if (overlapHandle) break;
             }
         }
 
-        console.log(this.#currentlyCollidingWith);
         if(!overlapHandle && this.#currentlyCollidingWith) {
             /** @todo: The API should instead allow to check for overlap on given objects. */
-            overlapHandle = this.#currentlyCollidingWith.object.getComponent(Handle);
+            overlapHandle = this.#currentlyCollidingWith.object.getComponent(GrabPoint);
         }
 
         /** @todo: Optimize with a typed list of handle, an octree? */
@@ -183,9 +182,9 @@ export class Interactor extends Component {
             }
         }
 
-        if (grabbableId === null) return;
-
-        this.startInteraction(grabbables[grabbableId], handleId!);
+        if (grabbableId !== null) {
+            this.startInteraction(grabbables[grabbableId], handleId!);
+        }
     }
 
     onPhysxCollision = (type: CollisionEventType, other: PhysXComponent) => {
