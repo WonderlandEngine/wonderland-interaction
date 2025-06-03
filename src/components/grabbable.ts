@@ -11,9 +11,9 @@ import {
 import {property} from '@wonderlandengine/api/decorators.js';
 
 import {Interactor} from './interactor.js';
- import {HistoryTracker} from '../history-tracker.js';
+import {HistoryTracker} from '../history-tracker.js';
 import {computeRelativeTransform} from '../utils/math.js';
-import { GrabPoint } from './interaction/grab-point.js';
+import {GrabPoint} from './interaction/grab-point.js';
 
 /** Temporary info about grabbed target. */
 export interface GrabData {
@@ -139,8 +139,7 @@ export class Grabbable extends Component {
      * @remarks
      * The notification occurs if any of the two interactables is grabbed
      */
-    private readonly _onGrabStart: Emitter<[this]> =
-        new Emitter();
+    private readonly _onGrabStart: Emitter<[this]> = new Emitter();
 
     /**
      * Emitter for the grab end event.
@@ -152,9 +151,10 @@ export class Grabbable extends Component {
     private readonly _onGrabEnd: Emitter<[this]> = new Emitter();
 
     init() {
-        this.handles = this.handleObjects.map(o => o.getComponent(GrabPoint)!);
-        if(this.handles.length === 0) {
-            const handle = this.object.getComponent(GrabPoint) ?? this.object.addComponent(GrabPoint);
+        this.handles = this.handleObjects.map((o) => o.getComponent(GrabPoint)!);
+        if (this.handles.length === 0) {
+            const handle =
+                this.object.getComponent(GrabPoint) ?? this.object.addComponent(GrabPoint);
             this.handles.push(handle);
         }
     }
@@ -245,7 +245,7 @@ export class Grabbable extends Component {
      * @param interactable The interactable undergoing the action.
      */
     grab(interactor: Interactor, handleId: number) {
-        if(this._grabData.length === MAX_GRABS) return;
+        if (this._grabData.length === MAX_GRABS) return;
 
         const grab = {interactor, handleId, transform: quat2.create()};
         this._grabData.push(grab);
@@ -273,7 +273,7 @@ export class Grabbable extends Component {
         }
 
         this._onGrabStart.notify(this);
-    };
+    }
 
     /**
      * Programmatically release an interactable.
@@ -310,7 +310,7 @@ export class Grabbable extends Component {
         }
 
         this._onGrabEnd.notify(this);
-    };
+    }
 
     /** `true` is any of the two handles is currently grabbed. */
     get isGrabbed(): boolean {

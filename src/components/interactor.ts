@@ -7,9 +7,9 @@ import {
     Scene,
 } from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
-import { Grabbable } from './grabbable.js';
-import { GrabSearchMode, GrabPoint } from './interaction/grab-point.js';
-import { vec3 } from 'gl-matrix';
+import {Grabbable} from './grabbable.js';
+import {GrabSearchMode, GrabPoint} from './interaction/grab-point.js';
+import {vec3} from 'gl-matrix';
 
 /** Represents whether the user's left or right hand is being used. */
 export enum Handedness {
@@ -139,7 +139,7 @@ export class Interactor extends Component {
 
         const overlaps = this._collision ? this._collision.queryOverlaps() : null;
         let overlapHandle: GrabPoint | null = null;
-        if(overlaps) {
+        if (overlaps) {
             /** @todo: The API should instead allow to check for overlap on given objects. */
             const overlaps = this._collision.queryOverlaps();
             for (const overlap of overlaps) {
@@ -148,7 +148,7 @@ export class Interactor extends Component {
             }
         }
 
-        if(!overlapHandle && this.#currentlyCollidingWith) {
+        if (!overlapHandle && this.#currentlyCollidingWith) {
             /** @todo: The API should instead allow to check for overlap on given objects. */
             overlapHandle = this.#currentlyCollidingWith.object.getComponent(GrabPoint);
         }
@@ -160,7 +160,7 @@ export class Interactor extends Component {
             for (let h = 0; h < grabbable.handles.length; ++h) {
                 const handle = grabbable.handles[h];
                 let dist = Number.POSITIVE_INFINITY;
-                switch(handle.searchMode) {
+                switch (handle.searchMode) {
                     case GrabSearchMode.Distance: {
                         /** @todo: Add interactor grab origin */
                         const otherPosition = handle.object.getPositionWorld();
@@ -174,7 +174,7 @@ export class Interactor extends Component {
                 }
 
                 const maxDistanceSq = handle.maxDistance * handle.maxDistance;
-                if(dist < maxDistanceSq && dist < minDistance) {
+                if (dist < maxDistanceSq && dist < minDistance) {
                     minDistance = dist;
                     grabbableId = i;
                     handleId = h;
