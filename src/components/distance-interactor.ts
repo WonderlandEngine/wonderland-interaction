@@ -6,7 +6,6 @@ import {property} from '@wonderlandengine/api/decorators.js';
 import {typename} from '../constants.js';
 import {radiusHierarchy} from '../utils/wle.js';
 import {Grabbable} from './grabbable.js';
-import {Interactable} from './interactable.js';
 import {Interactor} from './interactor.js';
 
 /** Different interaction type. */
@@ -118,8 +117,6 @@ export class DistanceInteractor extends Component {
     private _interaction: InteractionType = InteractionType.Searching;
     /** Currently focused grabbable (fetching or looking at). */
     private _targetGrab: Grabbable | null = null;
-    /** Currently fetching interactable. */
-    private _targetInteract: Interactable | null = null;
 
     /** Elapsed time to last search. */
     private _lastSearchElapsedTime = 0.0;
@@ -129,9 +126,9 @@ export class DistanceInteractor extends Component {
             return;
         }
 
-        this._targetInteract = this._targetGrab.getInteractable(
-            this._targetGrab.distanceHandle
-        );
+        // this._targetInteract = this._targetGrab.getInteractable(
+        //     this._targetGrab.distanceHandle
+        // );
         this._interaction = InteractionType.Fetching;
         resetMarker(this._targetGrab.distanceMarker);
         this._targetGrab.disablePhysx();
@@ -194,24 +191,24 @@ export class DistanceInteractor extends Component {
         const interactorPos = this._interactor.object.getPositionWorld(_pointA);
 
         if (this._interaction === InteractionType.Fetching) {
-            const speed = this.speed * dt * 10.0;
-            const from = this._targetInteract!.object.getPositionWorld(_pointB);
-            const toInteractor = vec3.subtract(_vectorA, interactorPos, from);
-            const distSqrt = vec3.squaredLength(toInteractor) - speed;
+            // const speed = this.speed * dt * 10.0;
+            // const from = this._targetGrab!.primaryGrab! .getPositionWorld(_pointB);
+            // const toInteractor = vec3.subtract(_vectorA, interactorPos, from);
+            // const distSqrt = vec3.squaredLength(toInteractor) - speed;
 
-            vec3.normalize(toInteractor, toInteractor);
-            // `10` for base speed.
-            vec3.scale(toInteractor, toInteractor, speed);
+            // vec3.normalize(toInteractor, toInteractor);
+            // // `10` for base speed.
+            // vec3.scale(toInteractor, toInteractor, speed);
 
-            this._targetGrab!.object.translateWorld(toInteractor);
+            // this._targetGrab!.object.translateWorld(toInteractor);
 
-            if (distSqrt < 0.01) {
-                this._interaction = InteractionType.None;
-                const interactable = this._targetInteract!;
-                this._targetGrab = null;
-                this._targetInteract = null;
-                this._interactor.startInteraction(interactable);
-            }
+            // if (distSqrt < 0.01) {
+            //     this._interaction = InteractionType.None;
+            //     const interactable = this._targetInteract!;
+            //     this._targetGrab = null;
+            //     this._targetInteract = null;
+            //     this._interactor.startInteraction(interactable);
+            // }
             return;
         }
 

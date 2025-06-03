@@ -7,7 +7,9 @@ import {
     Scene,
 } from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
-import {Interactable} from './interactable.js';
+import { Grabbable } from './grabbable.js';
+import { GrabSearchMode, Handle } from './interaction/handle.js';
+import { vec3 } from 'gl-matrix';
 
 /** Represents whether the user's left or right hand is being used. */
 export enum Handedness {
@@ -49,14 +51,16 @@ export class Interactor extends Component {
     private _physx: PhysXComponent = null!;
 
     /** Cached interactable after it's gripped. */
-    private _interactable: Interactable | null = null;
+    private _interactable: Grabbable | null = null;
 
     /** Grip start emitter. */
-    private readonly _onGripStart: Emitter<[Interactable]> = new Emitter();
+    private readonly _onGripStart: Emitter<[Grabbable]> = new Emitter();
     /** Grip end emitter. */
-    private readonly _onGripEnd: Emitter<[Interactable]> = new Emitter();
+    private readonly _onGripEnd: Emitter<[Grabbable]> = new Emitter();
 
     private readonly _onPreRender = () => {
+        if (!this.#xrInputSource) return;
+
         if (!this.#xrInputSource!.gripSpace) {
             this.#xrPose = null;
             return;
@@ -110,9 +114,9 @@ export class Interactor extends Component {
      *
      * @param interactable The interactable to process.
      */
-    public startInteraction(interactable: Interactable) {
+    public startInteraction(interactable: Grabbable, handle: number) {
         this._interactable = interactable;
-        interactable.onSelectStart.notify(this, interactable);
+        interactable.grab(this, handle);
         this._onGripStart.notify(interactable);
     }
 
@@ -121,25 +125,67 @@ export class Interactor extends Component {
      * interacts with it.
      */
     public checkForNearbyInteractables() {
-        if (this._collision) {
+        // TODO: Allocation.
+        const thisPosition = this.object.getPositionWorld();
+        let minDistance = Number.POSITIVE_INFINITY;
+        let grabbableId = null;
+        let handleId = null;
+
+        /* Prioritize collision / physx over distance grab */
+
+        // TODO: Link from handle to grabbable would be better.
+        // Just need to ensure than a handle can't be referenced by
+        // 2 grabbables.
+
+        const overlaps = this._collision ? this._collision.queryOverlaps() : null;
+        let overlapHandle: Handle | null = null;
+        if(overlaps) {
+            /** @todo: The API should instead allow to check for overlap on given objects. */
             const overlaps = this._collision.queryOverlaps();
             for (const overlap of overlaps) {
-                const interactable = overlap.object.getComponent(Interactable);
-                if (interactable) {
-                    this.startInteraction(interactable);
-                    return;
-                }
+                overlapHandle = overlap.object.getComponent(Handle);
+                if (overlapHandle) break;
             }
-        } else {
-            if (this.#currentlyCollidingWith) {
-                const interactable =
-                    this.#currentlyCollidingWith.object.getComponent(Interactable);
-                if (interactable) {
-                    this.startInteraction(interactable);
-                    return;
+        }
+
+        console.log(this.#currentlyCollidingWith);
+        if(!overlapHandle && this.#currentlyCollidingWith) {
+            /** @todo: The API should instead allow to check for overlap on given objects. */
+            overlapHandle = this.#currentlyCollidingWith.object.getComponent(Handle);
+        }
+
+        /** @todo: Optimize with a typed list of handle, an octree? */
+        const grabbables = this.scene.getActiveComponents(Grabbable);
+        for (let i = 0; i < grabbables.length; ++i) {
+            const grabbable = grabbables[i];
+            for (let h = 0; h < grabbable.handles.length; ++h) {
+                const handle = grabbable.handles[h];
+                let dist = Number.POSITIVE_INFINITY;
+                switch(handle.searchMode) {
+                    case GrabSearchMode.Distance: {
+                        /** @todo: Add interactor grab origin */
+                        const otherPosition = handle.object.getPositionWorld();
+                        dist = vec3.sqrDist(thisPosition, otherPosition);
+                        break;
+                    }
+                    case GrabSearchMode.Overlap: {
+                        dist = overlapHandle === handle ? 0.0 : dist;
+                        break;
+                    }
+                }
+
+                const maxDistanceSq = handle.maxDistance * handle.maxDistance;
+                if(dist < maxDistanceSq && dist < minDistance) {
+                    minDistance = dist;
+                    grabbableId = i;
+                    handleId = h;
                 }
             }
         }
+
+        if (grabbableId === null) return;
+
+        this.startInteraction(grabbables[grabbableId], handleId!);
     }
 
     onPhysxCollision = (type: CollisionEventType, other: PhysXComponent) => {
@@ -156,19 +202,19 @@ export class Interactor extends Component {
      */
     public stopInteraction() {
         if (this._interactable) {
-            this._interactable.onSelectEnd.notify(this, this._interactable);
+            this._interactable.release(this);
             this._onGripEnd.notify(this._interactable);
         }
         this._interactable = null;
     }
 
     /** Notified on a grip start. */
-    get onGripStart(): Emitter<[Interactable]> {
+    get onGripStart(): Emitter<[Grabbable]> {
         return this._onGripStart;
     }
 
     /** Notified on a grip end. */
-    get onGripEnd(): Emitter<[Interactable]> {
+    get onGripEnd(): Emitter<[Grabbable]> {
         return this._onGripEnd;
     }
 
@@ -187,12 +233,14 @@ export class Interactor extends Component {
      * Current interactable handled by this interactor. If no interaction is ongoing,
      * this getter returns `null`.
      */
-    get interactable(): Interactable | null {
+    get interactable(): Grabbable | null {
         return this._interactable;
     }
 
     private _startSession(session: XRSession) {
-        this.#referenceSpace = this.engine.xr!.referenceSpaceForType('local');
+        this.#referenceSpace =
+            this.engine.xr!.referenceSpaceForType('local-floor') ??
+            this.engine.xr!.referenceSpaceForType('local');
 
         session.addEventListener('inputsourceschange', (event) => {
             for (const item of event.removed) {
