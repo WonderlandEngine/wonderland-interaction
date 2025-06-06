@@ -17,8 +17,8 @@ import {HowlerAudioListener} from '@wonderlandengine/components';
 import {MouseLookComponent} from '@wonderlandengine/components';
 import {PlayerHeight} from '@wonderlandengine/components';
 import {DistanceInteractor} from 'wle-interaction';
+import {GrabPoint} from 'wle-interaction';
 import {Grabbable} from 'wle-interaction';
-import {Interactable} from 'wle-interaction';
 import {Interactor} from 'wle-interaction';
 /* wle:auto-imports:end */
 
@@ -27,7 +27,7 @@ import * as API from '@wonderlandengine/api'; // Deprecated: Backward compatibil
 
 /* wle:auto-constants:start */
 const Constants = {
-    ProjectName: 'Interaction',
+    ProjectName: 'SimpleInteraction',
     RuntimeBaseName: 'WonderlandRuntime',
     WebXRRequiredFeatures: ['local',],
     WebXROptionalFeatures: ['local','local-floor','hand-tracking','hit-test',],
@@ -88,8 +88,8 @@ engine.registerComponent(HowlerAudioListener);
 engine.registerComponent(MouseLookComponent);
 engine.registerComponent(PlayerHeight);
 engine.registerComponent(DistanceInteractor);
+engine.registerComponent(GrabPoint);
 engine.registerComponent(Grabbable);
-engine.registerComponent(Interactable);
 engine.registerComponent(Interactor);
 /* wle:auto-register:end */
 
