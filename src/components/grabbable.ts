@@ -155,7 +155,8 @@ export class Grabbable extends Component {
             return o.getComponent(GrabPoint) ?? o.addComponent(GrabPoint)!;
         });
         if (this.handles.length === 0) {
-            const handle = this.object.getComponent(GrabPoint) ?? this.object.addComponent(GrabPoint)!;
+            const handle =
+                this.object.getComponent(GrabPoint) ?? this.object.addComponent(GrabPoint)!;
             this.handles.push(handle);
         }
     }

@@ -4,7 +4,7 @@
     "main": "index.js",
     "license": "MIT",
     "dependencies": {
-        "@wonderlandengine/api": "file:../../../../wonderland-engine/js/api/packages/api",
+        "@wonderlandengine/api": "^1.4.3",
         "@wonderlandengine/components": "^1.0.7",
         "wle-interaction": "file:../.."
     },
