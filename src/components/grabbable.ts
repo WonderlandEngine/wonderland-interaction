@@ -151,10 +151,11 @@ export class Grabbable extends Component {
     private readonly _onGrabEnd: Emitter<[this]> = new Emitter();
 
     init() {
-        this.handles = this.handleObjects.map((o) => o.getComponent(GrabPoint)!);
+        this.handles = this.handleObjects.map((o) => {
+            return o.getComponent(GrabPoint) ?? o.addComponent(GrabPoint)!;
+        });
         if (this.handles.length === 0) {
-            const handle =
-                this.object.getComponent(GrabPoint) ?? this.object.addComponent(GrabPoint);
+            const handle = this.object.getComponent(GrabPoint) ?? this.object.addComponent(GrabPoint)!;
             this.handles.push(handle);
         }
     }

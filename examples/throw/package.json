@@ -1,24 +1,27 @@
 {
-  "name": "Throw.wlp",
-  "version": "1.0.0",
-  "description": "My Wonderland project",
-  "main": "js/index.js",
-  "type": "module",
-  "module": "js/index.js",
-  "keywords": [
-    "wonderland-engine"
-  ],  
-  "scripts": {
-    "build": "esbuild ./js/index.js --sourcemap --bundle --outfile=\"deploy/Interaction-bundle.js\"",
-    "dev": "npm run build -- --watch"
-  },
-  "devDependencies": {
-    "esbuild": "^0.15.12"
-  },
-  "dependencies": {
-    "@wonderlandengine/api": "^1.1.3",
-    "@wonderlandengine/components": "^1.0.6",
-    "gl-matrix": "^3.4.3",
-    "wle-interaction": "file:../.."
-  }
+    "name": "Throw.wlp",
+    "version": "1.0.0",
+    "description": "My Wonderland project",
+    "main": "js/index.js",
+    "type": "module",
+    "module": "js/index.js",
+    "keywords": [
+        "wonderland-engine"
+    ],
+    "scripts": {
+        "build": "esbuild ./js/index.js --sourcemap --bundle --outfile=\"deploy/Interaction-bundle.js\"",
+        "dev": "npm run build -- --watch"
+    },
+    "devDependencies": {
+        "esbuild": "^0.15.12"
+    },
+    "dependencies": {
+        "@wonderlandengine/api": "file:../../../../wonderland-engine/js/api/packages/api",
+        "@wonderlandengine/components": "^1.0.6",
+        "gl-matrix": "^3.4.3",
+        "wle-interaction": "file:../.."
+    },
+    "overrides": {
+        "@wonderlandengine/api": "$@wonderlandengine/api"
+    }
 }

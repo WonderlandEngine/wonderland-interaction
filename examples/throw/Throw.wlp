@@ -1753,12 +1753,6 @@
                             "radius": 0.1
                         }
                     }
-                },
-                {
-                    "type": "handle",
-                    "handle": {
-                        "searchMode": "Distance"
-                    }
                 }
             ],
             "translation": [
@@ -1826,6 +1820,12 @@
                         "sphere": {
                             "radius": 0.1
                         }
+                    }
+                },
+                {
+                    "type": "grab-point",
+                    "grab-point": {
+                        "searchMode": "Overlap"
                     }
                 }
             ],

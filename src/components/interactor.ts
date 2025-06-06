@@ -188,6 +188,7 @@ export class Interactor extends Component {
     }
 
     onPhysxCollision = (type: CollisionEventType, other: PhysXComponent) => {
+        console.log(`${type}: ${other.object.name}`);
         if (type == CollisionEventType.TriggerTouch) {
             this.#currentlyCollidingWith = other;
         } else {
