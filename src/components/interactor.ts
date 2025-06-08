@@ -13,12 +13,9 @@ import {vec3} from 'gl-matrix';
 
 /** Represents whether the user's left or right hand is being used. */
 export enum Handedness {
-    Right = 'right',
-    Left = 'left',
+    Left = 0,
+    Right,
 }
-
-/** An array of available handedness values. */
-export const HandednessValues = Object.values(Handedness);
 
 /**
  * Manages interaction capabilities of a VR controller or a similar input device.
@@ -40,7 +37,7 @@ export class Interactor extends Component {
     public useDefaultInputs = true;
 
     /** Handedness value. Compare against {@link Handedness}. */
-    @property.enum(HandednessValues, Handedness.Right)
+    @property.enum(['Left', 'Right'], Handedness.Right)
     public handedness!: number;
 
     /** Private Attributes. */
@@ -248,7 +245,7 @@ export class Interactor extends Component {
                     break;
                 }
             }
-            const handedness = HandednessValues[this.handedness];
+            const handedness = this.handedness === Handedness.Left ? 'left' : 'right';
             for (const item of event.added) {
                 if (item.handedness === handedness) {
                     this.#xrInputSource = item;

@@ -784,33 +784,6 @@
                     "input": {
                         "type": "hand right"
                     }
-                },
-                {
-                    "type": "interactor",
-                    "interactor": {
-                        "distance": 5.0,
-                        "ray": "248"
-                    }
-                },
-                {
-                    "type": "wlei:distance-interactor",
-                    "wlei:distance-interactor": {
-                        "ray": "248",
-                        "searchDelay": 0.2
-                    }
-                },
-                {
-                    "type": "physx",
-                    "physx": {
-                        "sphere": {
-                            "radius": 0.05
-                        },
-                        "trigger": true,
-                        "allowSimulation": false,
-                        "kinematic": true,
-                        "gravity": false,
-                        "block": 0
-                    }
                 }
             ],
             "translation": [
@@ -838,28 +811,6 @@
                     "type": "input",
                     "input": {
                         "type": "hand left"
-                    }
-                },
-                {
-                    "type": "interactor",
-                    "interactor": {
-                        "handedness": "left",
-                        "distance": 1.0,
-                        "ray": "247"
-                    },
-                    "active": true
-                },
-                {
-                    "type": "physx",
-                    "physx": {
-                        "sphere": {
-                            "radius": 0.05
-                        },
-                        "trigger": true,
-                        "allowSimulation": false,
-                        "kinematic": true,
-                        "gravity": false,
-                        "block": 0
                     }
                 }
             ],
@@ -999,30 +950,10 @@
                 0.6720348,
                 0.1044657
             ],
-            "rotation": [
-                -0.5001483,
-                0.5001506,
-                -0.4998518,
-                -0.499849
-            ],
             "scaling": [
                 0.9999395,
                 0.9999421,
                 0.9999976
-            ]
-        },
-        "238": {
-            "name": "Grab",
-            "parent": "233",
-            "scaling": [
-                0.9999996,
-                0.9999989,
-                0.9999994
-            ],
-            "translation": [
-                0.4385512,
-                0.0011875,
-                -0.0002295
             ]
         },
         "239": {
@@ -1049,24 +980,23 @@
                 }
             ],
             "scaling": [
-                0.3399999,
                 0.05,
-                0.05
+                0.05,
+                0.34
             ]
         },
         "240": {
             "name": "WeaponHandle",
             "parent": "233",
             "translation": [
-                0.431959,
+                0.0,
                 0.0000283,
-                0.0
+                0.432
             ],
-            "rotation": [
-                0.0,
-                0.0,
-                0.0,
-                1.0
+            "scaling": [
+                0.0199999,
+                0.0199999,
+                0.1
             ],
             "components": [
                 {
@@ -1076,11 +1006,6 @@
                         "material": "26"
                     }
                 }
-            ],
-            "scaling": [
-                0.1,
-                0.0199999,
-                0.0199999
             ]
         },
         "241": {
@@ -1138,17 +1063,6 @@
                 0.6557073,
                 0.3617781
             ],
-            "rotation": [
-                0.0,
-                0.0,
-                0.7071062,
-                0.7071073
-            ],
-            "scaling": [
-                0.9999322,
-                0.9999321,
-                1.0
-            ],
             "components": [
                 {
                     "type": "grabbable",
@@ -1187,32 +1101,18 @@
                             0.0
                         ]
                     }
-                },
-                {
-                    "type": "collision",
-                    "collision": {
-                        "sphere": {
-                            "radius": 0.2
-                        },
-                        "collider": "box",
-                        "aabb": {
-                            "extents": [
-                                0.1,
-                                0.1,
-                                0.3
-                            ]
-                        },
-                        "groups": 128,
-                        "box": {
-                            "extents": [
-                                0.1,
-                                0.1,
-                                0.3
-                            ]
-                        }
-                    },
-                    "active": false
                 }
+            ],
+            "scaling": [
+                0.9999322,
+                0.9999321,
+                1.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.7071062,
+                0.7071073
             ]
         },
         "244": {
@@ -1488,7 +1388,8 @@
                     "type": "grab-point",
                     "grab-point": {
                         "searchMode": "Overlap",
-                        "shouldSnap": false
+                        "shouldSnap": false,
+                        "snap": "None"
                     }
                 }
             ],
@@ -1544,6 +1445,92 @@
                         "shouldSnap": false
                     }
                 }
+            ]
+        },
+        "287": {
+            "name": "Grabber",
+            "parent": "129",
+            "components": [
+                {
+                    "type": "interactor",
+                    "interactor": {
+                        "distance": 5.0,
+                        "ray": "248"
+                    }
+                },
+                {
+                    "type": "physx",
+                    "physx": {
+                        "sphere": {
+                            "radius": 0.05
+                        },
+                        "trigger": true,
+                        "allowSimulation": false,
+                        "kinematic": true,
+                        "gravity": false,
+                        "block": 0
+                    }
+                }
+            ],
+            "translation": [
+                0.0071177,
+                0.0207965,
+                -0.0464138
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "289": {
+            "name": "Grabber",
+            "parent": "130",
+            "components": [
+                {
+                    "type": "interactor",
+                    "interactor": {
+                        "handedness": "left",
+                        "distance": 1.0,
+                        "ray": "247"
+                    },
+                    "active": true
+                },
+                {
+                    "type": "physx",
+                    "physx": {
+                        "sphere": {
+                            "radius": 0.05
+                        },
+                        "trigger": true,
+                        "allowSimulation": false,
+                        "kinematic": true,
+                        "gravity": false,
+                        "block": 0
+                    }
+                }
+            ],
+            "translation": [
+                0.0071177,
+                0.0207965,
+                -0.0464138
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
             ]
         }
     },
@@ -2428,7 +2415,7 @@
             "version": [
                 1,
                 4,
-                2
+                3
             ]
         },
         "xr": {
@@ -2445,13 +2432,14 @@
                 "sourcePaths": [
                     "js/"
                 ],
-                "bundling": "none"
+                "bundling": "esbuild",
+                "output": "Interaction-bundle.js"
             },
             "application": {
-                "output": "Interaction-bundle.js",
+                "output": "Interaction-app.js",
                 "bundling": "esbuild",
                 "esbuildFlags": "--format=esm --target=es2022",
-                "entryPoint": "js/index.js"
+                "entryPoint": "app.js"
             },
             "libraryPaths": [
                 "/js/lib/"
