@@ -999,30 +999,10 @@
                 0.6720348,
                 0.1044657
             ],
-            "rotation": [
-                -0.5001483,
-                0.5001506,
-                -0.4998518,
-                -0.499849
-            ],
             "scaling": [
                 0.9999395,
                 0.9999421,
                 0.9999976
-            ]
-        },
-        "238": {
-            "name": "Grab",
-            "parent": "233",
-            "scaling": [
-                0.9999996,
-                0.9999989,
-                0.9999994
-            ],
-            "translation": [
-                0.4385512,
-                0.0011875,
-                -0.0002295
             ]
         },
         "239": {
@@ -1049,24 +1029,23 @@
                 }
             ],
             "scaling": [
-                0.3399999,
                 0.05,
-                0.05
+                0.05,
+                0.34
             ]
         },
         "240": {
             "name": "WeaponHandle",
             "parent": "233",
             "translation": [
-                0.431959,
+                0.0,
                 0.0000283,
-                0.0
+                0.432
             ],
-            "rotation": [
-                0.0,
-                0.0,
-                0.0,
-                1.0
+            "scaling": [
+                0.0199999,
+                0.0199999,
+                0.1
             ],
             "components": [
                 {
@@ -1076,11 +1055,6 @@
                         "material": "26"
                     }
                 }
-            ],
-            "scaling": [
-                0.1,
-                0.0199999,
-                0.0199999
             ]
         },
         "241": {
@@ -1187,31 +1161,6 @@
                             0.0
                         ]
                     }
-                },
-                {
-                    "type": "collision",
-                    "collision": {
-                        "sphere": {
-                            "radius": 0.2
-                        },
-                        "collider": "box",
-                        "aabb": {
-                            "extents": [
-                                0.1,
-                                0.1,
-                                0.3
-                            ]
-                        },
-                        "groups": 128,
-                        "box": {
-                            "extents": [
-                                0.1,
-                                0.1,
-                                0.3
-                            ]
-                        }
-                    },
-                    "active": false
                 }
             ]
         },
@@ -1488,7 +1437,8 @@
                     "type": "grab-point",
                     "grab-point": {
                         "searchMode": "Overlap",
-                        "shouldSnap": false
+                        "shouldSnap": false,
+                        "snap": "None"
                     }
                 }
             ],
@@ -2428,7 +2378,7 @@
             "version": [
                 1,
                 4,
-                2
+                3
             ]
         },
         "xr": {
@@ -2445,13 +2395,14 @@
                 "sourcePaths": [
                     "js/"
                 ],
-                "bundling": "none"
+                "bundling": "esbuild",
+                "output": "Interaction-bundle.js"
             },
             "application": {
-                "output": "Interaction-bundle.js",
+                "output": "Interaction-app.js",
                 "bundling": "esbuild",
                 "esbuildFlags": "--format=esm --target=es2022",
-                "entryPoint": "js/index.js"
+                "entryPoint": "app.js"
             },
             "libraryPaths": [
                 "/js/lib/"

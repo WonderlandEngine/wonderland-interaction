@@ -5,11 +5,16 @@ export enum GrabSearchMode {
     Overlap = 1
 }
 
+export enum GrabSnapMode {
+    None = 0,
+    GrabToInteractor = 1,
+}
+
 export class GrabPoint extends Component {
     static TypeName = 'grab-point';
 
-    @property.bool(true)
-    shouldSnap: boolean = true;
+    @property.enum(['None', 'GrabToInteractor'], GrabSnapMode.GrabToInteractor)
+    snap: GrabSnapMode = GrabSnapMode.GrabToInteractor;
 
     @property.enum(['Distance', 'Overlap'], 0)
     searchMode: number = 0;
@@ -19,12 +24,4 @@ export class GrabPoint extends Component {
 
     @property.float(0.2)
     maxDistance = 0.2;
-
-    public physx: PhysXComponent | null = null;
-    public collision: CollisionComponent | null = null;
-
-    onActivate(): void {
-        this.physx = this.object.getComponent('physx');
-        this.collision = this.object.getComponent('collision');
-    }
 }

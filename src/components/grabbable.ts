@@ -1,4 +1,4 @@
-import {vec3, quat2, quat} from 'gl-matrix';
+import {vec3, quat2, quat, mat4} from 'gl-matrix';
 import {
     Component,
     Emitter,
@@ -13,7 +13,7 @@ import {property} from '@wonderlandengine/api/decorators.js';
 import {Interactor} from './interactor.js';
 import {HistoryTracker} from '../history-tracker.js';
 import {computeRelativeTransform} from '../utils/math.js';
-import {GrabPoint} from './interaction/grab-point.js';
+import {GrabPoint, GrabSnapMode} from './interaction/grab-point.js';
 
 /** Temporary info about grabbed target. */
 export interface GrabData {
@@ -253,10 +253,13 @@ export class Grabbable extends Component {
         this._grabData.push(grab);
 
         const handle = this.handles[handleId];
-        if (handle.shouldSnap) {
-            computeRelativeTransform(this.object, handle.object, grab.transform);
-        } else {
-            computeRelativeTransform(this.object, interactor.object, grab.transform);
+        switch (handle.snap) {
+            case GrabSnapMode.None:
+                computeRelativeTransform(this.object, interactor.object, grab.transform);
+                break;
+            case GrabSnapMode.GrabToInteractor:
+                computeRelativeTransform(this.object, handle.object, grab.transform);
+                break;
         }
 
         this._history.reset(this.object);
