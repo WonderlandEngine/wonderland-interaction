@@ -7,14 +7,14 @@ export enum GrabSearchMode {
 
 export enum GrabSnapMode {
     None = 0,
-    GrabToInteractor = 1,
+    PositionRotation = 1,
 }
 
 export class GrabPoint extends Component {
     static TypeName = 'grab-point';
 
-    @property.enum(['None', 'GrabToInteractor'], GrabSnapMode.GrabToInteractor)
-    snap: GrabSnapMode = GrabSnapMode.GrabToInteractor;
+    @property.enum(['None', 'GrabToInteractor'], GrabSnapMode.PositionRotation)
+    snap: GrabSnapMode = GrabSnapMode.PositionRotation;
 
     @property.enum(['Distance', 'Overlap'], 0)
     searchMode: number = 0;

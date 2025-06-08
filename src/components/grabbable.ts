@@ -257,7 +257,7 @@ export class Grabbable extends Component {
             case GrabSnapMode.None:
                 computeRelativeTransform(this.object, interactor.object, grab.transform);
                 break;
-            case GrabSnapMode.GrabToInteractor:
+            case GrabSnapMode.PositionRotation:
                 computeRelativeTransform(this.object, handle.object, grab.transform);
                 break;
         }

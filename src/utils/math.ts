@@ -57,8 +57,7 @@ export function computeRelativeTransform(
     vec3.sub(position, position, handPosition);
     vec3.transformQuat(position, position, handToLocal);
 
-    quat2.fromRotationTranslation(out, rot, position);
-    return out;
+    return quat2.fromRotationTranslation(out, rot, position);
 }
 
 export function absMaxVec3(out: vec3, a: vec3, b: vec3): vec3 {
