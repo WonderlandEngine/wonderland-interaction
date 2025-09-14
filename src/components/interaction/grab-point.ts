@@ -16,6 +16,9 @@ export class GrabPoint extends Component {
     @property.enum(['None', 'GrabToInteractor'], GrabSnapMode.PositionRotation)
     snap: GrabSnapMode = GrabSnapMode.PositionRotation;
 
+    @property.float(0.75)
+    snapLerp: number = 0.75;
+
     @property.enum(['Distance', 'Overlap'], 0)
     searchMode: number = 0;
 
