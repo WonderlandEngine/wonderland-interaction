@@ -1,5 +1,6 @@
 import {vec3, quat2, quat, mat4} from 'gl-matrix';
 import {
+    clamp,
     Component,
     Emitter,
     Object3D,
@@ -357,6 +358,9 @@ export class Grabbable extends Component {
         const transform = hand.getTransformWorld(_transform);
         quat2.multiply(transform, transform, grab.transform);
 
+        const handle = this.handles[grab.handleId];
+        const lerp = clamp(handle.snapLerp, 0, 1);
+        quat2.lerp(transform, this.object.transformWorld, transform, lerp);
         this.object.setTransformWorld(transform);
     }
 

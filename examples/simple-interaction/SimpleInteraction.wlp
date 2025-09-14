@@ -1005,6 +1005,12 @@
                         "mesh": "8",
                         "material": "26"
                     }
+                },
+                {
+                    "type": "grab-point",
+                    "grab-point": {
+                        "snapLerp": 1.0
+                    }
                 }
             ]
         },
@@ -1059,9 +1065,9 @@
         "243": {
             "name": "Weapon Double Hand",
             "translation": [
-                0.3969199,
-                0.6557073,
-                0.3617781
+                0.6568369,
+                0.655705,
+                0.3617778
             ],
             "components": [
                 {
@@ -1104,15 +1110,15 @@
                 }
             ],
             "scaling": [
-                0.9999322,
-                0.9999321,
+                0.9999269,
+                0.9999268,
                 1.0
             ],
             "rotation": [
                 0.0,
                 0.0,
-                0.7071062,
-                0.7071073
+                0.7071053,
+                0.7071081
             ]
         },
         "244": {
@@ -1531,6 +1537,111 @@
                 1.0,
                 1.0,
                 1.0
+            ]
+        },
+        "290": {
+            "name": "Weapon Single Hand Smooth",
+            "components": [
+                {
+                    "type": "grabbable",
+                    "grabbable": {
+                        "handle": "238",
+                        "throwLinearIntensity": 1.0,
+                        "useControllerVelocityData": true,
+                        "handleObjects": [
+                            "292"
+                        ]
+                    }
+                },
+                {
+                    "type": "physx",
+                    "physx": {
+                        "shape": "box",
+                        "box": {
+                            "extents": [
+                                0.3499999,
+                                0.05,
+                                0.05
+                            ]
+                        },
+                        "simulate": true,
+                        "kinematic": false,
+                        "groups": 255,
+                        "mass": 5.0,
+                        "linearDamping": 1.0,
+                        "bounciness": 0.0,
+                        "angularDamping": 1.0
+                    },
+                    "active": false
+                }
+            ],
+            "scaling": [
+                0.9999395,
+                0.9999421,
+                0.9999976
+            ],
+            "translation": [
+                0.3332784,
+                0.6720348,
+                0.1044657
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ]
+        },
+        "291": {
+            "name": "Mesh",
+            "parent": "290",
+            "translation": [
+                0.0,
+                0.0004645,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "mesh": "8",
+                        "material": "22"
+                    }
+                }
+            ],
+            "scaling": [
+                0.05,
+                0.05,
+                0.34
+            ]
+        },
+        "292": {
+            "name": "WeaponHandle",
+            "parent": "290",
+            "translation": [
+                0.0,
+                0.0000283,
+                0.432
+            ],
+            "scaling": [
+                0.0199999,
+                0.0199999,
+                0.1
+            ],
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "mesh": "8",
+                        "material": "26"
+                    }
+                }
             ]
         }
     },
@@ -2415,7 +2526,7 @@
             "version": [
                 1,
                 4,
-                3
+                6
             ]
         },
         "xr": {
