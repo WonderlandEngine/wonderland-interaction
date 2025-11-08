@@ -118,6 +118,17 @@ export class Grabbable extends Component {
     @property.int(0)
     public distanceHandle = 0;
 
+    /**
+     * If `true`, the primary grab will be set to
+     * the first grab point that has been interacted with.
+     *
+     * For a weapon, you generally want that option to be `false`
+     * and to always set the trigger grab as the first grab point, i.e.,
+     * the primary grab.
+     */
+    @property.bool(false)
+    public autoSetPrimaryGrab = false;
+
     handles: GrabPoint[] = [];
 
     /** Private Attributes. */
@@ -130,8 +141,6 @@ export class Grabbable extends Component {
     private _history: HistoryTracker = new HistoryTracker();
     private _physx: PhysXComponent | null = null;
     private _enablePhysx = false;
-
-    private _grabRotationWorld = quat.create();
 
     /**
      * Emitter for the grab start event.
@@ -270,9 +279,15 @@ export class Grabbable extends Component {
             this._physx.active = false;
         }
 
-        if (this.primaryGrab && this.secondaryGrab) {
-            const primary = this.handles[this.primaryGrab.handleId];
-            const secondary = this.handles[this.secondaryGrab.handleId];
+        if (this._grabData.length === 2) {
+            if (!this.autoSetPrimaryGrab && this._grabData[0].handleId !== 0) {
+                /* For main grab point to be primary handle */
+                const first = this._grabData[0];
+                this._grabData[0] = this._grabData[1];
+                this._grabData[1] = first;
+            }
+            const primary = this.handles[this._grabData[0].handleId];
+            const secondary = this.handles[this._grabData[1].handleId];
             /* Cache the grabbing distance between both handles. */
             this._maxSqDistance = vec3.squaredDistance(
                 primary.object.getPositionWorld(_pointA),
