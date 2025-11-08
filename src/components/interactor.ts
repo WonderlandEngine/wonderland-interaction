@@ -12,7 +12,7 @@ import {property} from '@wonderlandengine/api/decorators.js';
 import {Grabbable} from './grabbable.js';
 import {GrabSearchMode, GrabPoint} from './interaction/grab-point.js';
 import {vec3} from 'gl-matrix';
-import {setComponentsState} from '../utils/activate-children.js';
+import {setComponentsActive} from '../utils/activate-children.js';
 
 /** Represents whether the user's left or right hand is being used. */
 export enum Handedness {
@@ -140,7 +140,7 @@ export class Interactor extends Component {
         }
 
         if (this.meshRoot && hidden) {
-            setComponentsState(this.meshRoot, MeshComponent, false);
+            setComponentsActive(this.meshRoot, false, MeshComponent);
         }
     }
 
@@ -231,7 +231,7 @@ export class Interactor extends Component {
         this._interactable = null;
 
         if (this.meshRoot) {
-            setComponentsState(this.meshRoot, MeshComponent, true);
+            setComponentsActive(this.meshRoot, true, MeshComponent);
         }
     }
 

@@ -8,28 +8,21 @@ import {ComponentConstructor, Object3D} from '@wonderlandengine/api';
  * @example
  * ```js
  * // turn off all components on this object and its children
- * setComponentsActive(this.someObject, false);
+ * setComponentsActive(this.someObject, undefined, false);
  * ```
  */
-export function setComponentsActive(object: Object3D, active: boolean) {
-    object.active = active;
-
-    object.getComponents().forEach((c) => (c.active = active));
-
-    object.children.forEach((c) => setComponentsActive(c, active));
-}
-
-export function setComponentsState(
+export function setComponentsActive(
     object: Object3D,
-    typeClass: ComponentConstructor,
-    active: boolean
+    active: boolean,
+    typeClass?: ComponentConstructor
 ) {
-    const components = object.getComponents(typeClass);
+    // TODO: Fix typing in wonderlandengine/api
+    const components = object.getComponents(typeClass as any);
     for (const comp of components) {
         comp.active = active;
     }
     const children = object.children;
     for (const child of children) {
-        setComponentsState(child, typeClass, active);
+        setComponentsActive(child, active, typeClass);
     }
 }
