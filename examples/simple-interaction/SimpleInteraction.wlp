@@ -179,7 +179,7 @@
             ],
             "translation": [
                 0.0,
-                3.0,
+                1.6343142,
                 2.0
             ],
             "rotation": [
@@ -1461,7 +1461,9 @@
                     "type": "interactor",
                     "interactor": {
                         "distance": 5.0,
-                        "ray": "248"
+                        "ray": "248",
+                        "visualStateOnGrab": "Hidden",
+                        "meshRoot": "95"
                     }
                 },
                 {
@@ -1479,9 +1481,9 @@
                 }
             ],
             "translation": [
-                0.0071177,
-                0.0207965,
-                -0.0464138
+                0.0071173,
+                0.0208013,
+                -0.0124809
             ],
             "rotation": [
                 0.0,
@@ -1502,9 +1504,11 @@
                 {
                     "type": "interactor",
                     "interactor": {
-                        "handedness": "left",
+                        "handedness": "Left",
                         "distance": 1.0,
-                        "ray": "247"
+                        "ray": "247",
+                        "meshRoot": "53",
+                        "visualStateOnGrab": "Visible"
                     },
                     "active": true
                 },
@@ -1523,9 +1527,9 @@
                 }
             ],
             "translation": [
-                0.0071177,
-                0.0207965,
-                -0.0464138
+                0.0071165,
+                0.0208154,
+                -0.0120353
             ],
             "rotation": [
                 0.0,
@@ -1643,6 +1647,402 @@
                     }
                 }
             ]
+        },
+        "293": {
+            "name": "Weapons"
+        },
+        "294": {
+            "link": {
+                "name": "Sketchfab_model",
+                "file": "models\\shotgun.glb"
+            },
+            "parent": "308",
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                0.0074999,
+                0.0074999,
+                0.0074999
+            ]
+        },
+        "295": {
+            "link": {
+                "name": "1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
+                "file": "models\\shotgun.glb"
+            },
+            "parent": "294"
+        },
+        "296": {
+            "link": {
+                "name": "RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
+                "file": "models\\shotgun.glb"
+            },
+            "parent": "295"
+        },
+        "297": {
+            "link": {
+                "name": "shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
+                "file": "models\\shotgun.glb"
+            },
+            "parent": "296"
+        },
+        "298": {
+            "link": {
+                "name": "base<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
+                "file": "models\\shotgun.glb"
+            },
+            "parent": "297"
+        },
+        "299": {
+            "link": {
+                "name": "base_shotgun_0<base<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
+                "file": "models\\shotgun.glb"
+            },
+            "parent": "298",
+            "translation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotation": [
+                -0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "components": [
+                {
+                    "originalIndex": 0,
+                    "active": true
+                }
+            ]
+        },
+        "300": {
+            "link": {
+                "name": "loader<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
+                "file": "models\\shotgun.glb"
+            },
+            "parent": "297"
+        },
+        "301": {
+            "link": {
+                "name": "loader_shotgun_0<loader<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
+                "file": "models\\shotgun.glb"
+            },
+            "parent": "300"
+        },
+        "302": {
+            "link": {
+                "name": "trigger<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
+                "file": "models\\shotgun.glb"
+            },
+            "parent": "297"
+        },
+        "303": {
+            "link": {
+                "name": "trigger_shotgun_0<trigger<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
+                "file": "models\\shotgun.glb"
+            },
+            "parent": "302"
+        },
+        "304": {
+            "link": {
+                "name": "pump<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
+                "file": "models\\shotgun.glb"
+            },
+            "parent": "297"
+        },
+        "305": {
+            "link": {
+                "name": "pump_shotgun_0<pump<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
+                "file": "models\\shotgun.glb"
+            },
+            "parent": "304",
+            "components": [
+                {
+                    "originalIndex": 0,
+                    "active": true
+                }
+            ]
+        },
+        "306": {
+            "link": {
+                "name": "slug<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
+                "file": "models\\shotgun.glb"
+            },
+            "parent": "297"
+        },
+        "307": {
+            "link": {
+                "name": "slug_shotgun_0<slug<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
+                "file": "models\\shotgun.glb"
+            },
+            "parent": "306"
+        },
+        "308": {
+            "name": "Shotgun",
+            "parent": "293",
+            "translation": [
+                -0.8136621,
+                0.7089629,
+                0.5845035
+            ],
+            "components": [
+                {
+                    "type": "grabbable",
+                    "grabbable": {
+                        "handleObjects": [
+                            "309",
+                            "310"
+                        ]
+                    }
+                }
+            ],
+            "scaling": [
+                0.9999991,
+                0.9999977,
+                0.9999982
+            ],
+            "rotation": [
+                0.0002441,
+                0.7071075,
+                0.7071059,
+                -0.0002438
+            ]
+        },
+        "309": {
+            "name": "GrabMain",
+            "parent": "308",
+            "translation": [
+                -0.0052176,
+                0.0185649,
+                -0.0436809
+            ],
+            "scaling": [
+                0.9999968,
+                0.9999956,
+                0.9999935
+            ],
+            "components": [],
+            "rotation": [
+                0.0,
+                0.994836,
+                0.1014943,
+                -9.573309256438733e-8
+            ]
+        },
+        "310": {
+            "name": "GrabFront",
+            "parent": "308",
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "translation": [
+                0.0028557,
+                -0.4736237,
+                0.0573805
+            ]
+        },
+        "311": {
+            "name": "ShotgunTest",
+            "parent": "293",
+            "translation": [
+                0.0429472,
+                0.9814811,
+                0.0002529
+            ],
+            "components": [
+                {
+                    "type": "grabbable",
+                    "grabbable": {
+                        "handleObjects": [
+                            "326",
+                            "327"
+                        ]
+                    }
+                }
+            ],
+            "scaling": [
+                0.999998,
+                0.9999977,
+                0.9999969
+            ]
+        },
+        "326": {
+            "name": "GrabMain",
+            "parent": "311",
+            "translation": [
+                -0.0077657,
+                -0.0973875,
+                0.3439205
+            ],
+            "scaling": [
+                0.9999684,
+                0.9999716,
+                0.9999623
+            ],
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "material": "20",
+                        "mesh": "10"
+                    },
+                    "active": false
+                }
+            ],
+            "rotation": [
+                0.7071059,
+                0.0,
+                0.0,
+                0.7071076
+            ]
+        },
+        "327": {
+            "name": "GrabFront",
+            "parent": "311",
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "translation": [
+                -0.0076468,
+                -0.02245,
+                -0.1034033
+            ]
+        },
+        "312": {
+            "link": {
+                "name": "Sketchfab_model",
+                "file": "models\\shotgun-test.glb"
+            },
+            "parent": "311",
+            "scaling": [
+                0.6,
+                0.6000006,
+                0.6000009
+            ],
+            "rotation": [
+                2.3373722513042594e-7,
+                1.0,
+                3.360884761605121e-7,
+                -0.0
+            ]
+        },
+        "313": {
+            "link": {
+                "name": "1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
+                "file": "models\\shotgun-test.glb"
+            },
+            "parent": "312"
+        },
+        "314": {
+            "link": {
+                "name": "RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
+                "file": "models\\shotgun-test.glb"
+            },
+            "parent": "313"
+        },
+        "315": {
+            "link": {
+                "name": "shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
+                "file": "models\\shotgun-test.glb"
+            },
+            "parent": "314"
+        },
+        "316": {
+            "link": {
+                "name": "base<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
+                "file": "models\\shotgun-test.glb"
+            },
+            "parent": "315"
+        },
+        "317": {
+            "link": {
+                "name": "base_shotgun_0<base<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
+                "file": "models\\shotgun-test.glb"
+            },
+            "parent": "316"
+        },
+        "318": {
+            "link": {
+                "name": "loader<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
+                "file": "models\\shotgun-test.glb"
+            },
+            "parent": "315"
+        },
+        "319": {
+            "link": {
+                "name": "loader_shotgun_0<loader<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
+                "file": "models\\shotgun-test.glb"
+            },
+            "parent": "318"
+        },
+        "320": {
+            "link": {
+                "name": "pump<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
+                "file": "models\\shotgun-test.glb"
+            },
+            "parent": "315"
+        },
+        "321": {
+            "link": {
+                "name": "pump_shotgun_0<pump<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
+                "file": "models\\shotgun-test.glb"
+            },
+            "parent": "320"
+        },
+        "322": {
+            "link": {
+                "name": "slug<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
+                "file": "models\\shotgun-test.glb"
+            },
+            "parent": "315"
+        },
+        "323": {
+            "link": {
+                "name": "slug_shotgun_0<slug<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
+                "file": "models\\shotgun-test.glb"
+            },
+            "parent": "322"
+        },
+        "324": {
+            "link": {
+                "name": "trigger<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
+                "file": "models\\shotgun-test.glb"
+            },
+            "parent": "315"
+        },
+        "325": {
+            "link": {
+                "name": "trigger_shotgun_0<trigger<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
+                "file": "models\\shotgun-test.glb"
+            },
+            "parent": "324"
         }
     },
     "meshes": {
@@ -1786,6 +2186,128 @@
                 "name": "Circle",
                 "file": "models\\marker.glb"
             }
+        },
+        "251": {
+            "link": {
+                "name": "base_shotgun_0",
+                "file": "models\\shotgun.glb"
+            },
+            "simplifyTarget": 0.5,
+            "simplify": false
+        },
+        "252": {
+            "link": {
+                "name": "base_shotgun_0-uv1",
+                "file": "models\\shotgun.glb"
+            }
+        },
+        "253": {
+            "link": {
+                "name": "loader_shotgun_0",
+                "file": "models\\shotgun.glb"
+            }
+        },
+        "254": {
+            "link": {
+                "name": "loader_shotgun_0-uv1",
+                "file": "models\\shotgun.glb"
+            }
+        },
+        "255": {
+            "link": {
+                "name": "trigger_shotgun_0",
+                "file": "models\\shotgun.glb"
+            }
+        },
+        "256": {
+            "link": {
+                "name": "trigger_shotgun_0-uv1",
+                "file": "models\\shotgun.glb"
+            }
+        },
+        "257": {
+            "link": {
+                "name": "pump_shotgun_0",
+                "file": "models\\shotgun.glb"
+            }
+        },
+        "258": {
+            "link": {
+                "name": "pump_shotgun_0-uv1",
+                "file": "models\\shotgun.glb"
+            }
+        },
+        "259": {
+            "link": {
+                "name": "slug_shotgun_0",
+                "file": "models\\shotgun.glb"
+            }
+        },
+        "260": {
+            "link": {
+                "name": "slug_shotgun_0-uv1",
+                "file": "models\\shotgun.glb"
+            }
+        },
+        "261": {
+            "link": {
+                "name": "base_shotgun_0",
+                "file": "models\\shotgun-test.glb"
+            }
+        },
+        "262": {
+            "link": {
+                "name": "base_shotgun_0-uv1",
+                "file": "models\\shotgun-test.glb"
+            }
+        },
+        "263": {
+            "link": {
+                "name": "loader_shotgun_0",
+                "file": "models\\shotgun-test.glb"
+            }
+        },
+        "264": {
+            "link": {
+                "name": "loader_shotgun_0-uv1",
+                "file": "models\\shotgun-test.glb"
+            }
+        },
+        "265": {
+            "link": {
+                "name": "pump_shotgun_0",
+                "file": "models\\shotgun-test.glb"
+            }
+        },
+        "266": {
+            "link": {
+                "name": "pump_shotgun_0-uv1",
+                "file": "models\\shotgun-test.glb"
+            }
+        },
+        "267": {
+            "link": {
+                "name": "slug_shotgun_0",
+                "file": "models\\shotgun-test.glb"
+            }
+        },
+        "268": {
+            "link": {
+                "name": "slug_shotgun_0-uv1",
+                "file": "models\\shotgun-test.glb"
+            }
+        },
+        "269": {
+            "link": {
+                "name": "trigger_shotgun_0",
+                "file": "models\\shotgun-test.glb"
+            }
+        },
+        "270": {
+            "link": {
+                "name": "trigger_shotgun_0-uv1",
+                "file": "models\\shotgun-test.glb"
+            }
         }
     },
     "textures": {
@@ -1817,6 +2339,42 @@
             "link": {
                 "name": "skybox.png",
                 "file": "textures\\skybox.png"
+            }
+        },
+        "237": {
+            "link": {
+                "name": "texture_0",
+                "file": "models\\shotgun.glb"
+            }
+        },
+        "238": {
+            "link": {
+                "name": "texture_1",
+                "file": "models\\shotgun.glb"
+            }
+        },
+        "239": {
+            "link": {
+                "name": "texture_2",
+                "file": "models\\shotgun.glb"
+            }
+        },
+        "240": {
+            "link": {
+                "name": "texture_0",
+                "file": "models\\shotgun-test.glb"
+            }
+        },
+        "241": {
+            "link": {
+                "name": "texture_1",
+                "file": "models\\shotgun-test.glb"
+            }
+        },
+        "242": {
+            "link": {
+                "name": "texture_2",
+                "file": "models\\shotgun-test.glb"
             }
         }
     },
@@ -1860,6 +2418,44 @@
                 256,
                 256
             ]
+        },
+        "86": {
+            "link": {
+                "name": "image_0",
+                "file": "models\\shotgun.glb"
+            },
+            "compression": "none"
+        },
+        "87": {
+            "link": {
+                "name": "image_1",
+                "file": "models\\shotgun.glb"
+            },
+            "compression": "none"
+        },
+        "88": {
+            "link": {
+                "name": "image_2",
+                "file": "models\\shotgun.glb"
+            }
+        },
+        "89": {
+            "link": {
+                "name": "Image_2",
+                "file": "models\\shotgun-test.glb"
+            }
+        },
+        "90": {
+            "link": {
+                "name": "Image_1",
+                "file": "models\\shotgun-test.glb"
+            }
+        },
+        "91": {
+            "link": {
+                "name": "Image_0",
+                "file": "models\\shotgun-test.glb"
+            }
         }
     },
     "materials": {
@@ -2209,7 +2805,7 @@
                     1.0
                 ]
             },
-            "pipeline": "229",
+            "pipeline": "291",
             "Flat": {
                 "color": [
                     0.8392156,
@@ -2220,7 +2816,7 @@
             },
             "name": "Sky",
             "Sky": {
-                "texture": "236"
+                "texture": null
             }
         },
         "252": {
@@ -2246,6 +2842,23 @@
                 ]
             },
             "name": "GrabMarker"
+        },
+        "253": {
+            "link": {
+                "name": "shotgun",
+                "file": "models\\shotgun.glb"
+            },
+            "pipeline": "223",
+            "Phong": {
+                "normalTexture": "239",
+                "diffuseTexture": "237"
+            }
+        },
+        "254": {
+            "link": {
+                "name": "shotgun",
+                "file": "models\\shotgun-test.glb"
+            }
         }
     },
     "shaders": {
@@ -2339,183 +2952,15 @@
                 "file": "default"
             }
         },
-        "254": {
-            "link": {
-                "name": "lib\\Color.glsl",
-                "file": "default"
-            }
-        },
-        "255": {
-            "link": {
-                "name": "lib\\Compatibility.glsl",
-                "file": "default"
-            }
-        },
-        "256": {
-            "link": {
-                "name": "lib\\CoordinateSystems.glsl",
-                "file": "default"
-            }
-        },
-        "257": {
-            "link": {
-                "name": "lib\\GI.glsl",
-                "file": "default"
-            }
-        },
-        "258": {
-            "link": {
-                "name": "lib\\Inputs.glsl",
-                "file": "default"
-            }
-        },
-        "259": {
-            "link": {
-                "name": "lib\\Lights.glsl",
-                "file": "default"
-            }
-        },
-        "260": {
-            "link": {
-                "name": "lib\\Materials.glsl",
-                "file": "default"
-            }
-        },
-        "261": {
-            "link": {
-                "name": "lib\\Math.glsl",
-                "file": "default"
-            }
-        },
-        "262": {
-            "link": {
-                "name": "lib\\Packing.glsl",
-                "file": "default"
-            }
-        },
-        "263": {
-            "link": {
-                "name": "lib\\Quaternion.glsl",
-                "file": "default"
-            }
-        },
-        "264": {
-            "link": {
-                "name": "lib\\ShaderType.glsl",
-                "file": "default"
-            }
-        },
-        "265": {
-            "link": {
-                "name": "lib\\Slug.frag.glsl",
-                "file": "default"
-            }
-        },
-        "266": {
-            "link": {
-                "name": "lib\\Slug.vert.glsl",
-                "file": "default"
-            }
-        },
-        "267": {
-            "link": {
-                "name": "lib\\Surface.glsl",
-                "file": "default"
-            }
-        },
-        "268": {
-            "link": {
-                "name": "lib\\Textures.glsl",
-                "file": "default"
-            }
-        },
-        "269": {
-            "link": {
-                "name": "lib\\Uniforms.glsl",
-                "file": "default"
-            }
-        },
         "287": {
             "link": {
                 "name": "AtmosphericSky.frag",
                 "file": "default"
             }
         },
-        "288": {
+        "301": {
             "link": {
-                "name": "lib\\MorphTargets.glsl",
-                "file": "default"
-            }
-        },
-        "289": {
-            "link": {
-                "name": "lib\\PhysicalBSDF.glsl",
-                "file": "default"
-            }
-        },
-        "290": {
-            "link": {
-                "name": "lib\\SkyProcedural.glsl",
-                "file": "default"
-            }
-        },
-        "291": {
-            "link": {
-                "name": "lib\\Compatibility.glsl",
-                "file": "default"
-            }
-        },
-        "292": {
-            "link": {
-                "name": "lib\\GI.glsl",
-                "file": "default"
-            }
-        },
-        "293": {
-            "link": {
-                "name": "lib\\Inputs.glsl",
-                "file": "default"
-            }
-        },
-        "294": {
-            "link": {
-                "name": "lib\\Lights.glsl",
-                "file": "default"
-            }
-        },
-        "295": {
-            "link": {
-                "name": "lib\\Materials.glsl",
-                "file": "default"
-            }
-        },
-        "296": {
-            "link": {
-                "name": "lib\\Packing.glsl",
-                "file": "default"
-            }
-        },
-        "297": {
-            "link": {
-                "name": "lib\\Slug.frag.glsl",
-                "file": "default"
-            }
-        },
-        "298": {
-            "link": {
-                "name": "lib\\Slug.vert.glsl",
-                "file": "default"
-            }
-        },
-        "299": {
-            "link": {
-                "name": "lib\\Surface.glsl",
-                "file": "default"
-            }
-        },
-        "300": {
-            "link": {
-                "name": "lib\\Textures.glsl",
+                "name": "Color.frag",
                 "file": "default"
             }
         }
@@ -2525,8 +2970,9 @@
             "name": "SimpleInteraction",
             "version": [
                 1,
-                4,
-                6
+                5,
+                0,
+                4
             ]
         },
         "xr": {
@@ -2558,7 +3004,8 @@
         },
         "runtime": {
             "visualizeColliders": true,
-            "visualizePhysX": true
+            "visualizePhysX": true,
+            "loadUncompressedImagesAsBitmap": false
         },
         "physx": {
             "enable": true,
@@ -2567,7 +3014,7 @@
         },
         "rendering": {
             "sky": {
-                "enabled": false,
+                "enabled": true,
                 "material": "234"
             },
             "hdr": {
@@ -2575,7 +3022,8 @@
             },
             "environment": {
                 "bakingMode": "sky",
-                "material": "234"
+                "material": "234",
+                "enabled": true
             }
         },
         "editor": {
@@ -2686,8 +3134,10 @@
                 "file": "default"
             },
             "features": {
-                "ALPHA_MASKED": true,
-                "SEPARATE_OCCLUSION_TEXTURE": true
+                "ALPHA_MASKED": false,
+                "SEPARATE_OCCLUSION_TEXTURE": true,
+                "GLOBAL_ILLUMINATION": true,
+                "NORMAL_MAPPING": true
             }
         },
         "226": {
@@ -2743,46 +3193,79 @@
                 "name": "AtmosphericSky",
                 "file": "default"
             }
+        },
+        "292": {
+            "link": {
+                "name": "Color",
+                "file": "default"
+            }
+        },
+        "293": {
+            "link": {
+                "name": "VertexColor",
+                "file": "default"
+            }
         }
     },
     "files": {
         "271": {
             "fileName": "models/oculus-touch-v2-left.glb",
-            "importerName": ""
+            "importerName": "",
+            "colorSpace": "srgb"
         },
         "272": {
             "fileName": "models/oculus-touch-v2-right.glb",
-            "importerName": ""
+            "importerName": "",
+            "colorSpace": "srgb"
         },
         "273": {
             "fileName": "models/hand-left.glb",
-            "importerName": ""
+            "importerName": "",
+            "colorSpace": "srgb"
         },
         "274": {
             "fileName": "models/hand-right.glb",
-            "importerName": ""
+            "importerName": "",
+            "colorSpace": "srgb"
         },
         "275": {
             "fileName": "models/button.glb",
-            "importerName": ""
+            "importerName": "",
+            "colorSpace": "srgb"
         },
         "276": {
             "fileName": "models/teleport-indicator.glb",
-            "importerName": ""
+            "importerName": "",
+            "colorSpace": "srgb"
         },
         "277": {
             "fileName": "models/marker.glb",
-            "importerName": ""
+            "importerName": "",
+            "colorSpace": "srgb"
         },
         "278": {
             "fileName": "../throw/Throw.wlp",
             "importerName": "",
-            "importPhysicalAsPhongMaterials": true
+            "importPhysicalAsPhongMaterials": true,
+            "colorSpace": "srgb"
         },
         "279": {
             "fileName": "../throw/.editor/state.json",
             "importerName": "",
-            "importPhysicalAsPhongMaterials": true
+            "importPhysicalAsPhongMaterials": true,
+            "colorSpace": "srgb"
+        },
+        "280": {
+            "fileName": "models/shotgun.glb",
+            "importerName": "",
+            "importPhysicalAsPhongMaterials": true,
+            "colorSpace": "srgb"
+        },
+        "281": {
+            "fileName": "models/shotgun-test.glb",
+            "importerName": "",
+            "importPhysicalAsPhongMaterials": true,
+            "colorSpace": "srgb"
         }
     },
     "fonts": {
@@ -2795,5 +3278,117 @@
     },
     "languages": {},
     "morphTargets": {},
-    "particleEffects": {}
+    "particleEffects": {},
+    "shaderChunks": {
+        "1": {
+            "link": {
+                "name": "lib\\Color.glsl",
+                "file": "default"
+            }
+        },
+        "2": {
+            "link": {
+                "name": "lib\\Compatibility.glsl",
+                "file": "default"
+            }
+        },
+        "3": {
+            "link": {
+                "name": "lib\\CoordinateSystems.glsl",
+                "file": "default"
+            }
+        },
+        "4": {
+            "link": {
+                "name": "lib\\GI.glsl",
+                "file": "default"
+            }
+        },
+        "5": {
+            "link": {
+                "name": "lib\\Inputs.glsl",
+                "file": "default"
+            }
+        },
+        "6": {
+            "link": {
+                "name": "lib\\Lights.glsl",
+                "file": "default"
+            }
+        },
+        "7": {
+            "link": {
+                "name": "lib\\Materials.glsl",
+                "file": "default"
+            }
+        },
+        "8": {
+            "link": {
+                "name": "lib\\Math.glsl",
+                "file": "default"
+            }
+        },
+        "9": {
+            "link": {
+                "name": "lib\\MorphTargets.glsl",
+                "file": "default"
+            }
+        },
+        "10": {
+            "link": {
+                "name": "lib\\Packing.glsl",
+                "file": "default"
+            }
+        },
+        "11": {
+            "link": {
+                "name": "lib\\PhysicalBSDF.glsl",
+                "file": "default"
+            }
+        },
+        "12": {
+            "link": {
+                "name": "lib\\Quaternion.glsl",
+                "file": "default"
+            }
+        },
+        "13": {
+            "link": {
+                "name": "lib\\SkyProcedural.glsl",
+                "file": "default"
+            }
+        },
+        "14": {
+            "link": {
+                "name": "lib\\Slug.frag.glsl",
+                "file": "default"
+            }
+        },
+        "15": {
+            "link": {
+                "name": "lib\\Slug.vert.glsl",
+                "file": "default"
+            }
+        },
+        "16": {
+            "link": {
+                "name": "lib\\Surface.glsl",
+                "file": "default"
+            }
+        },
+        "17": {
+            "link": {
+                "name": "lib\\Textures.glsl",
+                "file": "default"
+            }
+        },
+        "18": {
+            "link": {
+                "name": "lib\\Uniforms.glsl",
+                "file": "default"
+            }
+        }
+    },
+    "probeVolumeScenarios": {},
+    "plugins": {}
 }

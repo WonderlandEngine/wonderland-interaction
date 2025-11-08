@@ -3,6 +3,8 @@ import {
     CollisionEventType,
     Component,
     Emitter,
+    MeshComponent,
+    Object3D,
     PhysXComponent,
     Scene,
 } from '@wonderlandengine/api';
@@ -10,12 +12,20 @@ import {property} from '@wonderlandengine/api/decorators.js';
 import {Grabbable} from './grabbable.js';
 import {GrabSearchMode, GrabPoint} from './interaction/grab-point.js';
 import {vec3} from 'gl-matrix';
+import {setComponentsActive} from '../utils/activate-children.js';
 
 /** Represents whether the user's left or right hand is being used. */
 export enum Handedness {
     Left = 0,
     Right,
 }
+
+export enum InteractorVisualState {
+    None = 0,
+    Visible,
+    Hidden,
+}
+export const InteractorVisualStateNames = ['None', 'Visible', 'Hidden'];
 
 /**
  * Manages interaction capabilities of a VR controller or a similar input device.
@@ -39,6 +49,12 @@ export class Interactor extends Component {
     /** Handedness value. Compare against {@link Handedness}. */
     @property.enum(['Left', 'Right'], Handedness.Right)
     public handedness!: number;
+
+    @property.object()
+    meshRoot: Object3D | null = null;
+
+    @property.enum(InteractorVisualStateNames, InteractorVisualState.Visible)
+    visualStateOnGrab = InteractorVisualState.Visible;
 
     /** Private Attributes. */
 
@@ -104,6 +120,7 @@ export class Interactor extends Component {
     onDeactivate(): void {
         this.engine.onXRSessionStart.add(this.#onSessionStart);
         this.engine.onXRSessionEnd.add(this.#onSessionEnd);
+        this._endSession();
     }
 
     /**
@@ -111,10 +128,20 @@ export class Interactor extends Component {
      *
      * @param interactable The interactable to process.
      */
-    public startInteraction(interactable: Grabbable, handle: number) {
+    public startInteraction(interactable: Grabbable, handleId: number) {
         this._interactable = interactable;
-        interactable.grab(this, handle);
+        interactable.grab(this, handleId);
         this._onGripStart.notify(interactable);
+
+        let hidden = this.visualStateOnGrab === InteractorVisualState.Hidden;
+        const handle = interactable.handles[handleId];
+        if (handle.interactorVisualState !== InteractorVisualState.None) {
+            hidden = handle.interactorVisualState === InteractorVisualState.Hidden;
+        }
+
+        if (this.meshRoot && hidden) {
+            setComponentsActive(this.meshRoot, false, MeshComponent);
+        }
     }
 
     /**
@@ -202,6 +229,10 @@ export class Interactor extends Component {
             this._onGripEnd.notify(this._interactable);
         }
         this._interactable = null;
+
+        if (this.meshRoot) {
+            setComponentsActive(this.meshRoot, true, MeshComponent);
+        }
     }
 
     /** Notified on a grip start. */
@@ -238,46 +269,61 @@ export class Interactor extends Component {
             this.engine.xr!.referenceSpaceForType('local-floor') ??
             this.engine.xr!.referenceSpaceForType('local');
 
-        session.addEventListener('inputsourceschange', (event) => {
-            for (const item of event.removed) {
-                if (item === this.#xrInputSource) {
-                    this.#xrInputSource = null;
-                    break;
-                }
-            }
-            const handedness = this.handedness === Handedness.Left ? 'left' : 'right';
-            for (const item of event.added) {
-                if (item.handedness === handedness) {
-                    this.#xrInputSource = item;
-                    break;
-                }
-            }
-        });
+        session.addEventListener('inputsourceschange', this.#inputSourceChangedEvent);
 
         if (!this.useDefaultInputs) {
             return;
         }
 
-        session.addEventListener('selectstart', (event) => {
-            if (this.#xrInputSource === event.inputSource) {
-                this.checkForNearbyInteractables();
-            }
-        });
-        session.addEventListener('selectend', (event) => {
-            if (this.#xrInputSource === event.inputSource) {
-                this.stopInteraction();
-            }
-        });
+        session.addEventListener('selectstart', this.#selectStartEvent);
+        session.addEventListener('selectend', this.#selectEndEvent);
 
         const scene = this.scene as Scene;
         scene.onPreRender.add(this._onPreRender);
     }
 
     private _endSession() {
+        const session = this.engine.xr?.session;
+        if (session) {
+            session.removeEventListener(
+                'inputsourceschange',
+                this.#inputSourceChangedEvent
+            );
+            session.removeEventListener('selectstart', this.#selectStartEvent);
+            session.removeEventListener('selectend', this.#selectEndEvent);
+        }
         this.#referenceSpace = null;
         this.#xrInputSource = null;
         this.stopInteraction();
         const scene = this.scene as Scene;
         scene.onPreRender.remove(this._onPreRender);
     }
+
+    #inputSourceChangedEvent = (event: XRInputSourceChangeEvent) => {
+        for (const item of event.removed) {
+            if (item === this.#xrInputSource) {
+                this.#xrInputSource = null;
+                break;
+            }
+        }
+        const handedness = this.handedness === Handedness.Left ? 'left' : 'right';
+        for (const item of event.added) {
+            if (item.handedness === handedness) {
+                this.#xrInputSource = item;
+                break;
+            }
+        }
+    };
+
+    #selectStartEvent = (event: XRInputSourceEvent) => {
+        if (this.#xrInputSource === event.inputSource) {
+            this.checkForNearbyInteractables();
+        }
+    };
+
+    #selectEndEvent = (event: XRInputSourceEvent) => {
+        if (this.#xrInputSource === event.inputSource) {
+            this.stopInteraction();
+        }
+    };
 }

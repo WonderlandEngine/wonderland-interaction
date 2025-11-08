@@ -1,4 +1,6 @@
 import {CollisionComponent, Component, PhysXComponent, property} from "@wonderlandengine/api";
+import { quat } from "gl-matrix";
+import { InteractorVisualState, InteractorVisualStateNames } from "../interactor.js";
 
 export enum GrabSearchMode {
     Distance = 0,
@@ -27,4 +29,14 @@ export class GrabPoint extends Component {
 
     @property.float(0.2)
     maxDistance = 0.2;
+
+    @property.enum(InteractorVisualStateNames, InteractorVisualState.None)
+    interactorVisualState = InteractorVisualState.None;
+
+    defaultRotation: quat = quat.create();
+
+    init() {
+        this.object.getRotationWorld(this.defaultRotation);
+        quat.invert(this.defaultRotation, this.defaultRotation);
+    }
 }

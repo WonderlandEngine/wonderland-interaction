@@ -60,6 +60,12 @@ export function computeRelativeTransform(
     return quat2.fromRotationTranslation(out, rot, position);
 }
 
+export function computeRelativeRotation(source: quat, target: quat, out: quat) {
+    const toLocal = quat.copy(_rotationA, target);
+    quat.invert(toLocal, toLocal);
+    quat.multiply(out, toLocal, source);
+}
+
 export function absMaxVec3(out: vec3, a: vec3, b: vec3): vec3 {
     const v1 = Math.abs(a[0]) + Math.abs(a[1]) + Math.abs(a[2]);
     const v2 = Math.abs(b[0]) + Math.abs(b[1]) + Math.abs(b[2]);

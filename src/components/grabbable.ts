@@ -13,7 +13,7 @@ import {property} from '@wonderlandengine/api/decorators.js';
 
 import {Interactor} from './interactor.js';
 import {HistoryTracker} from '../history-tracker.js';
-import {computeRelativeTransform} from '../utils/math.js';
+import {computeRelativeRotation, computeRelativeTransform} from '../utils/math.js';
 import {GrabPoint, GrabSnapMode} from './interaction/grab-point.js';
 
 /** Temporary info about grabbed target. */
@@ -117,6 +117,17 @@ export class Grabbable extends Component {
      */
     @property.int(0)
     public distanceHandle = 0;
+
+    /**
+     * If `true`, the primary grab will be set to
+     * the first grab point that has been interacted with.
+     *
+     * For a weapon, you generally want that option to be `false`
+     * and to always set the trigger grab as the first grab point, i.e.,
+     * the primary grab.
+     */
+    @property.bool(false)
+    public autoSetPrimaryGrab = false;
 
     handles: GrabPoint[] = [];
 
@@ -268,9 +279,15 @@ export class Grabbable extends Component {
             this._physx.active = false;
         }
 
-        if (this.primaryGrab && this.secondaryGrab) {
-            const primary = this.handles[this.primaryGrab.handleId];
-            const secondary = this.handles[this.secondaryGrab.handleId];
+        if (this._grabData.length === 2) {
+            if (!this.autoSetPrimaryGrab && this._grabData[0].handleId !== 0) {
+                /* For main grab point to be primary handle */
+                const first = this._grabData[0];
+                this._grabData[0] = this._grabData[1];
+                this._grabData[1] = first;
+            }
+            const primary = this.handles[this._grabData[0].handleId];
+            const secondary = this.handles[this._grabData[1].handleId];
             /* Cache the grabbing distance between both handles. */
             this._maxSqDistance = vec3.squaredDistance(
                 primary.object.getPositionWorld(_pointA),
@@ -368,6 +385,7 @@ export class Grabbable extends Component {
      * Compute the transform of this grabbable based on both handles.
      */
     private _updateTransformDoubleHand() {
+        const primaryGrab = this._grabData[0];
         const primaryInteractor = this._grabData[0]!.interactor;
         const secondaryInteractor = this._grabData[1]!.interactor;
         const primaryWorld = primaryInteractor.object.getPositionWorld(_pointA);
@@ -380,21 +398,35 @@ export class Grabbable extends Component {
             return;
         }
 
-        /* Rotate the grabbable from first handle to secondary. */
-        const dir = vec3.subtract(_vectorA, secondaryWorld, primaryWorld);
-        vec3.normalize(dir, dir);
-        const rotation = quat.rotationTo(_rotation, [0, 0, -1], dir);
-        this.object.setRotationWorld(rotation);
+        const primaryHandle = this.handles[primaryGrab.handleId];
 
-        const primaryHandle = this.handles[this.primaryGrab!.handleId];
+        /* Pivot */
 
-        /* Translate using the distance from the grabbable to the first handle */
-        const translation = vec3.sub(
-            _vectorA,
-            this.object.getPositionWorld(_pointB),
-            primaryHandle.object.getPositionWorld(_pointC)
+        const up = secondaryInteractor.meshRoot!.getUpWorld(new Float32Array([0, 0, 0]));
+        vec3.scale(up, up, -1);
+        vec3.normalize(up, up);
+
+        const mat = mat4.lookAt(mat4.create(), primaryWorld, secondaryWorld, up);
+        mat4.invert(mat, mat);
+
+        const pivotRotation = mat4.getRotation(quat.create(), mat);
+        const pivotPosition = primaryWorld;
+        const pivotToWorld = quat2.fromRotationTranslation(
+            quat2.create(),
+            pivotRotation,
+            pivotPosition
         );
-        vec3.add(translation, translation, primaryWorld);
-        this.object.setPositionWorld(translation);
+
+        /* Object to handle */
+
+        const objectToPivotVec = vec3.subtract(
+            vec3.create(),
+            this.object.getPositionWorld(),
+            primaryHandle.object.getPositionWorld()
+        );
+        const objectToPivot = quat2.fromTranslation(quat2.create(), objectToPivotVec);
+
+        const transform = quat2.multiply(quat2.create(), objectToPivot, pivotToWorld);
+        this.object.setTransformWorld(transform);
     }
 }

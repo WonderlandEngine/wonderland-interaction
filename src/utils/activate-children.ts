@@ -1,4 +1,4 @@
-import {Object3D} from '@wonderlandengine/api';
+import {ComponentConstructor, Object3D} from '@wonderlandengine/api';
 
 /**
  * Recursively sets the active state of the given object and all its children.
@@ -8,13 +8,21 @@ import {Object3D} from '@wonderlandengine/api';
  * @example
  * ```js
  * // turn off all components on this object and its children
- * setComponentsActive(this.someObject, false);
+ * setComponentsActive(this.someObject, undefined, false);
  * ```
  */
-export function setComponentsActive(object: Object3D, active: boolean) {
-    object.active = active;
-
-    object.getComponents().forEach((c) => (c.active = active));
-
-    object.children.forEach((c) => setComponentsActive(c, active));
+export function setComponentsActive(
+    object: Object3D,
+    active: boolean,
+    typeClass?: ComponentConstructor
+) {
+    // TODO: Fix typing in wonderlandengine/api
+    const components = object.getComponents(typeClass as any);
+    for (const comp of components) {
+        comp.active = active;
+    }
+    const children = object.children;
+    for (const child of children) {
+        setComponentsActive(child, active, typeClass);
+    }
 }
