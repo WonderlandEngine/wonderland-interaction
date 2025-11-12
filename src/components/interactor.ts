@@ -11,7 +11,7 @@ import {
 import {property} from '@wonderlandengine/api/decorators.js';
 import {Grabbable} from './grabbable.js';
 import {GrabSearchMode, GrabPoint} from './interaction/grab-point.js';
-import {vec3} from 'gl-matrix';
+import {quat, vec3} from 'gl-matrix';
 import {setComponentsActive} from '../utils/activate-children.js';
 
 /** Represents whether the user's left or right hand is being used. */
