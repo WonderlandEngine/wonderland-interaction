@@ -3,9 +3,9 @@
         "14": {
             "name": "Player",
             "translation": [
-                -0.0822798,
+                -2.9841971,
                 0.0,
-                0.8072429
+                -2.1806735
             ],
             "rotation": [
                 0.0,
@@ -2216,7 +2216,17 @@
                             "339",
                             "340",
                             "341"
-                        ]
+                        ],
+                        "translationConstraints": {
+                            "lock": {
+                                "x": true,
+                                "y": true,
+                                "z": true
+                            },
+                            "lockX": true,
+                            "lockY": true,
+                            "lockZ": true
+                        }
                     }
                 }
             ]
@@ -2411,6 +2421,200 @@
                         "mesh": "11"
                     }
                 }
+            ]
+        },
+        "342": {
+            "name": "Locking",
+            "parent": "333",
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -2.5,
+                0.0,
+                -2.7446005
+            ]
+        },
+        "343": {
+            "name": "Table",
+            "scaling": [
+                1.069,
+                0.2675206,
+                0.4
+            ],
+            "parent": "345",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "material": "25",
+                        "mesh": "8"
+                    }
+                },
+                {
+                    "type": "physx",
+                    "active": true,
+                    "physx": {
+                        "static": true,
+                        "shape": "box",
+                        "box": {
+                            "extents": [
+                                2.0,
+                                0.25,
+                                0.75
+                            ]
+                        },
+                        "bounciness": 0.0
+                    }
+                }
+            ],
+            "translation": [
+                0.0,
+                0.2849999,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ]
+        },
+        "344": {
+            "name": "Text",
+            "parent": "345",
+            "components": [
+                {
+                    "type": "text",
+                    "text": {
+                        "text": "Translation constraints"
+                    }
+                }
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "translation": [
+                0.0,
+                1.3796207,
+                -0.2937731
+            ]
+        },
+        "345": {
+            "name": "Environment",
+            "parent": "342"
+        },
+        "346": {
+            "name": "SliderUnbound",
+            "parent": "342",
+            "translation": [
+                -0.6547281,
+                1.0,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "347": {
+            "name": "Background",
+            "parent": "346",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "mesh": "7",
+                        "material": "26"
+                    }
+                }
+            ],
+            "scaling": [
+                0.3499999,
+                0.05,
+                1.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "translation": [
+                0.0000133,
+                0.00345,
+                -0.0002365
+            ]
+        },
+        "348": {
+            "name": "Handle",
+            "parent": "346",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "mesh": "9",
+                        "material": "22"
+                    }
+                },
+                {
+                    "type": "grabbable",
+                    "grabbable": {
+                        "translationConstraints": {
+                            "lockY": true,
+                            "lockZ": true,
+                            "min": [
+                                -0.3,
+                                1.0,
+                                1.0
+                            ],
+                            "max": [
+                                0.3,
+                                -1.0,
+                                -1.0
+                            ]
+                        }
+                    }
+                }
+            ],
+            "translation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                0.05,
+                0.05,
+                0.05
             ]
         }
     },

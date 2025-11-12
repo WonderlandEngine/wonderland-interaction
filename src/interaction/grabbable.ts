@@ -19,6 +19,10 @@ import {GrabPoint, GrabSnapMode} from './grab-point.js';
 export interface GrabData {
     interactor: Interactor;
     handleId: number;
+
+    /** Local translation on grab */
+    localPosition: Float32Array;
+
     /** Local transform in **interactor** space */
     transform: quat2;
 }
@@ -44,6 +48,23 @@ const rotationFromTwoHandle = (function () {
         return out;
     };
 })();
+
+export class TranslationConstraints {
+    @property.bool()
+    lockX: boolean = false;
+
+    @property.bool()
+    lockY: boolean = false;
+
+    @property.bool()
+    lockZ: boolean = false;
+
+    @property.vector3(1, 1, 1)
+    min!: Float32Array;
+
+    @property.vector3(-1, -1, -1)
+    max!: Float32Array;
+}
 
 /**
  * Enables objects to be interactively grabbed and manipulated in a virtual environment.
@@ -114,6 +135,14 @@ export class Grabbable extends Component {
     public useControllerVelocityData = true;
 
     /**
+     * Max distance to automatically stop grabbing.
+     *
+     * @note Set a negative value to disable.
+     */
+    @property.float(0.25)
+    public autoReleaseDistance = 0.25;
+
+    /**
      * The distance marker to use when distance-grabbed.
      */
     @property.object()
@@ -138,6 +167,13 @@ export class Grabbable extends Component {
     @property.bool(false)
     public autoSetPrimaryGrab = false;
 
+    /*
+     * Constraint Properties
+     */
+
+    @property.record(TranslationConstraints)
+    public translationConstraints: TranslationConstraints = null!;
+
     handles: GrabPoint[] = [];
 
     /** Private Attributes. */
@@ -145,8 +181,12 @@ export class Grabbable extends Component {
     /** Cached currently grabbed data. */
     private _grabData: GrabData[] = [];
 
-    /** Squared distance between both handle cached when starting a double grab. */
-    private _maxSqDistance: number | null = null;
+    /**
+     * Squared distance to automatically stop a grab when:
+     * - Using dual grabbing
+     * - Moving away from a locked grab
+     */
+    private _maxSqDistance: number = 1.0;
     private _history: HistoryTracker = new HistoryTracker();
     private _physx: PhysXComponent | null = null;
     private _enablePhysx = false;
@@ -278,8 +318,15 @@ export class Grabbable extends Component {
     grab(interactor: Interactor, handleId: number) {
         if (this._grabData.length === MAX_GRABS) return;
 
-        const grab = {interactor, handleId, transform: quat2.create()};
+        const grab = {
+            interactor,
+            handleId,
+            localPosition: new Float32Array([0, 0, 0]),
+            transform: quat2.create(),
+        };
         this._grabData.push(grab);
+
+        this.object.getPositionLocal(grab.localPosition);
 
         const handle = this.handles[handleId];
         switch (handle.snap) {
@@ -296,58 +343,57 @@ export class Grabbable extends Component {
             this._physx.active = false;
         }
 
-        if (this._grabData.length === 2) {
-            if (!this.autoSetPrimaryGrab && this._grabData[0].handleId !== 0) {
-                /* For main grab point to be primary handle */
-                const first = this._grabData[0];
-                this._grabData[0] = this._grabData[1];
-                this._grabData[1] = first;
-            }
-            const primary = this.handles[this._grabData[0].handleId];
-            const secondary = this.handles[this._grabData[1].handleId];
-
-            const primaryPos = primary.object.getPositionWorld(_pointA);
-            const secondaryPos = secondary.object.getPositionWorld(_pointB);
-            /* Cache the grabbing distance between both handles. */
-            this._maxSqDistance = vec3.squaredDistance(primaryPos, secondaryPos);
-
-            const primaryInteractorPos =
-                this._grabData[0].interactor.object.getPositionWorld();
-            const secondaryInteractorPos =
-                this._grabData[1].interactor.object.getPositionWorld();
-
-            /* Make the weapon snap to both hands or not */
-            const source =
-                primary.snap != GrabSnapMode.None ? primaryPos : primaryInteractorPos;
-            const target =
-                secondary.snap != GrabSnapMode.None ? secondaryPos : secondaryInteractorPos;
-
-            const interactorUp = this._grabData[1].interactor.object.getUpWorld(
-                vec3.create()
-            );
-            const up = vec3.create();
-            if (vec3.dot(interactorUp, [0, 1, 0]) >= 0.5) {
-                vec3.copy(up, interactorUp);
-                this._useUpOrientation = true;
-            } else {
-                this._grabData[1].interactor.object.getForwardWorld(up);
-                this._useUpOrientation = false;
-            }
-
-            const handRotation = rotationFromTwoHandle(
-                source,
-                target,
-                up,
-                this._defaultGrabRotation
-            );
-            const objectRotation = this.object.getRotationWorld(_rotation);
-
-            computeRelativeRotation(
-                objectRotation,
-                handRotation,
-                this._defaultGrabRotation
-            );
+        if (this._grabData.length === 1) {
+            this._maxSqDistance = this.autoReleaseDistance * this.autoReleaseDistance;
+            this._onGrabStart.notify(this);
+            return;
         }
+
+        if (!this.autoSetPrimaryGrab && this._grabData[0].handleId !== 0) {
+            /* For main grab point to be primary handle */
+            const first = this._grabData[0];
+            this._grabData[0] = this._grabData[1];
+            this._grabData[1] = first;
+        }
+        const primary = this.handles[this._grabData[0].handleId];
+        const secondary = this.handles[this._grabData[1].handleId];
+
+        const primaryPos = primary.object.getPositionWorld(_pointA);
+        const secondaryPos = secondary.object.getPositionWorld(_pointB);
+        /* Cache the grabbing distance between both handles. */
+        this._maxSqDistance =
+            vec3.squaredDistance(primaryPos, secondaryPos) +
+            this.autoReleaseDistance * this.autoReleaseDistance;
+
+        const primaryInteractorPos = this._grabData[0].interactor.object.getPositionWorld();
+        const secondaryInteractorPos =
+            this._grabData[1].interactor.object.getPositionWorld();
+
+        /* Make the weapon snap to both hands or not */
+        const source =
+            primary.snap != GrabSnapMode.None ? primaryPos : primaryInteractorPos;
+        const target =
+            secondary.snap != GrabSnapMode.None ? secondaryPos : secondaryInteractorPos;
+
+        const interactorUp = this._grabData[1].interactor.object.getUpWorld(vec3.create());
+        const up = vec3.create();
+        if (vec3.dot(interactorUp, [0, 1, 0]) >= 0.5) {
+            vec3.copy(up, interactorUp);
+            this._useUpOrientation = true;
+        } else {
+            this._grabData[1].interactor.object.getForwardWorld(up);
+            this._useUpOrientation = false;
+        }
+
+        const handRotation = rotationFromTwoHandle(
+            source,
+            target,
+            up,
+            this._defaultGrabRotation
+        );
+        const objectRotation = this.object.getRotationWorld(_rotation);
+
+        computeRelativeRotation(objectRotation, handRotation, this._defaultGrabRotation);
 
         this._onGrabStart.notify(this);
     }
@@ -379,10 +425,11 @@ export class Grabbable extends Component {
              * into the remaining grab data to avoid having an inconsistent single grab. */
             const interactor = otherGrab.interactor.object;
             computeRelativeTransform(this.object, interactor, otherGrab.transform);
+
+            this._maxSqDistance = this.autoReleaseDistance * this.autoReleaseDistance;
         }
 
         this._grabData.splice(index, 1);
-        this._maxSqDistance = null;
 
         if (this.canThrow && !this.isGrabbed) {
             this.throw(interactor);
@@ -425,6 +472,16 @@ export class Grabbable extends Component {
         const grab = this._grabData[index]!;
         const hand = grab.interactor.object;
 
+        const handPosition = hand.getPositionWorld();
+        const position = this.object.getPositionWorld();
+
+        const squaredDistance = vec3.squaredDistance(handPosition, position);
+        if (squaredDistance > this._maxSqDistance) {
+            /* Hands are too far apart, release the second handle. */
+            this.release(grab.interactor);
+            return;
+        }
+
         /* `grab.transform` is in the hand space, thus multiplyig
          * the hand transform by the object's transform leads to
          * its world space transform. */
@@ -434,7 +491,10 @@ export class Grabbable extends Component {
         const handle = this.handles[grab.handleId];
         const lerp = clamp(handle.snapLerp, 0, 1);
         quat2.lerp(transform, this.object.transformWorld, transform, lerp);
+
         this.object.setTransformWorld(transform);
+
+        this._applyConstraints(grab);
     }
 
     /**
@@ -485,5 +545,53 @@ export class Grabbable extends Component {
 
         const transform = quat2.multiply(quat2.create(), objectToPivot, pivotToWorld);
         this.object.setTransformWorld(transform);
+    }
+
+    private _applyConstraints(grab: GrabData) {
+        if (
+            !this.translationConstraints.lockX &&
+            !this.translationConstraints.lockY &&
+            !this.translationConstraints.lockZ
+        ) {
+            return;
+        }
+
+        this.object.getPositionLocal(_pointA);
+
+        const min = this.translationConstraints.min;
+        const max = this.translationConstraints.max;
+        const validX = min[0] < max[0];
+        const validY = min[1] < max[1];
+        const validZ = min[2] < max[2];
+        {
+            const bounds = vec3.set(
+                _pointB,
+                validX ? min[0] : Number.NEGATIVE_INFINITY,
+                validY ? min[1] : Number.NEGATIVE_INFINITY,
+                validZ ? min[2] : Number.NEGATIVE_INFINITY
+            );
+            vec3.max(_pointA, _pointA, bounds);
+        }
+        {
+            const bounds = vec3.set(
+                _pointB,
+                validX ? max[0] : Number.POSITIVE_INFINITY,
+                validY ? max[1] : Number.POSITIVE_INFINITY,
+                validZ ? max[2] : Number.POSITIVE_INFINITY
+            );
+            vec3.min(_pointA, _pointA, bounds);
+        }
+
+        if (this.translationConstraints.lockX) {
+            _pointA[0] = grab.localPosition[0];
+        }
+        if (this.translationConstraints.lockY) {
+            _pointA[1] = grab.localPosition[1];
+        }
+        if (this.translationConstraints.lockZ) {
+            _pointA[2] = grab.localPosition[2];
+        }
+
+        this.object.setPositionLocal(_pointA);
     }
 }
