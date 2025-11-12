@@ -1,6 +1,6 @@
 import {Component} from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
-import {typename} from '../../constants.js';
+import {typename} from '../constants.js';
 import {SmoothLocomotion} from './smooth-locomotion.js';
 import {TeleportLocomotion} from './teleport-locomotion.js';
 import {LocomotionType} from './enums/LocomotionType.js';

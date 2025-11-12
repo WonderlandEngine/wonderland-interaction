@@ -1,10 +1,15 @@
-import {CollisionComponent, Component, PhysXComponent, property} from "@wonderlandengine/api";
-import { quat } from "gl-matrix";
-import { InteractorVisualState, InteractorVisualStateNames } from "../interactor.js";
+import {
+    CollisionComponent,
+    Component,
+    PhysXComponent,
+    property,
+} from '@wonderlandengine/api';
+import {quat} from 'gl-matrix';
+import {InteractorVisualState, InteractorVisualStateNames} from './interactor.js';
 
 export enum GrabSearchMode {
     Distance = 0,
-    Overlap = 1
+    Overlap = 1,
 }
 
 export enum GrabSnapMode {

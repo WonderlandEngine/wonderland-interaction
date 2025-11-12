@@ -1,10 +1,10 @@
 import {Component, ForceMode, Object3D, PhysXComponent} from '@wonderlandengine/api';
-import {typename} from '../../constants.js';
+import {typename} from '../constants.js';
 import {vec3} from 'gl-matrix';
 import {ActiveCamera} from '../helpers/active-camera.js';
 import {LocomotionSelector} from './locomotion-selector.js';
 import {InputBridge, InputBridgeTypename} from './input-bridge.js';
-import {toRad} from '../../utils/math.js';
+import {toRad} from '../utils/math.js';
 
 /* Temporaries */
 const tempCameraVec = vec3.create();

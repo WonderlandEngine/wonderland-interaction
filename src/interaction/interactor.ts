@@ -10,7 +10,7 @@ import {
 } from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
 import {Grabbable} from './grabbable.js';
-import {GrabSearchMode, GrabPoint} from './interaction/grab-point.js';
+import {GrabSearchMode, GrabPoint} from './grab-point.js';
 import {quat, vec3} from 'gl-matrix';
 import {setComponentsActive} from '../utils/activate-children.js';
 

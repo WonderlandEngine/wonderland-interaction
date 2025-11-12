@@ -13,7 +13,7 @@ import {property} from '@wonderlandengine/api/decorators.js';
 import {Interactor} from './interactor.js';
 import {HistoryTracker} from '../history-tracker.js';
 import {computeRelativeRotation, computeRelativeTransform} from '../utils/math.js';
-import {GrabPoint, GrabSnapMode} from './interaction/grab-point.js';
+import {GrabPoint, GrabSnapMode} from './grab-point.js';
 
 /** Temporary info about grabbed target. */
 export interface GrabData {

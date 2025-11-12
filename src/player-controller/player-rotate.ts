@@ -1,6 +1,6 @@
 import {Component, LockAxis, Object3D} from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
-import {EPSILON, typename} from '../../constants.js';
+import {EPSILON, typename} from '../constants.js';
 import {PlayerController} from './player-controller.js';
 import {RotationType} from './enums/RotationType.js';
 import {InputBridge, InputBridgeTypename} from './input-bridge.js';

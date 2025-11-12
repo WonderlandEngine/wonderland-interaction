@@ -1,11 +1,11 @@
 import {Component, NumberArray, Object3D} from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
-import {typename} from '../../constants.js';
+import {typename} from '../constants.js';
 import {ControlsKeyboard} from './controls-keyboard.js';
 import {vec3} from 'gl-matrix';
 import {ControlsVR} from './controls-vr.js';
-import {Handedness} from '../interactor.js';
-import {absMaxVec3} from '../../utils/math.js';
+import {Handedness} from '../interaction/interactor.js';
+import {absMaxVec3} from '../utils/math.js';
 
 export const InputBridgeTypename = typename('input-bridge');
 

@@ -1,6 +1,6 @@
 import {Component, NumberArray, Object3D} from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
-import {typename} from '../../constants.js';
+import {typename} from '../constants.js';
 import {vec3} from 'gl-matrix';
 
 const tempVec1 = vec3.create();

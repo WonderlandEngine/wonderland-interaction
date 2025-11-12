@@ -1,6 +1,6 @@
 import {Component, Object3D} from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
-import {typename} from '../../constants.js';
+import {typename} from '../constants.js';
 import {vec3} from 'gl-matrix';
 import {InputBridge} from './input-bridge.js';
 import {PlayerController, getRequiredComponents} from './player-controller.js';

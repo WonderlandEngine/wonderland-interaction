@@ -1,6 +1,6 @@
 import {Component, PhysXComponent} from '@wonderlandengine/api';
 import {vec3} from 'gl-matrix';
-import {typename} from '../../constants.js';
+import {typename} from '../constants.js';
 
 /**
  * Direction type for Keyboard Inputs.
