@@ -6,7 +6,6 @@ import {
     Object3D,
     PhysXComponent,
     Property,
-    PropertyRecord,
     WonderlandEngine,
 } from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
@@ -35,6 +34,16 @@ const _vectorB = vec3.create();
 const _vectorC = vec3.create();
 const _rotation = quat.create();
 const _transform = quat2.create();
+
+const rotationFromTwoHandle = (function () {
+    const matTemp = mat4.create();
+    return function (source: vec3, target: vec3, up: vec3, out: quat) {
+        const mat = mat4.lookAt(matTemp, source, target, up);
+        mat4.invert(mat, mat);
+        mat4.getRotation(out, mat);
+        return out;
+    };
+})();
 
 /**
  * Enables objects to be interactively grabbed and manipulated in a virtual environment.
@@ -141,6 +150,14 @@ export class Grabbable extends Component {
     private _history: HistoryTracker = new HistoryTracker();
     private _physx: PhysXComponent | null = null;
     private _enablePhysx = false;
+
+    /**
+     * Default relative grab transform to apply when updating
+     * the grabable transform every frame.
+     * @hidden
+     */
+    private _defaultGrabRotation: quat = quat.create();
+    private _useUpOrientation: boolean = false;
 
     /**
      * Emitter for the grab start event.
@@ -288,10 +305,47 @@ export class Grabbable extends Component {
             }
             const primary = this.handles[this._grabData[0].handleId];
             const secondary = this.handles[this._grabData[1].handleId];
+
+            const primaryPos = primary.object.getPositionWorld(_pointA);
+            const secondaryPos = secondary.object.getPositionWorld(_pointB);
             /* Cache the grabbing distance between both handles. */
-            this._maxSqDistance = vec3.squaredDistance(
-                primary.object.getPositionWorld(_pointA),
-                secondary.object.getPositionWorld(_pointB)
+            this._maxSqDistance = vec3.squaredDistance(primaryPos, secondaryPos);
+
+            const primaryInteractorPos =
+                this._grabData[0].interactor.object.getPositionWorld();
+            const secondaryInteractorPos =
+                this._grabData[1].interactor.object.getPositionWorld();
+
+            /* Make the weapon snap to both hands or not */
+            const source =
+                primary.snap != GrabSnapMode.None ? primaryPos : primaryInteractorPos;
+            const target =
+                secondary.snap != GrabSnapMode.None ? secondaryPos : secondaryInteractorPos;
+
+            const interactorUp = this._grabData[1].interactor.object.getUpWorld(
+                vec3.create()
+            );
+            const up = vec3.create();
+            if (vec3.dot(interactorUp, [0, 1, 0]) >= 0.5) {
+                vec3.copy(up, interactorUp);
+                this._useUpOrientation = true;
+            } else {
+                this._grabData[1].interactor.object.getForwardWorld(up);
+                this._useUpOrientation = false;
+            }
+
+            const handRotation = rotationFromTwoHandle(
+                source,
+                target,
+                up,
+                this._defaultGrabRotation
+            );
+            const objectRotation = this.object.getRotationWorld(_rotation);
+
+            computeRelativeRotation(
+                objectRotation,
+                handRotation,
+                this._defaultGrabRotation
             );
         }
 
@@ -319,6 +373,8 @@ export class Grabbable extends Component {
 
         const otherGrab = index === 0 ? this._grabData[1] : this._grabData[0];
         if (otherGrab) {
+            // TODO: Only do that if the grab isn't snappy.
+
             /* If only one handle is released, we need to store the current transform
              * into the remaining grab data to avoid having an inconsistent single grab. */
             const interactor = otherGrab.interactor.object;
@@ -391,6 +447,8 @@ export class Grabbable extends Component {
         const primaryWorld = primaryInteractor.object.getPositionWorld(_pointA);
         const secondaryWorld = secondaryInteractor.object.getPositionWorld(_pointB);
 
+        const primaryHandle = this.handles[primaryGrab.handleId];
+
         const squaredDistance = vec3.squaredDistance(primaryWorld, secondaryWorld);
         if (squaredDistance > this._maxSqDistance! * 2.0) {
             /* Hands are too far apart, release the second handle. */
@@ -398,23 +456,22 @@ export class Grabbable extends Component {
             return;
         }
 
-        const primaryHandle = this.handles[primaryGrab.handleId];
-
         /* Pivot */
 
-        const up = secondaryInteractor.meshRoot!.getUpWorld(new Float32Array([0, 0, 0]));
-        vec3.scale(up, up, -1);
-        vec3.normalize(up, up);
-
-        const mat = mat4.lookAt(mat4.create(), primaryWorld, secondaryWorld, up);
-        mat4.invert(mat, mat);
-
-        const pivotRotation = mat4.getRotation(quat.create(), mat);
-        const pivotPosition = primaryWorld;
+        const up = this._useUpOrientation
+            ? secondaryInteractor.object.getUpWorld(vec3.create())
+            : secondaryInteractor.object.getForwardWorld(vec3.create());
+        const pivotRotation = rotationFromTwoHandle(
+            primaryWorld,
+            secondaryWorld,
+            up,
+            quat.create()
+        );
+        quat.multiply(pivotRotation, pivotRotation, this._defaultGrabRotation);
         const pivotToWorld = quat2.fromRotationTranslation(
             quat2.create(),
             pivotRotation,
-            pivotPosition
+            primaryWorld
         );
 
         /* Object to handle */
