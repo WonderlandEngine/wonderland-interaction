@@ -1,5 +1,4 @@
 import {Component, Object3D} from '@wonderlandengine/api';
-import {typename} from '../constants.js';
 import {PlayerController, getRequiredComponents} from './player-controller.js';
 import {property} from '@wonderlandengine/api/decorators.js';
 import {InputBridge} from './input-bridge.js';
@@ -12,7 +11,7 @@ import {setComponentsActive} from '../utils/activate-children.js';
 const _axis = vec3.create();
 
 export class TeleportLocomotion extends Component {
-    static TypeName = typename('teleport-locomotion');
+    static TypeName = 'teleport-locomotion';
 
     @property.object({required: false})
     inputBridgeObject!: Object3D;

@@ -1,13 +1,13 @@
 import {Component, LockAxis, Object3D} from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
-import {EPSILON, typename} from '../constants.js';
 import {PlayerController} from './player-controller.js';
 import {RotationType} from './enums/RotationType.js';
 import {InputBridge, InputBridgeTypename} from './input-bridge.js';
 import {vec3} from 'gl-matrix';
+import {EPSILON} from '../constants.js';
 
 export class PlayerRotate extends Component {
-    static TypeName = typename('player-rotate');
+    static TypeName = 'player-rotate';
     private static rotationTypeMapping = ['Snap', 'Smooth'];
 
     @property.enum(

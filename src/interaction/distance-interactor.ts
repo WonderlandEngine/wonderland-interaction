@@ -3,7 +3,6 @@ import {vec3} from 'gl-matrix';
 import {CollisionComponent, Component, Object3D} from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
 
-import {typename} from '../constants.js';
 import {radiusHierarchy} from '../utils/wle.js';
 import {Grabbable} from './grabbable.js';
 import {Interactor} from './interactor.js';
@@ -77,7 +76,7 @@ const _vectorA = vec3.create();
  */
 export class DistanceInteractor extends Component {
     /** @overload */
-    static TypeName = typename('distance-interactor');
+    static TypeName = 'distance-interactor';
 
     /** Public Attributes. */
 

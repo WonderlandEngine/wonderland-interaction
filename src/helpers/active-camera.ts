@@ -1,6 +1,5 @@
 import {Component, NumberArray, Object3D} from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
-import {typename} from '../constants.js';
 import {vec3} from 'gl-matrix';
 
 const tempVec1 = vec3.create();
@@ -10,7 +9,7 @@ const tempVec2 = vec3.create();
  * This component helps retrieve the camera position in VR and non-VR.
  */
 export class ActiveCamera extends Component {
-    static TypeName = typename('active-camera');
+    static TypeName = 'active-camera';
 
     @property.object({required: true})
     nonVrCamera!: Object3D;
