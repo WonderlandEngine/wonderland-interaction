@@ -1,8 +1,7 @@
 import {Component, InputComponent, Object3D} from '@wonderlandengine/api';
-import {typename} from '../../constants.js';
 import {property} from '@wonderlandengine/api/decorators.js';
 import {vec3} from 'gl-matrix';
-import {Handedness} from '../interactor.js';
+import {Handedness} from '../interaction/interactor.js';
 
 const tempVectorAxisLeft = vec3.create();
 const tempVectorAxisRight = vec3.create();
@@ -17,7 +16,7 @@ const tempVectorAxisRight = vec3.create();
  *   - walk and strafe with left, rotate with right
  */
 export class ControlsVR extends Component {
-    static TypeName = typename('controls-vr');
+    static TypeName = 'controls-vr';
 
     @property.object({required: true})
     leftControlObject!: Object3D;

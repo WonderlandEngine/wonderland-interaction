@@ -1,16 +1,15 @@
 export * from './history-tracker.js';
+export * from './interaction/grab-point.js';
 
-export * from './components/interaction/grab-point.js';
+export * from './interaction/grabbable.js';
+export * from './interaction/interactor.js';
+export * from './interaction/distance-interactor.js';
 
-export * from './components/grabbable.js';
-export * from './components/interactor.js';
-export * from './components/distance-interactor.js';
-
-export * from './components/helpers/sync-position-world.js';
-export * from './components/helpers/active-camera.js';
+export * from './helpers/sync-position-world.js';
+export * from './helpers/active-camera.js';
 
 export * from './utils/math.js';
 export * from './utils/activate-children.js';
 export * from './utils/wle.js';
 
-export * from './components/player-controller/index.js';
+export * from './player-controller/index.js';

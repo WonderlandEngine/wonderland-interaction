@@ -1,6 +1,5 @@
 import {Component, PhysXComponent} from '@wonderlandengine/api';
 import {vec3} from 'gl-matrix';
-import {typename} from '../../constants.js';
 
 /**
  * Direction type for Keyboard Inputs.
@@ -41,7 +40,7 @@ const keyMap: {[key: string]: Direction} = {
  * - lock all angularAxis except for Y (For rotation torque ability)(Can be disabled if you don't want Rotation)
  */
 export class ControlsKeyboard extends Component {
-    static TypeName = typename('controls-keyboard');
+    static TypeName = 'controls-keyboard';
 
     up = false;
     right = false;

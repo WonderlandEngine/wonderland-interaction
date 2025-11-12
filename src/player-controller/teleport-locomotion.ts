@@ -1,18 +1,17 @@
 import {Component, Object3D} from '@wonderlandengine/api';
-import {typename} from '../../constants.js';
 import {PlayerController, getRequiredComponents} from './player-controller.js';
 import {property} from '@wonderlandengine/api/decorators.js';
 import {InputBridge} from './input-bridge.js';
 import {quat, vec2, vec3} from 'gl-matrix';
 import {ActiveCamera} from '../helpers/active-camera.js';
-import {Handedness} from '../interactor.js';
-import {setComponentsActive} from '../../utils/activate-children.js';
+import {Handedness} from '../interaction/interactor.js';
+import {setComponentsActive} from '../utils/activate-children.js';
 
 /* Temporaries. */
 const _axis = vec3.create();
 
 export class TeleportLocomotion extends Component {
-    static TypeName = typename('teleport-locomotion');
+    static TypeName = 'teleport-locomotion';
 
     @property.object({required: false})
     inputBridgeObject!: Object3D;

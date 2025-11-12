@@ -1,12 +1,11 @@
 import {Component, Object3D} from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
-import {typename} from '../../constants.js';
 import {vec3} from 'gl-matrix';
 import {InputBridge} from './input-bridge.js';
 import {PlayerController, getRequiredComponents} from './player-controller.js';
 
 export class SmoothLocomotion extends Component {
-    static TypeName = typename('smooth-locomotion');
+    static TypeName = 'smooth-locomotion';
 
     /**
      * Whether or not the player is allowed to move
