@@ -22,6 +22,9 @@ export interface GrabData {
 
     /** Local translation on grab */
     localPosition: Float32Array;
+    localRotation: Float32Array;
+
+    handlePositionWorld: Float32Array;
 
     /** Local transform in **interactor** space */
     transform: quat2;
@@ -49,7 +52,12 @@ const rotationFromTwoHandle = (function () {
     };
 })();
 
-export class TranslationConstraints {
+export enum GrabRotationType {
+    Hand = 0,
+    AroundPivot,
+}
+
+export class Constraints {
     @property.bool()
     lockX: boolean = false;
 
@@ -171,8 +179,14 @@ export class Grabbable extends Component {
      * Constraint Properties
      */
 
-    @property.record(TranslationConstraints)
-    public translationConstraints: TranslationConstraints = null!;
+    @property.enum(['Hand', 'AroundPivot'], GrabRotationType.Hand)
+    public rotationType = GrabRotationType.Hand;
+
+    @property.record(Constraints)
+    public translationConstraints: Constraints = null!;
+
+    @property.record(Constraints)
+    public rotationConstraints: Constraints = null!;
 
     handles: GrabPoint[] = [];
 
@@ -321,14 +335,18 @@ export class Grabbable extends Component {
         const grab = {
             interactor,
             handleId,
-            localPosition: new Float32Array([0, 0, 0]),
+            localPosition: new Float32Array([0, 0, 0]), // TODO: Local transform instead.
+            localRotation: new Float32Array([0, 0, 0, 0]),
+            handlePositionWorld: new Float32Array([0, 0, 0]),
             transform: quat2.create(),
         };
         this._grabData.push(grab);
 
-        this.object.getPositionLocal(grab.localPosition);
-
         const handle = this.handles[handleId];
+        this.object.getPositionLocal(grab.localPosition);
+        this.object.getRotationLocal(grab.localRotation);
+        handle.object.getPositionWorld(grab.handlePositionWorld);
+
         switch (handle.snap) {
             case GrabSnapMode.None:
                 computeRelativeTransform(this.object, interactor.object, grab.transform);
@@ -471,28 +489,60 @@ export class Grabbable extends Component {
     private _updateTransformSingleHand(index: number) {
         const grab = this._grabData[index]!;
         const hand = grab.interactor.object;
+        const handle = this.handles[grab.handleId];
 
         const handPosition = hand.getPositionWorld();
-        const position = this.object.getPositionWorld();
+        const handlePosition = handle.object.getPositionWorld();
 
-        const squaredDistance = vec3.squaredDistance(handPosition, position);
+        const squaredDistance = vec3.squaredDistance(handPosition, handlePosition);
         if (squaredDistance > this._maxSqDistance) {
             /* Hands are too far apart, release the second handle. */
             this.release(grab.interactor);
             return;
         }
 
-        /* `grab.transform` is in the hand space, thus multiplyig
-         * the hand transform by the object's transform leads to
-         * its world space transform. */
-        const transform = hand.getTransformWorld(_transform);
-        quat2.multiply(transform, transform, grab.transform);
+        switch (this.rotationType) {
+            case GrabRotationType.Hand: {
+                /* `grab.transform` is in the hand space, thus multiplyig
+                 * the hand transform by the object's transform leads to
+                 * its world space transform. */
+                const transform = hand.getTransformWorld(_transform);
+                quat2.multiply(transform, transform, grab.transform);
 
-        const handle = this.handles[grab.handleId];
-        const lerp = clamp(handle.snapLerp, 0, 1);
-        quat2.lerp(transform, this.object.transformWorld, transform, lerp);
+                const handle = this.handles[grab.handleId];
+                const lerp = clamp(handle.snapLerp, 0, 1);
+                quat2.lerp(transform, this.object.transformWorld, transform, lerp);
 
-        this.object.setTransformWorld(transform);
+                this.object.setTransformWorld(transform);
+                break;
+            }
+            case GrabRotationType.AroundPivot:
+                // TODO: Do the same for multiple hands
+                const position = this.object.getPositionWorld();
+                const axis = vec3.set(vec3.create(),
+                    this.rotationConstraints.lockX ? 0 : 1,
+                    this.rotationConstraints.lockY ? 0 : 1,
+                    this.rotationConstraints.lockZ ? 0 : 1,
+                );
+                vec3.normalize(axis, axis);
+                const objectToHand = vec3.subtract(vec3.create(), handPosition, position);
+                vec3.normalize(objectToHand, objectToHand);
+                const objectToHandle = vec3.subtract(vec3.create(), grab.handlePositionWorld, position);
+                vec3.normalize(objectToHandle, objectToHandle);
+
+                let angle = -vec3.angle(objectToHand, objectToHandle);
+                const cross = vec3.cross(vec3.create(), objectToHand, objectToHandle);
+                if (vec3.dot(axis, cross) < 0) { // Or > 0
+                    angle = -angle;
+                }
+
+                const rot = quat.setAxisAngle(quat.create(), axis, angle);
+                quat.multiply(rot, rot, grab.localRotation);
+                this.object.setRotationLocal(rot);
+
+                // TODO
+                break;
+        }
 
         this._applyConstraints(grab);
     }
@@ -545,9 +595,15 @@ export class Grabbable extends Component {
 
         const transform = quat2.multiply(quat2.create(), objectToPivot, pivotToWorld);
         this.object.setTransformWorld(transform);
+
+        this._applyConstraints(primaryGrab);
     }
 
     private _applyConstraints(grab: GrabData) {
+        this.object.getRotationLocal(_rotation);
+
+        // TODO: Constraint rotation
+
         if (
             !this.translationConstraints.lockX &&
             !this.translationConstraints.lockY &&
