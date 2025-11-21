@@ -19,6 +19,12 @@ import {
 } from '../utils/math.js';
 import {GrabPoint, GrabSnapMode} from './grab-point.js';
 import {FORWARD, UP} from '../constants.js';
+import {
+    computeLocalPositionForPivot,
+    rotateAroundPivot,
+    rotateAroundPivotDual,
+    rotateFreeDual,
+} from './providers.js';
 
 /** Temporary info about grabbed target. */
 export interface GrabData {
@@ -43,35 +49,6 @@ const _vectorB = vec3.create();
 const _vectorC = vec3.create();
 const _rotation = quat.create();
 const _transform = quat2.create();
-
-const rotationFromTwoHandle = (function () {
-    const matTemp = mat4.create();
-    return function (source: vec3, target: vec3, up: vec3, out: quat) {
-        const mat = mat4.lookAt(matTemp, source, target, up);
-        mat4.invert(mat, mat);
-        mat4.getRotation(out, mat);
-        return out;
-    };
-})();
-
-const rotateAroundPivot = (function () {
-    return function (out: quat, axis: vec3, origin: vec3, handle: vec3): quat {
-        const objectToHandle = vec3.subtract(vec3.create(), handle, origin);
-        vec3.normalize(objectToHandle, objectToHandle);
-
-        /* Project vector onto plane defined by axis */
-        const vDotN = vec3.dot(objectToHandle, axis);
-        const projected = vec3.scale(vec3.create(), axis, vDotN);
-        vec3.sub(projected, objectToHandle, projected);
-        vec3.normalize(projected, projected);
-
-        const worldUp = vec3.dot(axis, UP) < 0.5 ? UP : FORWARD;
-        const forward = vec3.cross(vec3.create(), worldUp, axis);
-        vec3.normalize(forward, forward);
-
-        return quat.rotationTo(out, forward, projected);
-    };
-})();
 
 // TODO: Expose.
 export enum SingleGrabType {
@@ -403,16 +380,9 @@ export class Grabbable extends Component {
 
         switch (this.rotationType) {
             case GrabRotationType.AroundPivot: {
-                const axis = this.rotationConstraints.axis();
-                const positionLocal = vec3.set(vec3.create(), 0, 0, 0);
-                const handlePositionLocal = this.object.transformPointInverseWorld(
-                    handle.object.getPositionWorld()
-                );
-                rotateAroundPivot(
+                this.rotationAroundPivot(
                     this._defaultGrabRotation,
-                    axis,
-                    positionLocal,
-                    handlePositionLocal
+                    handle.object.getPositionWorld()
                 );
                 quat.invert(this._defaultGrabRotation, this._defaultGrabRotation);
                 break;
@@ -461,15 +431,30 @@ export class Grabbable extends Component {
             this._useUpOrientation = false;
         }
 
-        const handRotation = rotationFromTwoHandle(
-            source,
-            target,
-            up,
-            this._defaultGrabRotation
-        );
-        const objectRotation = this.object.getRotationWorld(_rotation);
-
-        computeRelativeRotation(objectRotation, handRotation, this._defaultGrabRotation);
+        switch (this.rotationType) {
+            case GrabRotationType.AroundPivot:
+                {
+                    this.rotationAroundPivotDual(this._defaultGrabRotation, source, target);
+                    quat.invert(this._defaultGrabRotation, this._defaultGrabRotation);
+                }
+                break;
+            case GrabRotationType.Hand:
+                {
+                    const handRotation = rotateFreeDual(
+                        source,
+                        target,
+                        up,
+                        this._defaultGrabRotation
+                    );
+                    const objectRotation = this.object.getRotationWorld(_rotation);
+                    computeRelativeRotation(
+                        objectRotation,
+                        handRotation,
+                        this._defaultGrabRotation
+                    );
+                }
+                break;
+        }
 
         this._onGrabStart.notify(this);
     }
@@ -539,6 +524,23 @@ export class Grabbable extends Component {
         return this._onGrabEnd;
     }
 
+    protected rotationAroundPivot(out: quat, positionWorld: vec3) {
+        /* Use grabbable parent space for the rotation to avoid taking into account
+         * the actual grabbable rotation undergoing. */
+        const localPos = computeLocalPositionForPivot(this.object, positionWorld);
+        const axis = this.rotationConstraints.axis();
+        return rotateAroundPivot(out, axis, localPos);
+    }
+
+    protected rotationAroundPivotDual(out: quat, primaryWorld: vec3, secondaryWorld: vec3) {
+        /* Use grabbable parent space for the rotation to avoid taking into account
+         * the actual grabbable rotation undergoing. */
+        const primaryLocalPos = computeLocalPositionForPivot(this.object, primaryWorld);
+        const secondaryLocalPos = computeLocalPositionForPivot(this.object, secondaryWorld);
+        const axis = this.rotationConstraints.axis();
+        return rotateAroundPivotDual(out, axis, primaryLocalPos, secondaryLocalPos);
+    }
+
     /**
      * Compute the transform of this grabbable based on a single handle.
      *
@@ -575,26 +577,8 @@ export class Grabbable extends Component {
                 break;
             }
             case GrabRotationType.AroundPivot:
-                // TODO: Do the same for multiple hands
-
-                const positionLocal = vec3.set(vec3.create(), 0, 0, 0);
-
-                /* Use grabbable parent space for the rotation to avoid taking into account
-                 * the actual grabbable rotation undergoing. */
-                const parent = this.object.parent ?? this.scene.wrap(0);
-                const handParentSpace = parent.transformPointInverseWorld(handPosition);
-                const handPositionLocal = vec3.subtract(
-                    vec3.create(),
-                    handParentSpace,
-                    this.object.getPositionLocal()
-                );
-                const axis = this.rotationConstraints.axis();
-                const rot = rotateAroundPivot(
-                    quat.create(),
-                    axis,
-                    positionLocal,
-                    handPositionLocal
-                );
+                // TODO: Handle position?
+                const rot = this.rotationAroundPivot(quat.create(), handPosition);
                 quat.multiply(rot, rot, this._defaultGrabRotation);
                 this.object.setRotationLocal(rot);
                 break;
@@ -622,37 +606,59 @@ export class Grabbable extends Component {
             return;
         }
 
-        /* Pivot */
+        switch (this.rotationType) {
+            case GrabRotationType.Hand:
+                {
+                    /* Pivot */
+                    const up = this._useUpOrientation
+                        ? secondaryInteractor.object.getUpWorld(vec3.create())
+                        : secondaryInteractor.object.getForwardWorld(vec3.create());
+                    const pivotRotation = rotateFreeDual(
+                        primaryWorld,
+                        secondaryWorld,
+                        up,
+                        quat.create()
+                    );
+                    quat.multiply(pivotRotation, pivotRotation, this._defaultGrabRotation);
+                    const pivotToWorld = quat2.fromRotationTranslation(
+                        quat2.create(),
+                        pivotRotation,
+                        primaryWorld
+                    );
 
-        const up = this._useUpOrientation
-            ? secondaryInteractor.object.getUpWorld(vec3.create())
-            : secondaryInteractor.object.getForwardWorld(vec3.create());
-        const pivotRotation = rotationFromTwoHandle(
-            primaryWorld,
-            secondaryWorld,
-            up,
-            quat.create()
-        );
-        quat.multiply(pivotRotation, pivotRotation, this._defaultGrabRotation);
-        const pivotToWorld = quat2.fromRotationTranslation(
-            quat2.create(),
-            pivotRotation,
-            primaryWorld
-        );
+                    /* Object to handle */
 
-        /* Object to handle */
+                    const objectToPivotVec = vec3.subtract(
+                        vec3.create(),
+                        this.object.getPositionWorld(),
+                        primaryHandle.object.getPositionWorld()
+                    );
+                    const objectToPivot = quat2.fromTranslation(
+                        quat2.create(),
+                        objectToPivotVec
+                    );
 
-        const objectToPivotVec = vec3.subtract(
-            vec3.create(),
-            this.object.getPositionWorld(),
-            primaryHandle.object.getPositionWorld()
-        );
-        const objectToPivot = quat2.fromTranslation(quat2.create(), objectToPivotVec);
-
-        const transform = quat2.multiply(quat2.create(), objectToPivot, pivotToWorld);
-        this.object.setTransformWorld(transform);
-
-        this._applyConstraints(primaryGrab);
+                    const transform = quat2.multiply(
+                        quat2.create(),
+                        objectToPivot,
+                        pivotToWorld
+                    );
+                    this.object.setTransformWorld(transform);
+                    this._applyConstraints(primaryGrab);
+                }
+                break;
+            case GrabRotationType.AroundPivot:
+                {
+                    const rot = this.rotationAroundPivotDual(
+                        quat.create(),
+                        primaryWorld,
+                        secondaryWorld
+                    );
+                    quat.multiply(rot, rot, this._defaultGrabRotation);
+                    this.object.setRotationLocal(rot);
+                }
+                break;
+        }
     }
 
     private _applyConstraints(grab: GrabData) {
