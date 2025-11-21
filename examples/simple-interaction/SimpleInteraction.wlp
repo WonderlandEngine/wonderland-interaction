@@ -3,20 +3,79 @@
         "14": {
             "name": "Player",
             "translation": [
-                -2.9841971,
-                0.0,
-                -2.1806735
+                -2.6703875,
+                0.343031,
+                1.9847025
             ],
             "rotation": [
                 0.0,
-                0.0,
-                0.0,
-                1.0
+                1.0,
+                1.9666335049350891e-7,
+                0.0000013
             ],
             "scaling": [
-                0.9999998,
+                0.999999,
                 1.0,
-                0.9999998
+                0.999999
+            ],
+            "components": [
+                {
+                    "type": "player-controller"
+                },
+                {
+                    "type": "locomotion-selector",
+                    "locomotion-selector": {
+                        "locomotionType": "SmoothLocomotion"
+                    }
+                },
+                {
+                    "type": "player-rotate",
+                    "player-rotate": {
+                        "rotationType": "Snap",
+                        "rotationSpeed": 6.1999998,
+                        "inputBridgeObject": "14"
+                    }
+                },
+                {
+                    "type": "controls-vr",
+                    "controls-vr": {
+                        "leftControlObject": "130",
+                        "rightControlObject": "129"
+                    }
+                },
+                {
+                    "type": "input-bridge",
+                    "input-bridge": {
+                        "inputs": "14"
+                    }
+                },
+                {
+                    "type": "active-camera",
+                    "active-camera": {
+                        "nonVrCamera": "17",
+                        "leftEye": "18",
+                        "rightEye": "19"
+                    }
+                },
+                {
+                    "type": "physx",
+                    "physx": {
+                        "sphere": {
+                            "radius": 0.15
+                        },
+                        "staticFriction": 0.0,
+                        "dynamicFriction": 0.0,
+                        "bounciness": 0.0,
+                        "angularDamping": 10.0
+                    }
+                },
+                {
+                    "type": "smooth-locomotion",
+                    "smooth-locomotion": {
+                        "inputBridgeObject": "14",
+                        "speed": 20.0
+                    }
+                }
             ]
         },
         "15": {
@@ -2183,22 +2242,21 @@
             ]
         },
         "333": {
-            "name": "InteractableObjects",
-            "components": []
+            "name": "TranslationObjects",
+            "components": [],
+            "translation": [
+                -2.5,
+                0.0,
+                -2.7446005
+            ]
         },
         "332": {
             "name": "SteeringWheel",
-            "parent": "333",
+            "parent": "363",
             "translation": [
-                -2.6882083,
-                1.0,
-                2.7077164
-            ],
-            "rotation": [
-                -0.7072297,
                 0.0,
                 0.0,
-                0.7069837
+                0.0
             ],
             "scaling": [
                 1.0,
@@ -2226,9 +2284,21 @@
                             "lockX": true,
                             "lockY": true,
                             "lockZ": true
-                        }
+                        },
+                        "rotationConstraints": {
+                            "lockY": false,
+                            "lockX": true,
+                            "lockZ": true
+                        },
+                        "rotationType": "AroundPivot"
                     }
                 }
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
             ]
         },
         "335": {
@@ -2423,26 +2493,6 @@
                 }
             ]
         },
-        "342": {
-            "name": "Locking",
-            "parent": "333",
-            "rotation": [
-                0.0,
-                0.0,
-                0.0,
-                1.0
-            ],
-            "scaling": [
-                1.0,
-                1.0,
-                1.0
-            ],
-            "translation": [
-                -2.5,
-                0.0,
-                -2.7446005
-            ]
-        },
         "343": {
             "name": "Table",
             "scaling": [
@@ -2518,16 +2568,7 @@
         },
         "345": {
             "name": "Environment",
-            "parent": "342"
-        },
-        "346": {
-            "name": "SliderUnbound",
-            "parent": "342",
-            "translation": [
-                -0.6547281,
-                1.0,
-                0.0
-            ],
+            "parent": "333",
             "rotation": [
                 0.0,
                 0.0,
@@ -2538,6 +2579,26 @@
                 1.0,
                 1.0,
                 1.0
+            ]
+        },
+        "346": {
+            "name": "SliderUnbound",
+            "parent": "333",
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "translation": [
+                0.0,
+                0.9318817,
+                0.0
             ]
         },
         "347": {
@@ -2615,6 +2676,345 @@
                 0.05,
                 0.05,
                 0.05
+            ]
+        },
+        "349": {
+            "name": "ComplexInteractableObjects"
+        },
+        "350": {
+            "name": "Table",
+            "translation": [
+                0.0,
+                0.2849999,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.069,
+                0.2675206,
+                0.4
+            ],
+            "parent": "352",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "material": "25",
+                        "mesh": "8"
+                    }
+                },
+                {
+                    "type": "physx",
+                    "active": true,
+                    "physx": {
+                        "static": true,
+                        "shape": "box",
+                        "box": {
+                            "extents": [
+                                2.0,
+                                0.25,
+                                0.75
+                            ]
+                        },
+                        "bounciness": 0.0
+                    }
+                }
+            ]
+        },
+        "351": {
+            "name": "Advanced Interactables",
+            "translation": [
+                1.1920928955078125e-7,
+                1.3796205,
+                -0.2937721
+            ],
+            "rotation": [
+                5.4200185672925753e-8,
+                1.0,
+                1.2718392383703758e-7,
+                -0.000244
+            ],
+            "scaling": [
+                0.9999994,
+                1.0,
+                0.9999993
+            ],
+            "parent": "352",
+            "components": [
+                {
+                    "type": "text",
+                    "text": {
+                        "text": "Advanced Interactables"
+                    }
+                }
+            ]
+        },
+        "352": {
+            "name": "Environment",
+            "parent": "349",
+            "translation": [
+                -2.5,
+                0.0,
+                3.2550001
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "342": {
+            "name": "Door",
+            "parent": "349",
+            "translation": [
+                0.0,
+                1.0,
+                3.5
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "354": {
+            "name": "Door",
+            "parent": "362",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "mesh": "8",
+                        "material": "25"
+                    }
+                }
+            ],
+            "scaling": [
+                0.5,
+                1.0,
+                0.05
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "translation": [
+                -2.9802322387695313e-8,
+                0.0,
+                0.0
+            ]
+        },
+        "355": {
+            "name": "Frame",
+            "parent": "342"
+        },
+        "356": {
+            "name": "Left",
+            "translation": [
+                0.5497784,
+                0.0,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "parent": "355",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "material": "20",
+                        "mesh": "8"
+                    }
+                }
+            ],
+            "scaling": [
+                0.05,
+                1.0,
+                0.05
+            ]
+        },
+        "357": {
+            "name": "Right",
+            "translation": [
+                -0.55,
+                0.0,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                0.05,
+                1.0,
+                0.05
+            ],
+            "parent": "355",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "material": "20",
+                        "mesh": "8"
+                    }
+                }
+            ]
+        },
+        "358": {
+            "name": "Up",
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                0.5,
+                0.05,
+                0.05
+            ],
+            "parent": "355",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "material": "20",
+                        "mesh": "8"
+                    }
+                }
+            ],
+            "translation": [
+                0.0,
+                1.0549999,
+                0.0
+            ]
+        },
+        "359": {
+            "name": "Interactable",
+            "parent": "342",
+            "components": [
+                {
+                    "type": "grabbable",
+                    "grabbable": {
+                        "rotationType": "AroundPivot",
+                        "handleObjects": [
+                            "360"
+                        ],
+                        "rotationConstraints": {
+                            "lockX": true,
+                            "lockZ": true
+                        },
+                        "translationConstraints": {
+                            "lockX": true,
+                            "lockY": true,
+                            "lockZ": true
+                        }
+                    }
+                }
+            ],
+            "translation": [
+                -0.5000003,
+                -0.9999986,
+                3.790482878684998e-7
+            ],
+            "scaling": [
+                0.9999983,
+                1.0,
+                0.9999983
+            ]
+        },
+        "360": {
+            "name": "Handle",
+            "parent": "362",
+            "translation": [
+                0.3598538,
+                -0.0,
+                -0.0877356
+            ],
+            "rotation": [
+                0.7071068,
+                0.0,
+                0.0,
+                0.7071067
+            ],
+            "scaling": [
+                0.05,
+                0.0499987,
+                0.0499987
+            ],
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "material": "22",
+                        "mesh": "11"
+                    }
+                }
+            ]
+        },
+        "362": {
+            "name": "Door",
+            "parent": "359",
+            "translation": [
+                0.5,
+                1.0,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "363": {
+            "name": "SteeringWheel",
+            "parent": "349",
+            "translation": [
+                -2.6882081,
+                0.9308456,
+                2.7110049
+            ],
+            "rotation": [
+                -0.7072303,
+                0.0,
+                0.0,
+                0.7069831
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
             ]
         }
     },
@@ -3136,6 +3536,12 @@
                     0.3089579,
                     0.0,
                     1.0
+                ],
+                "fogColor": [
+                    0.5249999,
+                    1.0,
+                    1.0,
+                    0.0
                 ]
             },
             "pipeline": "37"
@@ -3545,7 +3951,7 @@
                 1,
                 5,
                 0,
-                4
+                5
             ]
         },
         "xr": {

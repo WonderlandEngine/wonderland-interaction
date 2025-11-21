@@ -12,10 +12,8 @@ import {property} from '@wonderlandengine/api/decorators.js';
 
 import {Interactor} from './interactor.js';
 import {HistoryTracker} from '../history-tracker.js';
-import {computeRelativeRotation, computeRelativeTransform} from '../utils/math.js';
+import {computeRelativeRotation, computeRelativeTransform, toDegree} from '../utils/math.js';
 import {GrabPoint, GrabSnapMode} from './grab-point.js';
-import { RotationType } from '../player-controller/index.js';
-import { EPSILON, FORWARD, UP } from '../constants.js';
 
 /** Temporary info about grabbed target. */
 export interface GrabData {
@@ -404,8 +402,9 @@ export class Grabbable extends Component {
         switch(this.rotationType) {
             case GrabRotationType.AroundPivot: {
                 const axis = this.rotationConstraints.axis();
-                const handlePositionLocal = this.object.transformPointInverseWorld(handle.object.getPositionWorld());
-                rotateAroundPivot(this._defaultGrabRotation, axis, this.object.getPositionLocal(), handlePositionLocal);
+                const positionLocal = vec3.set(vec3.create(), 0, 0, 0);
+                const handlePositionLocal = vec3.subtract(vec3.create(), handle.object.getPositionWorld(), this.object.getPositionWorld());
+                rotateAroundPivot(this._defaultGrabRotation, axis, positionLocal, handlePositionLocal);
                 quat.invert(this._defaultGrabRotation, this._defaultGrabRotation);
                 break;
             }
@@ -568,8 +567,8 @@ export class Grabbable extends Component {
             }
             case GrabRotationType.AroundPivot:
                 // TODO: Do the same for multiple hands
-                const positionLocal = this.object.getPositionLocal();
-                const handPositionLocal = this.object.transformPointInverseWorld(handPosition);
+                const positionLocal = vec3.set(vec3.create(), 0, 0, 0);
+                const handPositionLocal = vec3.subtract(vec3.create(), handPosition, this.object.getPositionWorld());
                 const axis = this.rotationConstraints.axis();
                 const rot = rotateAroundPivot(quat.create(), axis, positionLocal, handPositionLocal);
                 quat.multiply(rot, rot, this._defaultGrabRotation);
