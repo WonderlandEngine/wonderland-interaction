@@ -10,7 +10,7 @@
             "rotation": [
                 0.0,
                 1.0,
-                1.9666335049350894e-7,
+                1.9666335049350897e-7,
                 0.0000013
             ],
             "scaling": [
@@ -3976,8 +3976,8 @@
             ]
         },
         "runtime": {
-            "visualizeColliders": true,
-            "visualizePhysX": true,
+            "visualizeColliders": false,
+            "visualizePhysX": false,
             "loadUncompressedImagesAsBitmap": false
         },
         "physx": {
