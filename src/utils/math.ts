@@ -11,6 +11,10 @@ export function toRad(degrees: number) {
     return (degrees * Math.PI) / 180.0;
 }
 
+export function toDegree(radians: number) {
+    return (radians * 180) / Math.PI;
+}
+
 /**
  * Compute the delta between `src` and the `dst` quaternion.
  *
