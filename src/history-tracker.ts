@@ -60,7 +60,7 @@ export class HistoryTracker {
      * @param target The object to get the velocity from, in case the XR pose doesn't expose any.
      * @param delta The delta time.
      */
-    updateFromPose(xrPose: XRPose, target: Object3D, delta: number) {
+    updateFromPose(xrPose: XRPose, space: Object3D, target: Object3D, delta: number) {
         /* eslint-disable */
         // @ts-ignore Unfortunately, typings are outdated.
         const velocity: DOMPointReadOnly | null = xrPose.linearVelocity;
@@ -73,6 +73,7 @@ export class HistoryTracker {
             linearOutput[0] = velocity.x;
             linearOutput[1] = velocity.y;
             linearOutput[2] = velocity.z;
+            space.transformVectorWorld(linearOutput);
         } else {
             this._updateLinear(linearOutput, target, delta);
         }
@@ -82,6 +83,7 @@ export class HistoryTracker {
             angularOutput[0] = angular.x;
             angularOutput[1] = angular.y;
             angularOutput[2] = angular.z;
+            space.transformVectorWorld(angularOutput);
         } else {
             this._updateAngular(angularOutput, target, delta);
         }

@@ -290,7 +290,12 @@ export class Grabbable extends Component {
 
         const xrPose = anyGrab!.interactor.xrPose;
         if (xrPose && this.useControllerVelocityData) {
-            this._history.updateFromPose(xrPose, this.object, dt);
+            this._history.updateFromPose(
+                xrPose,
+                anyGrab!.interactor.trackedSpace,
+                this.object,
+                dt
+            );
         } else {
             this._history.update(this.object, dt);
         }
