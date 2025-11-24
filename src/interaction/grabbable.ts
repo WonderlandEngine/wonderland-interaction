@@ -22,6 +22,7 @@ import {
 } from './providers.js';
 import {Axis, AxisNames} from '../enums.js';
 import {FORWARD, RIGHT, UP} from '../constants.js';
+import { TempVec3 } from '../internal-constants.js';
 
 /** Temporary info about grabbed target. */
 export interface GrabData {
@@ -439,21 +440,27 @@ export class Grabbable extends Component {
     protected rotationAroundPivot(out: quat, positionWorld: vec3) {
         /* Use grabbable parent space for the rotation to avoid taking into account
          * the actual grabbable rotation undergoing. */
-        const localPos = computeLocalPositionForPivot(this.object, positionWorld);
-        return rotateAroundPivot(out, axis(this.pivotAxis), localPos);
+        const localPos = computeLocalPositionForPivot(TempVec3.acquire(), this.object, positionWorld);
+        rotateAroundPivot(out, axis(this.pivotAxis), localPos);
+
+        TempVec3.free();
+        return out;
     }
 
     protected rotationAroundPivotDual(out: quat, primaryWorld: vec3, secondaryWorld: vec3) {
         /* Use grabbable parent space for the rotation to avoid taking into account
          * the actual grabbable rotation undergoing. */
-        const primaryLocalPos = computeLocalPositionForPivot(this.object, primaryWorld);
-        const secondaryLocalPos = computeLocalPositionForPivot(this.object, secondaryWorld);
-        return rotateAroundPivotDual(
+        const primaryLocalPos = computeLocalPositionForPivot(TempVec3.acquire(), this.object, primaryWorld);
+        const secondaryLocalPos = computeLocalPositionForPivot(TempVec3.acquire(), this.object, secondaryWorld);
+        rotateAroundPivotDual(
             out,
             axis(this.pivotAxis),
             primaryLocalPos,
             secondaryLocalPos
         );
+
+        TempVec3.free(2);
+        return out;
     }
 
     /**
