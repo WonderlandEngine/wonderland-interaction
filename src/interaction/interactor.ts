@@ -56,6 +56,9 @@ export class Interactor extends Component {
     @property.enum(InteractorVisualStateNames, InteractorVisualState.Visible)
     visualStateOnGrab = InteractorVisualState.Visible;
 
+    @property.object({required: true})
+    trackedSpace: Object3D = null!;
+
     /** Private Attributes. */
 
     /** Collision component of this object. */
