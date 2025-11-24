@@ -12,19 +12,16 @@ import {property} from '@wonderlandengine/api/decorators.js';
 
 import {Interactor} from './interactor.js';
 import {HistoryTracker} from '../history-tracker.js';
-import {
-    computeRelativeRotation,
-    computeRelativeTransform,
-    toDegree,
-} from '../utils/math.js';
+import {computeRelativeRotation, computeRelativeTransform} from '../utils/math.js';
 import {GrabPoint, GrabSnapMode} from './grab-point.js';
-import {FORWARD, UP} from '../constants.js';
 import {
     computeLocalPositionForPivot,
     rotateAroundPivot,
     rotateAroundPivotDual,
     rotateFreeDual,
 } from './providers.js';
+import {Axis, AxisNames} from '../enums.js';
+import {FORWARD, RIGHT, UP} from '../constants.js';
 
 /** Temporary info about grabbed target. */
 export interface GrabData {
@@ -79,17 +76,14 @@ export class Constraints {
     max!: Float32Array;
 }
 
-export class RotationConstraints {
-    @property.bool()
-    lockX: boolean = false;
-    @property.bool()
-    lockY: boolean = false;
-    @property.bool()
-    lockZ: boolean = false;
-
-    axis(out: vec3 = vec3.create()) {
-        vec3.set(out, this.lockX ? 0 : 1, this.lockY ? 0 : 1, this.lockZ ? 0 : 1);
-        return vec3.normalize(out, out);
+function axis(axis: Axis) {
+    switch (axis) {
+        case Axis.X:
+            return RIGHT;
+        case Axis.Y:
+            return UP;
+        case Axis.Z:
+            return FORWARD;
     }
 }
 
@@ -167,7 +161,13 @@ export class Grabbable extends Component {
      * @note Set a negative value to disable.
      */
     @property.float(0.25)
-    public autoReleaseDistance = 0.25;
+    public releaseDistance = 0.25;
+
+    /**
+     * Similar to {@link releaseDistance}, but for dual grab
+     */
+    @property.float(0.5)
+    public releaseDistanceDual = 0.5;
 
     /**
      * The distance marker to use when distance-grabbed.
@@ -194,18 +194,19 @@ export class Grabbable extends Component {
     @property.bool(false)
     public autoSetPrimaryGrab = false;
 
+    @property.enum(['Hand', 'AroundPivot'], GrabRotationType.Hand)
+    public rotationType = GrabRotationType.Hand;
+
+    /** Pivot axis used when {@link rotationType} is set to {@link GrabRotationType.AroundPivot} */
+    @property.enum(AxisNames, Axis.Y)
+    public pivotAxis: Axis = Axis.Y;
+
     /*
      * Constraint Properties
      */
 
-    @property.enum(['Hand', 'AroundPivot'], GrabRotationType.Hand)
-    public rotationType = GrabRotationType.Hand;
-
     @property.record(Constraints)
     public translationConstraints: Constraints = null!;
-
-    @property.record(RotationConstraints)
-    public rotationConstraints: RotationConstraints = null!;
 
     handles: GrabPoint[] = [];
 
@@ -359,101 +360,18 @@ export class Grabbable extends Component {
             transform: quat2.create(),
         };
         this._grabData.push(grab);
-
-        const handle = this.handles[handleId];
         this.object.getPositionLocal(grab.localPosition);
         this.object.getRotationLocal(grab.localRotation);
-
-        switch (handle.snap) {
-            case GrabSnapMode.None:
-                computeRelativeTransform(this.object, interactor.object, grab.transform);
-                break;
-            case GrabSnapMode.PositionRotation:
-                computeRelativeTransform(this.object, handle.object, grab.transform);
-                break;
-        }
 
         this._history.reset(this.object);
         if (this._physx) {
             this._physx.active = false;
         }
 
-        switch (this.rotationType) {
-            case GrabRotationType.AroundPivot: {
-                this.rotationAroundPivot(
-                    this._defaultGrabRotation,
-                    handle.object.getPositionWorld()
-                );
-                quat.invert(this._defaultGrabRotation, this._defaultGrabRotation);
-                break;
-            }
-        }
-
         if (this._grabData.length === 1) {
-            this._maxSqDistance = this.autoReleaseDistance * this.autoReleaseDistance;
-            this._onGrabStart.notify(this);
-            return;
-        }
-
-        if (!this.autoSetPrimaryGrab && this._grabData[0].handleId !== 0) {
-            /* For main grab point to be primary handle */
-            const first = this._grabData[0];
-            this._grabData[0] = this._grabData[1];
-            this._grabData[1] = first;
-        }
-        const primary = this.handles[this._grabData[0].handleId];
-        const secondary = this.handles[this._grabData[1].handleId];
-
-        const primaryPos = primary.object.getPositionWorld(_pointA);
-        const secondaryPos = secondary.object.getPositionWorld(_pointB);
-        /* Cache the grabbing distance between both handles. */
-        this._maxSqDistance =
-            vec3.squaredDistance(primaryPos, secondaryPos) +
-            this.autoReleaseDistance * this.autoReleaseDistance;
-
-        const primaryInteractorPos = this._grabData[0].interactor.object.getPositionWorld();
-        const secondaryInteractorPos =
-            this._grabData[1].interactor.object.getPositionWorld();
-
-        /* Make the weapon snap to both hands or not */
-        const source =
-            primary.snap != GrabSnapMode.None ? primaryPos : primaryInteractorPos;
-        const target =
-            secondary.snap != GrabSnapMode.None ? secondaryPos : secondaryInteractorPos;
-
-        const interactorUp = this._grabData[1].interactor.object.getUpWorld(vec3.create());
-        const up = vec3.create();
-        if (vec3.dot(interactorUp, [0, 1, 0]) >= 0.5) {
-            vec3.copy(up, interactorUp);
-            this._useUpOrientation = true;
+            this.initializeGrab();
         } else {
-            this._grabData[1].interactor.object.getForwardWorld(up);
-            this._useUpOrientation = false;
-        }
-
-        switch (this.rotationType) {
-            case GrabRotationType.AroundPivot:
-                {
-                    this.rotationAroundPivotDual(this._defaultGrabRotation, source, target);
-                    quat.invert(this._defaultGrabRotation, this._defaultGrabRotation);
-                }
-                break;
-            case GrabRotationType.Hand:
-                {
-                    const handRotation = rotateFreeDual(
-                        source,
-                        target,
-                        up,
-                        this._defaultGrabRotation
-                    );
-                    const objectRotation = this.object.getRotationWorld(_rotation);
-                    computeRelativeRotation(
-                        objectRotation,
-                        handRotation,
-                        this._defaultGrabRotation
-                    );
-                }
-                break;
+            this.initializeDualGrab();
         }
 
         this._onGrabStart.notify(this);
@@ -478,25 +396,14 @@ export class Grabbable extends Component {
         const grab = this._grabData[index];
         if (!grab) return;
 
-        const otherGrab = index === 0 ? this._grabData[1] : this._grabData[0];
-        if (otherGrab) {
-            // TODO: Only do that if the grab isn't snappy.
-
-            /* If only one handle is released, we need to store the current transform
-             * into the remaining grab data to avoid having an inconsistent single grab. */
-            const interactor = otherGrab.interactor.object;
-            computeRelativeTransform(this.object, interactor, otherGrab.transform);
-
-            this._maxSqDistance = this.autoReleaseDistance * this.autoReleaseDistance;
-        }
-
         this._grabData.splice(index, 1);
 
-        if (this.canThrow && !this.isGrabbed) {
+        if (this._grabData.length) {
+            this.initializeGrab();
+        } else if (this.canThrow) {
             this.throw(interactor);
+            this._onGrabEnd.notify(this);
         }
-
-        this._onGrabEnd.notify(this);
     }
 
     /** `true` is any of the two handles is currently grabbed. */
@@ -528,8 +435,7 @@ export class Grabbable extends Component {
         /* Use grabbable parent space for the rotation to avoid taking into account
          * the actual grabbable rotation undergoing. */
         const localPos = computeLocalPositionForPivot(this.object, positionWorld);
-        const axis = this.rotationConstraints.axis();
-        return rotateAroundPivot(out, axis, localPos);
+        return rotateAroundPivot(out, axis(this.pivotAxis), localPos);
     }
 
     protected rotationAroundPivotDual(out: quat, primaryWorld: vec3, secondaryWorld: vec3) {
@@ -537,8 +443,123 @@ export class Grabbable extends Component {
          * the actual grabbable rotation undergoing. */
         const primaryLocalPos = computeLocalPositionForPivot(this.object, primaryWorld);
         const secondaryLocalPos = computeLocalPositionForPivot(this.object, secondaryWorld);
-        const axis = this.rotationConstraints.axis();
-        return rotateAroundPivotDual(out, axis, primaryLocalPos, secondaryLocalPos);
+        return rotateAroundPivotDual(
+            out,
+            axis(this.pivotAxis),
+            primaryLocalPos,
+            secondaryLocalPos
+        );
+    }
+
+    /**
+     * Initialize single hand grab
+     *
+     * @note Triggered when single grab occurs, or when second hand is released.
+     */
+    protected initializeGrab() {
+        this._maxSqDistance = this.releaseDistance * this.releaseDistance;
+
+        const grab = this._grabData[0];
+        const interactor = grab.interactor.object;
+        const handle = this.handles[grab.handleId];
+        const source = handle.snap != GrabSnapMode.None ? handle.object : interactor;
+
+        switch (this.rotationType) {
+            case GrabRotationType.AroundPivot: {
+                this.rotationAroundPivot(
+                    this._defaultGrabRotation,
+                    source.getPositionWorld()
+                );
+                computeRelativeRotation(
+                    this.object.getRotationLocal(),
+                    this._defaultGrabRotation,
+                    this._defaultGrabRotation
+                );
+                break;
+            }
+            case GrabRotationType.Hand:
+                computeRelativeTransform(this.object, source, grab.transform);
+                break;
+        }
+    }
+
+    /**
+     * Initialize double hand grab
+     */
+    protected initializeDualGrab() {
+        if (!this.autoSetPrimaryGrab && this._grabData[0].handleId !== 0) {
+            /* For main grab point to be primary handle */
+            const first = this._grabData[0];
+            this._grabData[0] = this._grabData[1];
+            this._grabData[1] = first;
+        }
+
+        const primaryHandle = this.handles[this._grabData[0].handleId];
+        const primaryInteractor = this._grabData[0].interactor.object;
+
+        const secondaryHandle = this.handles[this._grabData[1].handleId];
+        const secondaryInteractor = this._grabData[1].interactor.object;
+
+        /* Switch between handle or interactor for snapping */
+        const source =
+            primaryHandle.snap != GrabSnapMode.None
+                ? primaryHandle.object
+                : primaryInteractor;
+        const target =
+            secondaryHandle.snap != GrabSnapMode.None
+                ? secondaryHandle.object
+                : secondaryInteractor;
+
+        this._maxSqDistance = this.releaseDistanceDual * this.releaseDistanceDual;
+
+        switch (this.rotationType) {
+            case GrabRotationType.AroundPivot: {
+                this.rotationAroundPivotDual(
+                    this._defaultGrabRotation,
+                    source.getPositionWorld(),
+                    target!.getPositionWorld()
+                );
+                computeRelativeRotation(
+                    this.object.getRotationLocal(),
+                    this._defaultGrabRotation,
+                    this._defaultGrabRotation
+                );
+                break;
+            }
+            case GrabRotationType.Hand: {
+                const interactorUp = secondaryInteractor!.getUpWorld(vec3.create());
+                const up = vec3.create();
+                if (vec3.dot(interactorUp, [0, 1, 0]) >= 0.5) {
+                    vec3.copy(up, interactorUp);
+                    this._useUpOrientation = true;
+                } else {
+                    this._grabData[1].interactor.object.getForwardWorld(up);
+                    this._useUpOrientation = false;
+                }
+
+                /* Cache the grabbing distance between both handles. */
+                this._maxSqDistance =
+                    vec3.squaredDistance(
+                        primaryHandle.object.getPositionWorld(),
+                        secondaryHandle!.object.getPositionWorld()
+                    ) +
+                    this.releaseDistanceDual * this.releaseDistanceDual;
+
+                const handRotation = rotateFreeDual(
+                    source.getPositionWorld(),
+                    target!.getPositionWorld(),
+                    up,
+                    this._defaultGrabRotation
+                );
+                const objectRotation = this.object.getRotationWorld(_rotation);
+                computeRelativeRotation(
+                    objectRotation,
+                    handRotation,
+                    this._defaultGrabRotation
+                );
+                break;
+            }
+        }
     }
 
     /**
@@ -598,17 +619,21 @@ export class Grabbable extends Component {
         const secondaryWorld = secondaryInteractor.object.getPositionWorld(_pointB);
 
         const primaryHandle = this.handles[primaryGrab.handleId];
-
-        const squaredDistance = vec3.squaredDistance(primaryWorld, secondaryWorld);
-        if (squaredDistance > this._maxSqDistance! * 2.0) {
-            /* Hands are too far apart, release the second handle. */
-            this.release(secondaryInteractor);
-            return;
-        }
+        const secondaryHandle = this.handles[this._grabData[1].handleId];
 
         switch (this.rotationType) {
             case GrabRotationType.Hand:
                 {
+                    const squaredDistance = vec3.squaredDistance(
+                        primaryWorld,
+                        secondaryWorld
+                    );
+                    if (squaredDistance > this._maxSqDistance!) {
+                        /* Hands are too far apart, release the second handle. */
+                        this.release(secondaryInteractor);
+                        return;
+                    }
+
                     /* Pivot */
                     const up = this._useUpOrientation
                         ? secondaryInteractor.object.getUpWorld(vec3.create())
@@ -649,6 +674,24 @@ export class Grabbable extends Component {
                 break;
             case GrabRotationType.AroundPivot:
                 {
+                    if (
+                        vec3.squaredDistance(
+                            primaryWorld,
+                            primaryHandle.object.getPositionWorld()
+                        ) > this._maxSqDistance
+                    ) {
+                        this.release(primaryInteractor);
+                        return;
+                    }
+                    if (
+                        vec3.squaredDistance(
+                            secondaryWorld,
+                            secondaryHandle.object.getPositionWorld()
+                        ) > this._maxSqDistance
+                    ) {
+                        this.release(secondaryInteractor);
+                        return;
+                    }
                     const rot = this.rotationAroundPivotDual(
                         quat.create(),
                         primaryWorld,
