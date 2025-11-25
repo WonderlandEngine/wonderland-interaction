@@ -1,4 +1,4 @@
-import { mat4, quat, vec3 } from "gl-matrix";
+import { mat4, quat, quat2, vec3 } from "gl-matrix";
 
 class StaticStack<T> {
     private _data: Float32Array;
@@ -35,6 +35,12 @@ export const TempVec3 = new StaticStack<vec3>(3);
  * @hidden
  */
 export const TempQuat = new StaticStack<quat>(4);
+/**
+ * Stack of quaternion temporaries.
+ *
+ * @hidden
+ */
+export const TempDualQuat = new StaticStack<quat2>(8);
 /**
  * Stack of 4x4 matrix temporaries.
  *

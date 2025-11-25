@@ -1,7 +1,7 @@
 import {mat4, quat, vec3} from 'gl-matrix';
 import {FORWARD, UP} from '../constants.js';
 import {Object3D} from '@wonderlandengine/api';
-import { TempMat4, TempQuat, TempVec3 } from '../internal-constants.js';
+import {TempMat4, TempQuat, TempVec3} from '../internal-constants.js';
 
 function rotateAroundPivotForward(
     out: quat,
@@ -58,9 +58,16 @@ export function rotateFreeDual(source: vec3, target: vec3, up: vec3, out: quat) 
     return out;
 }
 
-export function computeLocalPositionForPivot(out: vec3, target: Object3D, positionWorld: vec3): vec3 {
+export function computeLocalPositionForPivot(
+    out: vec3,
+    target: Object3D,
+    positionWorld: vec3
+): vec3 {
     const parent = target.parent ?? target.scene.wrap(0);
-    const handParentSpace = parent.transformPointInverseWorld(TempVec3.acquire(), positionWorld);
+    const handParentSpace = parent.transformPointInverseWorld(
+        TempVec3.acquire(),
+        positionWorld
+    );
     vec3.subtract(out, handParentSpace, target.getPositionLocal());
 
     TempVec3.free();

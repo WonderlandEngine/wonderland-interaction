@@ -37,11 +37,4 @@ export class GrabPoint extends Component {
 
     @property.enum(InteractorVisualStateNames, InteractorVisualState.None)
     interactorVisualState = InteractorVisualState.None;
-
-    defaultRotation: quat = quat.create();
-
-    init() {
-        this.object.getRotationWorld(this.defaultRotation);
-        quat.invert(this.defaultRotation, this.defaultRotation);
-    }
 }
