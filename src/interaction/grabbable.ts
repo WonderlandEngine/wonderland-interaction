@@ -625,9 +625,11 @@ export class Grabbable extends Component {
             }
             case GrabRotationType.AroundPivot:
                 // TODO: Handle position?
-                const rot = this.rotationAroundPivot(quat.create(), handPosition);
+                const rot = this.rotationAroundPivot(TempQuat.acquire(), handPosition);
                 quat.multiply(rot, rot, this._defaultGrabRotation);
                 this.object.setRotationLocal(rot);
+
+                TempQuat.free();
                 break;
         }
 
@@ -663,18 +665,22 @@ export class Grabbable extends Component {
                     }
 
                     /* Pivot */
-                    const up = this._useUpOrientation
-                        ? secondaryInteractor.object.getUpWorld(vec3.create())
-                        : secondaryInteractor.object.getForwardWorld(vec3.create());
+                    const up = TempVec3.acquire();
+                    if (this._useUpOrientation) {
+                        secondaryInteractor.object.getUpWorld(up);
+                    } else {
+                        secondaryInteractor.object.getForwardWorld(up);
+                    }
+
                     const pivotRotation = rotateFreeDual(
                         primaryWorld,
                         secondaryWorld,
                         up,
-                        quat.create()
+                        TempQuat.acquire()
                     );
                     quat.multiply(pivotRotation, pivotRotation, this._defaultGrabRotation);
                     const pivotToWorld = quat2.fromRotationTranslation(
-                        quat2.create(),
+                        TempDualQuat.acquire(),
                         pivotRotation,
                         primaryWorld
                     );
@@ -682,21 +688,26 @@ export class Grabbable extends Component {
                     /* Object to handle */
 
                     const objectToPivotVec = vec3.subtract(
-                        vec3.create(),
+                        TempVec3.acquire(),
                         this.object.getPositionWorld(),
                         primaryHandle.object.getPositionWorld()
                     );
                     const objectToPivot = quat2.fromTranslation(
-                        quat2.create(),
+                        TempDualQuat.acquire(),
                         objectToPivotVec
                     );
 
                     const transform = quat2.multiply(
-                        quat2.create(),
+                        objectToPivot,
                         objectToPivot,
                         pivotToWorld
                     );
                     this.object.setTransformWorld(transform);
+
+                    TempVec3.free(2);
+                    TempDualQuat.free(2);
+                    TempQuat.free();
+
                     this._applyConstraints(primaryGrab);
                 }
                 break;
@@ -721,12 +732,14 @@ export class Grabbable extends Component {
                         break;
                     }
                     const rot = this.rotationAroundPivotDual(
-                        quat.create(),
+                        TempQuat.acquire(),
                         primaryWorld,
                         secondaryWorld
                     );
                     quat.multiply(rot, rot, this._defaultGrabRotation);
                     this.object.setRotationLocal(rot);
+
+                    TempQuat.free();
                 }
                 break;
         }
