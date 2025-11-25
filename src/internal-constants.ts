@@ -1,5 +1,6 @@
 import { mat4, quat, quat2, vec3 } from "gl-matrix";
 
+/** Statically sized temporary stack. */
 class StaticStack<T> {
     private _data: Float32Array;
     private _views: T[];
@@ -14,10 +15,12 @@ class StaticStack<T> {
         }
     }
 
-    acquire() {
+    /** Acquire a element */
+    get() {
         return this._views[this._sentinel++];
     }
 
+    /** Release `count` elements */
     free(count = 1) {
         this._sentinel -= count;
     }
