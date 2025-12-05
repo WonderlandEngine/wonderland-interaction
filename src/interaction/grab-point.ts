@@ -1,11 +1,11 @@
-import {
-    CollisionComponent,
-    Component,
-    PhysXComponent,
-    property,
-} from '@wonderlandengine/api';
+import {Component, property} from '@wonderlandengine/api';
 import {quat} from 'gl-matrix';
-import {InteractorVisualState, InteractorVisualStateNames} from './interactor.js';
+import {
+    Interactor,
+    InteractorVisualState,
+    InteractorVisualStateNames,
+} from './interactor.js';
+import {Grabbable} from './grabbable.js';
 
 export enum GrabSearchMode {
     Distance = 0,
@@ -35,6 +35,17 @@ export class GrabPoint extends Component {
     @property.float(0.2)
     maxDistance = 0.2;
 
+    /** If `true`, handle can be transfered to another interactor on grab */
+    @property.bool(false)
+    transferable = false;
+
     @property.enum(InteractorVisualStateNames, InteractorVisualState.None)
     interactorVisualState = InteractorVisualState.None;
+
+    /** @hidden */
+    _interactor: Interactor | null = null;
+
+    get interactor() {
+        return this._interactor;
+    }
 }

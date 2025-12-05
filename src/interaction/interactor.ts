@@ -67,14 +67,25 @@ export class Interactor extends Component {
     /** Physx component of this object. */
     private _physx: PhysXComponent = null!;
 
+    /**
+     * Physx collision callback index.
+     *
+     * @hidden
+     */
+    private _physxCallback: number | null = null;
+
     /** Cached interactable after it's gripped. */
-    private _interactable: Grabbable | null = null;
+    private _grabbable: Grabbable | null = null;
+
+    /** Cached interactable after it's gripped. */
+    private _grabId: Grabbable | null = null;
 
     /** Grip start emitter. */
     private readonly _onGripStart: Emitter<[Grabbable]> = new Emitter();
     /** Grip end emitter. */
     private readonly _onGripEnd: Emitter<[Grabbable]> = new Emitter();
 
+    /** @hidden */
     private readonly _onPreRender = () => {
         if (!this.#xrInputSource) return;
 
@@ -94,7 +105,7 @@ export class Interactor extends Component {
     #xrPose: XRPose | null = null;
     #onSessionStart = this._startSession.bind(this);
     #onSessionEnd = this._endSession.bind(this);
-    #currentlyCollidingWith: PhysXComponent | null = null;
+    #currentlyCollidingWith: GrabPoint | null = null;
 
     /**
      * Set the collision component needed to perform
@@ -111,17 +122,22 @@ export class Interactor extends Component {
         if (!this._collision && !this._physx) {
             throw new Error('grabber.start(): No collision or physx component found');
         }
-        if (!this._collision) {
-            this._physx.onCollision(this.onPhysxCollision);
-        }
     }
 
     onActivate(): void {
         this.engine.onXRSessionStart.add(this.#onSessionStart);
         this.engine.onXRSessionEnd.add(this.#onSessionEnd);
+
+        if (!this._collision) {
+            this._physxCallback = this._physx.onCollision(this.onPhysxCollision);
+        }
     }
 
     onDeactivate(): void {
+        if (this._physxCallback !== null) {
+            this._physx.removeCollisionCallback(this._physxCallback);
+            this._physxCallback = null;
+        }
         this.engine.onXRSessionStart.add(this.#onSessionStart);
         this.engine.onXRSessionEnd.add(this.#onSessionEnd);
         this._endSession();
@@ -133,12 +149,18 @@ export class Interactor extends Component {
      * @param interactable The interactable to process.
      */
     public startInteraction(interactable: Grabbable, handleId: number) {
-        this._interactable = interactable;
+        const handle = interactable.handles[handleId];
+        if (handle.interactor) {
+            if (!handle.transferable) return;
+            interactable.release(handle.interactor);
+        }
+        handle._interactor = this;
+
+        this._grabbable = interactable;
         interactable.grab(this, handleId);
         this._onGripStart.notify(interactable);
 
         let hidden = this.visualStateOnGrab === InteractorVisualState.Hidden;
-        const handle = interactable.handles[handleId];
         if (handle.interactorVisualState !== InteractorVisualState.None) {
             hidden = handle.interactorVisualState === InteractorVisualState.Hidden;
         }
@@ -178,7 +200,7 @@ export class Interactor extends Component {
 
         if (!overlapHandle && this.#currentlyCollidingWith) {
             /** @todo: The API should instead allow to check for overlap on given objects. */
-            overlapHandle = this.#currentlyCollidingWith.object.getComponent(GrabPoint);
+            overlapHandle = this.#currentlyCollidingWith;
         }
 
         /** @todo: Optimize with a typed list of handle, an octree? */
@@ -216,9 +238,12 @@ export class Interactor extends Component {
     }
 
     onPhysxCollision = (type: CollisionEventType, other: PhysXComponent) => {
+        const grab = other.object.getComponent(GrabPoint);
+        if (!grab) return;
+
         if (type == CollisionEventType.TriggerTouch) {
-            this.#currentlyCollidingWith = other;
-        } else {
+            this.#currentlyCollidingWith = grab;
+        } else if (grab === this.#currentlyCollidingWith) {
             this.#currentlyCollidingWith = null;
         }
     };
@@ -228,11 +253,11 @@ export class Interactor extends Component {
      * currently bound interactable.
      */
     public stopInteraction() {
-        if (this._interactable) {
-            this._interactable.release(this);
-            this._onGripEnd.notify(this._interactable);
+        if (this._grabbable) {
+            this._grabbable.release(this);
+            this._onGripEnd.notify(this._grabbable);
         }
-        this._interactable = null;
+        this._grabbable = null;
 
         if (this.meshRoot) {
             setComponentsActive(this.meshRoot, true, MeshComponent);
@@ -265,7 +290,7 @@ export class Interactor extends Component {
      * this getter returns `null`.
      */
     get interactable(): Grabbable | null {
-        return this._interactable;
+        return this._grabbable;
     }
 
     private _startSession(session: XRSession) {

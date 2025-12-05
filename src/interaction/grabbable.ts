@@ -26,7 +26,7 @@ import {
     rotateFreeDual,
 } from './providers.js';
 import {Axis, AxisNames} from '../enums.js';
-import {EPSILON, FORWARD, RIGHT, UP} from '../constants.js';
+import {FORWARD, RIGHT, UP} from '../constants.js';
 import {TempDualQuat, TempQuat, TempVec3} from '../internal-constants.js';
 
 /** Temporary info about grabbed target. */
@@ -34,9 +34,8 @@ export interface GrabData {
     interactor: Interactor;
     handleId: number;
 
-    /** Local translation on grab */
-    localPosition: Float32Array;
-    localRotation: Float32Array;
+    /** Local grab anchor position */
+    localAnchor: vec3;
 }
 
 /* Constants */
@@ -47,13 +46,6 @@ const MAX_GRABS = 2;
 const GRAB_EPSILON_DIST = 5 / 1000;
 /* 1 degree */
 const GRAB_EPSILON_ANGLE = 0.01745;
-
-// TODO: Expose.
-export enum SingleGrabType {
-    None,
-    Default,
-    Steal,
-}
 
 export enum GrabRotationType {
     Hand = 0,
@@ -165,12 +157,6 @@ export class Grabbable extends Component {
     public releaseDistance = 0.25;
 
     /**
-     * Similar to {@link releaseDistance}, but for dual grab
-     */
-    @property.float(0.5)
-    public releaseDistanceDual = 0.5;
-
-    /**
      * The distance marker to use when distance-grabbed.
      */
     @property.object()
@@ -221,7 +207,6 @@ export class Grabbable extends Component {
      * - Using dual grabbing
      * - Moving away from a locked grab
      */
-    private _maxSqDistance: number = 1.0;
     private _history: HistoryTracker = new HistoryTracker();
     private _physx: PhysXComponent | null = null;
     private _enablePhysx = false;
@@ -232,6 +217,13 @@ export class Grabbable extends Component {
      * @hidden
      */
     private _defaultGrabTransform: quat2 = quat2.create();
+
+    /**
+     * Local position saved on grab start
+     *
+     * @hidden
+     */
+    private _savedLocalPosition = vec3.create();
 
     /**
      * @hidden
@@ -279,26 +271,26 @@ export class Grabbable extends Component {
     }
 
     update(dt: number): void {
-        if (!this.isGrabbed) {
-            return;
-        }
-
-        let anyGrab: GrabData | null = null;
-
         if (!this._lerp) {
             for (let i = this._grabData.length - 1; i >= 0; --i) {
                 const grab = this._grabData[i];
-                const handle = this.handles[grab.handleId];
-                const handlePosition = handle.object.getPositionWorld();
-                const hand = grab.interactor.object;
-                const handPosition = hand.getPositionWorld();
+                // TODO: Remove alloc.
+                const handlePosition = this.object.transformPointWorld(
+                    vec3.create(),
+                    grab.localAnchor
+                );
+                const handPosition = grab.interactor.object.getPositionWorld();
                 const squaredDistance = vec3.squaredDistance(handPosition, handlePosition);
-                if (squaredDistance <= this._maxSqDistance) continue;
+                if (squaredDistance <= this.releaseDistance * this.releaseDistance)
+                    continue;
                 /* Hands are too far apart, release the second handle. */
                 this.release(grab.interactor);
             }
         }
 
+        if (!this.isGrabbed) return;
+
+        let anyGrab: GrabData | null = null;
         if (this.primaryGrab && this.secondaryGrab) {
             anyGrab = this.primaryGrab;
             this._updateTransformDoubleHand();
@@ -340,7 +332,7 @@ export class Grabbable extends Component {
         if (!this._physx) {
             return;
         }
-        this._physx.active = true;
+        this._setKinematicState(false);
 
         const angular = this._history.angular(TempVec3.get());
         vec3.scale(angular, angular, this.throwAngularIntensity);
@@ -379,21 +371,19 @@ export class Grabbable extends Component {
     grab(interactor: Interactor, handleId: number) {
         if (this._grabData.length === MAX_GRABS) return;
 
-        const grab = {
+        const grab: GrabData = {
             interactor,
             handleId,
-            localPosition: new Float32Array([0, 0, 0]), // TODO: Local transform instead.
-            localRotation: new Float32Array([0, 0, 0, 0]),
-            transform: quat2.create(),
+            localAnchor: vec3.create(),
         };
         this._grabData.push(grab);
-        this.object.getPositionLocal(grab.localPosition);
-        this.object.getRotationLocal(grab.localRotation);
+
+        const handle = this.handles[handleId];
+        const source = handle.snap != GrabSnapMode.None ? handle.object : interactor.object;
+        this.object.transformPointInverseWorld(grab.localAnchor, source.getPositionWorld());
 
         this._history.reset(this.object);
-        if (this._physx) {
-            this._physx.active = false;
-        }
+        this._setKinematicState(true);
 
         if (this._grabData.length === 1) {
             this.initializeGrab();
@@ -422,6 +412,9 @@ export class Grabbable extends Component {
         const index = this._grabData.findIndex((v) => v.interactor === interactor);
         const grab = this._grabData[index];
         if (!grab) return;
+
+        const handle = this.handles[grab.handleId];
+        handle._interactor = null;
 
         this._grabData.splice(index, 1);
 
@@ -502,13 +495,13 @@ export class Grabbable extends Component {
      * @note Triggered when single grab occurs, or when second hand is released.
      */
     protected initializeGrab() {
-        this._maxSqDistance = this.releaseDistance * this.releaseDistance;
-
         const grab = this._grabData[0];
         const interactor = grab.interactor.object;
         const handle = this.handles[grab.handleId];
         const source = handle.snap != GrabSnapMode.None ? handle.object : interactor;
         this._lerp = handle.snap != GrabSnapMode.None;
+
+        this.object.getPositionLocal(this._savedLocalPosition);
 
         switch (this.rotationType) {
             case GrabRotationType.AroundPivot: {
@@ -550,8 +543,6 @@ export class Grabbable extends Component {
                 ? secondaryHandle.object
                 : secondaryInteractor;
 
-        this._maxSqDistance = this.releaseDistanceDual * this.releaseDistanceDual;
-
         const sourcePosWorld = source.getPositionWorld(TempVec3.get());
         const targetPosWorld = target!.getPositionWorld(TempVec3.get());
 
@@ -578,14 +569,6 @@ export class Grabbable extends Component {
                 } else {
                     secondaryInteractor.getForwardWorld(up);
                 }
-
-                /* Cache the grabbing distance between both handles. */
-                this._maxSqDistance =
-                    vec3.squaredDistance(
-                        primaryHandle.object.getPositionWorld(),
-                        secondaryHandle!.object.getPositionWorld()
-                    ) +
-                    this.releaseDistanceDual * this.releaseDistanceDual;
 
                 const handRotation = rotateFreeDual(
                     sourcePosWorld,
@@ -787,17 +770,27 @@ export class Grabbable extends Component {
         vec3.min(localPos, localPos, bounds);
 
         if (this.translationConstraints.lockX) {
-            localPos[0] = grab.localPosition[0];
+            localPos[0] = this._savedLocalPosition[0];
         }
         if (this.translationConstraints.lockY) {
-            localPos[1] = grab.localPosition[1];
+            localPos[1] = this._savedLocalPosition[1];
         }
         if (this.translationConstraints.lockZ) {
-            localPos[2] = grab.localPosition[2];
+            localPos[2] = this._savedLocalPosition[2];
         }
 
         this.object.setPositionLocal(localPos);
 
         TempVec3.free(2);
+    }
+
+    private _setKinematicState(enable: boolean) {
+        if (!this._physx) return;
+        if (enable === this._physx.kinematic) return;
+
+        this._physx.kinematic = enable;
+        /* Required to change the physx object state */
+        this._physx.active = false;
+        this._physx.active = true;
     }
 }
