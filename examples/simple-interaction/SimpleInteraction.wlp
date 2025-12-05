@@ -1113,7 +1113,7 @@
             ],
             "translation": [
                 0.0,
-                0.69889,
+                0.5490274,
                 0.0034008
             ],
             "rotation": [
@@ -1582,7 +1582,12 @@
                         "allowSimulation": false,
                         "kinematic": true,
                         "gravity": false,
-                        "block": 0
+                        "block": 0,
+                        "translationOffset": [
+                            0.0,
+                            -0.025,
+                            -0.025
+                        ]
                     }
                 }
             ],
@@ -1721,7 +1726,7 @@
             "name": "Weapons",
             "translation": [
                 0.0,
-                0.3776887,
+                0.2597541,
                 0.0
             ],
             "rotation": [
@@ -1877,9 +1882,9 @@
             "name": "Shotgun",
             "parent": "293",
             "translation": [
-                -1.2484854,
-                0.7089631,
-                0.5845035
+                -1.7965617,
+                0.7089632,
+                0.5845036
             ],
             "components": [
                 {
@@ -1948,7 +1953,7 @@
         "328": {
             "name": "Hammer",
             "translation": [
-                -0.7946559,
+                -1.6604275,
                 0.6720358,
                 0.2721869
             ],
@@ -3315,7 +3320,7 @@
             ]
         },
         "381": {
-            "name": "WeaponBar",
+            "name": "Weapon Single Hand Bar",
             "parent": "293",
             "translation": [
                 -0.308867,
@@ -3354,6 +3359,234 @@
                     "text": {
                         "alignment": "center",
                         "text": "Free Grab"
+                    }
+                }
+            ],
+            "translation": [
+                0.0,
+                0.5,
+                0.0
+            ]
+        },
+        "311": {
+            "name": "Grabbable",
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                0.025,
+                0.025,
+                0.3499999
+            ],
+            "parent": "327",
+            "components": [
+                {
+                    "type": "grabbable",
+                    "grabbable": {
+                        "throwLinearIntensity": 1.0,
+                        "useControllerVelocityData": true
+                    }
+                },
+                {
+                    "type": "physx",
+                    "active": true,
+                    "physx": {
+                        "kinematic": false,
+                        "simulate": true,
+                        "mass": 5.0,
+                        "shape": "box",
+                        "box": {
+                            "extents": [
+                                0.025,
+                                0.025,
+                                0.3499999
+                            ]
+                        },
+                        "linearDamping": 1.0,
+                        "angularDamping": 1.0,
+                        "bounciness": 0.0,
+                        "groups": 255
+                    }
+                },
+                {
+                    "type": "mesh",
+                    "active": true,
+                    "mesh": {
+                        "material": "26",
+                        "mesh": "8"
+                    }
+                },
+                {
+                    "type": "grab-point",
+                    "grab-point": {
+                        "searchMode": "Overlap",
+                        "snap": "None",
+                        "transferable": true
+                    }
+                }
+            ]
+        },
+        "326": {
+            "name": "Grab",
+            "parent": "311",
+            "components": [
+                {
+                    "type": "collision",
+                    "active": true,
+                    "collision": {
+                        "collider": "box",
+                        "aabb": {
+                            "extents": [
+                                0.025,
+                                0.025,
+                                0.3499999
+                            ]
+                        },
+                        "box": {
+                            "extents": [
+                                0.025,
+                                0.025,
+                                0.3499999
+                            ]
+                        },
+                        "groups": 128
+                    }
+                }
+            ]
+        },
+        "327": {
+            "name": "Transferable Weapon Single Hand Bar",
+            "translation": [
+                -0.9877265,
+                0.625,
+                0.2307724
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "parent": "293"
+        },
+        "312": {
+            "name": "Description",
+            "translation": [
+                0.0,
+                0.5,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                0.9999935,
+                1.0,
+                0.9999932
+            ],
+            "parent": "327",
+            "components": [
+                {
+                    "type": "text",
+                    "text": {
+                        "alignment": "center",
+                        "text": "Transferable\nFree Grab"
+                    }
+                }
+            ]
+        },
+        "313": {
+            "name": "Ball",
+            "parent": "293",
+            "translation": [
+                1.7142554,
+                0.6075261,
+                0.1959186
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "314": {
+            "name": "Grabbable",
+            "parent": "313",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "mesh": "9",
+                        "material": "22"
+                    }
+                },
+                {
+                    "type": "physx",
+                    "physx": {
+                        "sphere": {
+                            "radius": 0.05
+                        }
+                    },
+                    "active": true
+                },
+                {
+                    "type": "grabbable"
+                }
+            ],
+            "scaling": [
+                0.05,
+                0.05,
+                0.05
+            ],
+            "translation": [
+                0.0,
+                0.0073751,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ]
+        },
+        "315": {
+            "name": "Description",
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                0.9999935,
+                1.0,
+                0.9999932
+            ],
+            "parent": "313",
+            "components": [
+                {
+                    "type": "text",
+                    "text": {
+                        "alignment": "center",
+                        "text": "Default\n"
                     }
                 }
             ],

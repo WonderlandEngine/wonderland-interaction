@@ -47,13 +47,6 @@ const GRAB_EPSILON_DIST = 5 / 1000;
 /* 1 degree */
 const GRAB_EPSILON_ANGLE = 0.01745;
 
-// TODO: Expose.
-export enum SingleGrabType {
-    None,
-    Default,
-    Steal,
-}
-
 export enum GrabRotationType {
     Hand = 0,
     AroundPivot,
@@ -267,16 +260,6 @@ export class Grabbable extends Component {
                 this.object.getComponent(GrabPoint) ?? this.object.addComponent(GrabPoint)!;
             this.handles.push(handle);
         }
-
-        for (let i = 0; i < this.handles.length; ++i) {
-            const grab = this.handles[i];
-            if (grab.grabbable) {
-                throw new Error(
-                    `Grab point on object ${grab.object.name} is already attached to another grabbable, this is currently unsupported.`
-                );
-            }
-            grab._grabbable = this;
-        }
     }
 
     start(): void {
@@ -349,7 +332,7 @@ export class Grabbable extends Component {
         if (!this._physx) {
             return;
         }
-        this._physx.active = true;
+        this._setKinematicState(false);
 
         const angular = this._history.angular(TempVec3.get());
         vec3.scale(angular, angular, this.throwAngularIntensity);
@@ -400,9 +383,7 @@ export class Grabbable extends Component {
         this.object.transformPointInverseWorld(grab.localAnchor, source.getPositionWorld());
 
         this._history.reset(this.object);
-        if (this._physx) {
-            this._physx.active = false;
-        }
+        this._setKinematicState(true);
 
         if (this._grabData.length === 1) {
             this.initializeGrab();
@@ -431,6 +412,9 @@ export class Grabbable extends Component {
         const index = this._grabData.findIndex((v) => v.interactor === interactor);
         const grab = this._grabData[index];
         if (!grab) return;
+
+        const handle = this.handles[grab.handleId];
+        handle._interactor = null;
 
         this._grabData.splice(index, 1);
 
@@ -798,5 +782,15 @@ export class Grabbable extends Component {
         this.object.setPositionLocal(localPos);
 
         TempVec3.free(2);
+    }
+
+    private _setKinematicState(enable: boolean) {
+        if (!this._physx) return;
+        if (enable === this._physx.kinematic) return;
+
+        this._physx.kinematic = enable;
+        /* Required to change the physx object state */
+        this._physx.active = false;
+        this._physx.active = true;
     }
 }
