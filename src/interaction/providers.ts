@@ -55,7 +55,7 @@ export function rotateFreeDual(source: vec3, target: vec3, up: vec3, out: quat) 
     mat4.getRotation(out, mat);
 
     TempMat4.free();
-    return out;
+    return quat.normalize(out, out);
 }
 
 export function computeLocalPositionForPivot(

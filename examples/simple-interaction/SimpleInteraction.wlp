@@ -3,20 +3,20 @@
         "14": {
             "name": "Player",
             "translation": [
-                -2.6703875,
-                0.343031,
-                1.9847025
+                0.5576794,
+                0.3430307,
+                1.9847037
             ],
             "rotation": [
+                -3.4281509897482465e-7,
+                -0.000174,
                 0.0,
-                1.0,
-                1.9666335049350897e-7,
-                0.0000013
+                1.0
             ],
             "scaling": [
-                0.999999,
+                0.9999981,
                 1.0,
-                0.999999
+                0.9999984
             ],
             "components": [
                 {
@@ -1130,9 +1130,9 @@
         "243": {
             "name": "Weapon Double Hand",
             "translation": [
-                0.6568369,
-                0.655705,
-                0.3617778
+                1.7044705,
+                0.6557026,
+                0.3617772
             ],
             "components": [
                 {
@@ -1175,15 +1175,15 @@
                 }
             ],
             "scaling": [
-                0.9999269,
-                0.9999268,
+                0.9999219,
+                0.9999218,
                 1.0
             ],
             "rotation": [
                 0.0,
                 0.0,
-                0.7071053,
-                0.7071081
+                0.7071037,
+                0.7071097
             ]
         },
         "244": {
@@ -1528,7 +1528,8 @@
                         "distance": 5.0,
                         "ray": "248",
                         "visualStateOnGrab": "Visible",
-                        "meshRoot": "95"
+                        "meshRoot": "95",
+                        "trackedSpace": "205"
                     }
                 },
                 {
@@ -1573,7 +1574,8 @@
                         "distance": 1.0,
                         "ray": "247",
                         "meshRoot": "53",
-                        "visualStateOnGrab": "Visible"
+                        "visualStateOnGrab": "Visible",
+                        "trackedSpace": "205"
                     },
                     "active": true
                 },
@@ -1609,7 +1611,7 @@
             ]
         },
         "290": {
-            "name": "Weapon Single Hand Smooth",
+            "name": "Weapon",
             "components": [
                 {
                     "type": "grabbable",
@@ -1645,21 +1647,22 @@
                 }
             ],
             "scaling": [
-                0.9999395,
-                0.9999421,
-                0.9999976
+                1.0,
+                1.0,
+                1.0
             ],
             "translation": [
-                0.3332784,
-                0.6720348,
-                0.1044657
+                0.0,
+                5.960464477539063e-8,
+                -2.9802322387695313e-8
             ],
             "rotation": [
                 0.0,
                 0.0,
                 0.0,
                 1.0
-            ]
+            ],
+            "parent": "377"
         },
         "291": {
             "name": "Mesh",
@@ -1709,6 +1712,14 @@
                     "mesh": {
                         "mesh": "8",
                         "material": "26"
+                    }
+                },
+                {
+                    "type": "grab-point",
+                    "grab-point": {
+                        "snapLerp": 0.1,
+                        "snap": "GrabToInteractor",
+                        "maxDistance": 0.6999999
                     }
                 }
             ]
@@ -2721,31 +2732,32 @@
             ]
         },
         "351": {
-            "name": "Advanced Interactables",
-            "translation": [
-                1.4999998,
-                2.3796203,
-                -0.2937719
-            ],
+            "name": "Snap Lerp Description",
             "scaling": [
-                0.9999963,
-                1.0,
-                0.9999961
+                1.000054,
+                1.0000579,
+                0.9999956
             ],
-            "parent": "352",
+            "parent": "377",
             "components": [
                 {
                     "type": "text",
                     "text": {
-                        "text": "Advanced Interactables"
+                        "text": "Snap + Lerp",
+                        "alignment": "center"
                     }
                 }
             ],
             "rotation": [
-                5.452875839750959e-8,
-                0.9999999,
-                0.0000019,
-                -0.000244
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "translation": [
+                0.0,
+                0.3753315,
+                0.0
             ]
         },
         "352": {
@@ -3376,6 +3388,54 @@
                     "type": "text",
                     "text": {
                         "text": "Pivot grab\nphysx\n"
+                    }
+                }
+            ]
+        },
+        "377": {
+            "name": "Weapon Single Hand Smooth",
+            "parent": null,
+            "translation": [
+                1.0381245,
+                0.6562694,
+                0.1993119
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                0.9999395,
+                0.9999421,
+                0.9999976
+            ]
+        },
+        "378": {
+            "name": "Advanced Interactables",
+            "translation": [
+                1.4999998,
+                2.3796203,
+                -0.2937719
+            ],
+            "rotation": [
+                5.452875839750959e-8,
+                0.9999999,
+                0.0000019,
+                -0.000244
+            ],
+            "scaling": [
+                0.9999963,
+                1.0,
+                0.9999961
+            ],
+            "parent": "352",
+            "components": [
+                {
+                    "type": "text",
+                    "text": {
+                        "text": "Advanced Interactables"
                     }
                 }
             ]
@@ -4320,7 +4380,7 @@
                 1,
                 5,
                 0,
-                5
+                7
             ]
         },
         "xr": {
@@ -4738,5 +4798,6 @@
         }
     },
     "probeVolumeScenarios": {},
-    "plugins": {}
+    "plugins": {},
+    "audioClips": {}
 }

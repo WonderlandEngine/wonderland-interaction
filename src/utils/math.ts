@@ -1,5 +1,5 @@
 import {Object3D} from '@wonderlandengine/api';
-import {quat, quat2, vec3} from 'gl-matrix';
+import {quat, quat2, vec3, vec4} from 'gl-matrix';
 
 /** Temporaries. */
 const _pointA = vec3.create();
@@ -30,6 +30,18 @@ export function quatDelta(out: quat, src: quat, dst: quat): quat {
     return quat.normalize(out, out);
 }
 
+export function isPointEqual(a: vec3, b: vec3, epsilon: number) {
+    return (
+        Math.abs(a[0] - b[0]) < epsilon &&
+        Math.abs(a[1] - b[1]) < epsilon &&
+        Math.abs(a[2] - b[2]) < epsilon
+    );
+}
+
+export function isQuatEqual(a: quat, b: quat, epsilon: number) {
+    return Math.abs(vec4.dot(a, b)) >= 1 - epsilon;
+}
+
 /**
  * Compute the relative transformation from source to target.
  *
@@ -46,7 +58,7 @@ export function quatDelta(out: quat, src: quat, dst: quat): quat {
 export function computeRelativeTransform(
     source: Object3D,
     target: Object3D,
-    out: quat2 = quat2.create()
+    out: quat2
 ): quat2 {
     const handToLocal = target.getRotationWorld(_rotationA);
     quat.invert(handToLocal, handToLocal);
@@ -54,6 +66,7 @@ export function computeRelativeTransform(
     /* Transform rotation into target's space */
     const rot = source.getRotationWorld(_rotationB);
     quat.multiply(rot, handToLocal, rot);
+    quat.normalize(rot, rot);
 
     /* Transform position into target's space */
     const position = source.getPositionWorld(_pointA);
@@ -68,6 +81,7 @@ export function computeRelativeRotation(source: quat, target: quat, out: quat) {
     const toLocal = quat.copy(_rotationA, target);
     quat.invert(toLocal, toLocal);
     quat.multiply(out, toLocal, source);
+    return quat.normalize(out, out);
 }
 
 export function absMaxVec3(out: vec3, a: vec3, b: vec3): vec3 {
