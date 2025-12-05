@@ -29,27 +29,21 @@ import {Axis, AxisNames} from '../enums.js';
 import {FORWARD, RIGHT, UP} from '../constants.js';
 import {TempDualQuat, TempQuat, TempVec3} from '../internal-constants.js';
 
-/** Temporary info about grabbed target. */
-export interface GrabData {
-    interactor: Interactor;
-    handleId: number;
-
-    /** Local grab anchor position */
-    localAnchor: vec3;
-}
-
 /* Constants */
 
 const MAX_GRABS = 2;
-
-/* Half a centimeter is a good enough epsilon. */
-const GRAB_EPSILON_DIST = 5 / 1000;
-/* 1 degree */
-const GRAB_EPSILON_ANGLE = 0.01745;
+const GRAB_EPSILON_DIST = 0.005; /* Half centimeter. */
+const GRAB_EPSILON_ANGLE = 0.01745; /* One degree */
 
 export enum GrabRotationType {
     Hand = 0,
     AroundPivot,
+}
+
+export enum GrabType {
+    Single,
+    SingleOrDual,
+    Dual,
 }
 
 export class Constraints {
@@ -78,6 +72,15 @@ function axis(axis: Axis) {
         case Axis.Z:
             return FORWARD;
     }
+}
+
+/** Temporaries associated to a grab point upon interaction. */
+interface GrabData {
+    interactor: Interactor;
+    handleId: number;
+
+    /** Local grab anchor position */
+    localAnchor: vec3;
 }
 
 /**
@@ -209,7 +212,6 @@ export class Grabbable extends Component {
      */
     private _history: HistoryTracker = new HistoryTracker();
     private _physx: PhysXComponent | null = null;
-    private _enablePhysx = false;
 
     /**
      * Default relative grab transform to apply when updating
@@ -226,9 +228,13 @@ export class Grabbable extends Component {
     private _savedLocalPosition = vec3.create();
 
     /**
+     * `true` if the grabbable is currently getting snapped onto the interactor.
+     *
      * @hidden
      */
     private _lerp = true;
+
+    /** @hidden */
     private _useUpOrientation: boolean = false;
 
     /**
@@ -264,10 +270,6 @@ export class Grabbable extends Component {
 
     start(): void {
         this._physx = this.object.getComponent('physx');
-    }
-
-    onActivate(): void {
-        this._enablePhysx = this._physx?.active ?? false;
     }
 
     update(dt: number): void {
@@ -310,18 +312,6 @@ export class Grabbable extends Component {
             );
         } else {
             this._history.update(this.object, dt);
-        }
-    }
-
-    enablePhysx() {
-        if (this._physx) {
-            this._physx.active = this._enablePhysx;
-        }
-    }
-
-    disablePhysx() {
-        if (this._physx) {
-            this._physx.active = false;
         }
     }
 
@@ -451,6 +441,12 @@ export class Grabbable extends Component {
         return this._onGrabEnd;
     }
 
+    /**
+     * Rotate the grabable around an origin.
+     *
+     * @param out Destination quaternion
+     * @param positionWorld Anchor point, in **world space**.
+     */
     protected rotationAroundPivot(out: quat, positionWorld: vec3) {
         /* Use grabbable parent space for the rotation to avoid taking into account
          * the actual grabbable rotation undergoing. */
