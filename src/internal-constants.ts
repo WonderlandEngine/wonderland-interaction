@@ -1,4 +1,4 @@
-import { mat4, quat, quat2, vec3 } from "gl-matrix";
+import {mat4, quat, quat2, vec3} from 'gl-matrix';
 
 /** Statically sized temporary stack. */
 class StaticStack<T> {
@@ -10,8 +10,12 @@ class StaticStack<T> {
         this._data = new Float32Array(maxCount * componentCount);
         this._views = new Array(maxCount);
         const bytesPerElement = componentCount * Float32Array.BYTES_PER_ELEMENT;
-        for(let i = 0; i < maxCount; ++i) {
-            this._views[i] = new Float32Array(this._data.buffer, i * bytesPerElement, componentCount) as T;
+        for (let i = 0; i < maxCount; ++i) {
+            this._views[i] = new Float32Array(
+                this._data.buffer,
+                i * bytesPerElement,
+                componentCount
+            ) as T;
         }
     }
 
