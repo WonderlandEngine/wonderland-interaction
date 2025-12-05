@@ -974,7 +974,7 @@
             ]
         },
         "233": {
-            "name": "Weapon Single Hand",
+            "name": "Grabbable",
             "components": [
                 {
                     "type": "grabbable",
@@ -1009,16 +1009,17 @@
                     "active": false
                 }
             ],
-            "parent": null,
-            "translation": [
-                0.0147822,
-                0.6720348,
-                0.1044657
-            ],
+            "parent": "379",
             "scaling": [
                 0.9999395,
                 0.9999421,
                 0.9999976
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
             ]
         },
         "239": {
@@ -1112,7 +1113,7 @@
             ],
             "translation": [
                 0.0,
-                0.2853865,
+                0.69889,
                 0.0034008
             ],
             "rotation": [
@@ -1416,7 +1417,7 @@
             ]
         },
         "282": {
-            "name": "WeaponBar",
+            "name": "Grabbable",
             "components": [
                 {
                     "type": "grabbable",
@@ -1464,12 +1465,7 @@
                     }
                 }
             ],
-            "parent": null,
-            "translation": [
-                -0.3806658,
-                0.6720359,
-                0.2721869
-            ],
+            "parent": "381",
             "rotation": [
                 0.0,
                 0.0,
@@ -1507,14 +1503,6 @@
                         }
                     },
                     "active": true
-                },
-                {
-                    "type": "interactable",
-                    "active": true,
-                    "interactable": {
-                        "snap": false,
-                        "shouldSnap": false
-                    }
                 }
             ]
         },
@@ -1542,7 +1530,12 @@
                         "allowSimulation": false,
                         "kinematic": true,
                         "gravity": false,
-                        "block": 0
+                        "block": 0,
+                        "translationOffset": [
+                            0.0,
+                            -0.025,
+                            -0.025
+                        ]
                     }
                 }
             ],
@@ -1611,7 +1604,7 @@
             ]
         },
         "290": {
-            "name": "Weapon",
+            "name": "Grabbable",
             "components": [
                 {
                     "type": "grabbable",
@@ -1725,7 +1718,23 @@
             ]
         },
         "293": {
-            "name": "Weapons"
+            "name": "Weapons",
+            "translation": [
+                0.0,
+                0.3776887,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ]
         },
         "294": {
             "link": {
@@ -1868,8 +1877,8 @@
             "name": "Shotgun",
             "parent": "293",
             "translation": [
-                -0.8136621,
-                0.7089629,
+                -1.2484854,
+                0.7089631,
                 0.5845035
             ],
             "components": [
@@ -1884,15 +1893,15 @@
                 }
             ],
             "scaling": [
-                0.9999991,
-                0.9999977,
-                0.9999982
+                0.9999992,
+                0.9999975,
+                0.9999981
             ],
             "rotation": [
-                0.0002441,
-                0.7071075,
-                0.7071059,
-                -0.0002438
+                0.000244,
+                0.7071079,
+                0.7071055,
+                -0.0002437
             ]
         },
         "309": {
@@ -1936,194 +1945,10 @@
                 0.0612937
             ]
         },
-        "311": {
-            "name": "ShotgunTest",
-            "parent": "293",
-            "translation": [
-                0.0429472,
-                0.9814811,
-                0.0002529
-            ],
-            "components": [
-                {
-                    "type": "grabbable",
-                    "grabbable": {
-                        "handleObjects": [
-                            "326",
-                            "327"
-                        ]
-                    }
-                }
-            ],
-            "scaling": [
-                0.999998,
-                0.9999977,
-                0.9999969
-            ]
-        },
-        "326": {
-            "name": "GrabMain",
-            "parent": "311",
-            "translation": [
-                -0.0077657,
-                -0.0973875,
-                0.3439205
-            ],
-            "scaling": [
-                0.9999684,
-                0.9999716,
-                0.9999623
-            ],
-            "components": [
-                {
-                    "type": "mesh",
-                    "mesh": {
-                        "material": "20",
-                        "mesh": "10"
-                    },
-                    "active": false
-                }
-            ],
-            "rotation": [
-                0.7071059,
-                0.0,
-                0.0,
-                0.7071076
-            ]
-        },
-        "327": {
-            "name": "GrabFront",
-            "parent": "311",
-            "scaling": [
-                1.0,
-                1.0,
-                1.0
-            ],
-            "rotation": [
-                0.0,
-                0.0,
-                0.0,
-                1.0
-            ],
-            "translation": [
-                -0.0076468,
-                -0.02245,
-                -0.1034033
-            ]
-        },
-        "312": {
-            "link": {
-                "name": "Sketchfab_model",
-                "file": "models\\shotgun-test.glb"
-            },
-            "parent": "311",
-            "scaling": [
-                0.6,
-                0.6000006,
-                0.6000009
-            ],
-            "rotation": [
-                2.3373722513042594e-7,
-                1.0,
-                3.360884761605121e-7,
-                -0.0
-            ]
-        },
-        "313": {
-            "link": {
-                "name": "1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
-                "file": "models\\shotgun-test.glb"
-            },
-            "parent": "312"
-        },
-        "314": {
-            "link": {
-                "name": "RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
-                "file": "models\\shotgun-test.glb"
-            },
-            "parent": "313"
-        },
-        "315": {
-            "link": {
-                "name": "shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
-                "file": "models\\shotgun-test.glb"
-            },
-            "parent": "314"
-        },
-        "316": {
-            "link": {
-                "name": "base<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
-                "file": "models\\shotgun-test.glb"
-            },
-            "parent": "315"
-        },
-        "317": {
-            "link": {
-                "name": "base_shotgun_0<base<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
-                "file": "models\\shotgun-test.glb"
-            },
-            "parent": "316"
-        },
-        "318": {
-            "link": {
-                "name": "loader<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
-                "file": "models\\shotgun-test.glb"
-            },
-            "parent": "315"
-        },
-        "319": {
-            "link": {
-                "name": "loader_shotgun_0<loader<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
-                "file": "models\\shotgun-test.glb"
-            },
-            "parent": "318"
-        },
-        "320": {
-            "link": {
-                "name": "pump<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
-                "file": "models\\shotgun-test.glb"
-            },
-            "parent": "315"
-        },
-        "321": {
-            "link": {
-                "name": "pump_shotgun_0<pump<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
-                "file": "models\\shotgun-test.glb"
-            },
-            "parent": "320"
-        },
-        "322": {
-            "link": {
-                "name": "slug<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
-                "file": "models\\shotgun-test.glb"
-            },
-            "parent": "315"
-        },
-        "323": {
-            "link": {
-                "name": "slug_shotgun_0<slug<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
-                "file": "models\\shotgun-test.glb"
-            },
-            "parent": "322"
-        },
-        "324": {
-            "link": {
-                "name": "trigger<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
-                "file": "models\\shotgun-test.glb"
-            },
-            "parent": "315"
-        },
-        "325": {
-            "link": {
-                "name": "trigger_shotgun_0<trigger<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
-                "file": "models\\shotgun-test.glb"
-            },
-            "parent": "324"
-        },
         "328": {
             "name": "Hammer",
             "translation": [
-                -0.6137485,
+                -0.7946559,
                 0.6720358,
                 0.2721869
             ],
@@ -2732,7 +2557,7 @@
             ]
         },
         "351": {
-            "name": "Snap Lerp Description",
+            "name": "Description",
             "scaling": [
                 1.000054,
                 1.0000579,
@@ -2756,7 +2581,7 @@
             ],
             "translation": [
                 0.0,
-                0.3753315,
+                0.5,
                 0.0
             ]
         },
@@ -3393,11 +3218,11 @@
             ]
         },
         "377": {
-            "name": "Weapon Single Hand Smooth",
-            "parent": null,
+            "name": "Weapon Single Hand Snap Lerp",
+            "parent": "293",
             "translation": [
                 1.0381245,
-                0.6562694,
+                0.625,
                 0.1993119
             ],
             "rotation": [
@@ -3438,6 +3263,104 @@
                         "text": "Advanced Interactables"
                     }
                 }
+            ]
+        },
+        "379": {
+            "name": "Weapon Single Hand Snap",
+            "parent": "293",
+            "translation": [
+                0.2962521,
+                0.6247258,
+                0.2107154
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "380": {
+            "name": "Description",
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                0.9999935,
+                1.0,
+                0.9999932
+            ],
+            "parent": "379",
+            "components": [
+                {
+                    "type": "text",
+                    "text": {
+                        "alignment": "center",
+                        "text": "Snap\n"
+                    }
+                }
+            ],
+            "translation": [
+                0.0,
+                0.4999999,
+                0.0
+            ]
+        },
+        "381": {
+            "name": "WeaponBar",
+            "parent": "293",
+            "translation": [
+                -0.308867,
+                0.625,
+                0.2307725
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "382": {
+            "name": "Description",
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                0.9999935,
+                1.0,
+                0.9999932
+            ],
+            "parent": "381",
+            "components": [
+                {
+                    "type": "text",
+                    "text": {
+                        "alignment": "center",
+                        "text": "Free Grab"
+                    }
+                }
+            ],
+            "translation": [
+                0.0,
+                0.5,
+                0.0
             ]
         }
     },
@@ -4412,7 +4335,7 @@
         },
         "runtime": {
             "visualizeColliders": false,
-            "visualizePhysX": false,
+            "visualizePhysX": true,
             "loadUncompressedImagesAsBitmap": false
         },
         "physx": {

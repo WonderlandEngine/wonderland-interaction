@@ -6,6 +6,7 @@ import {
 } from '@wonderlandengine/api';
 import {quat} from 'gl-matrix';
 import {InteractorVisualState, InteractorVisualStateNames} from './interactor.js';
+import {Grabbable} from './grabbable.js';
 
 export enum GrabSearchMode {
     Distance = 0,
@@ -37,4 +38,11 @@ export class GrabPoint extends Component {
 
     @property.enum(InteractorVisualStateNames, InteractorVisualState.None)
     interactorVisualState = InteractorVisualState.None;
+
+    /** @hidden */
+    _grabbable: Grabbable | null = null;
+
+    get grabbable() {
+        return this._grabbable;
+    }
 }
