@@ -77,9 +77,6 @@ export class Interactor extends Component {
     /** Cached interactable after it's gripped. */
     private _grabbable: Grabbable | null = null;
 
-    /** Cached interactable after it's gripped. */
-    private _grabId: Grabbable | null = null;
-
     /** Grip start emitter. */
     private readonly _onGripStart: Emitter<[Grabbable]> = new Emitter();
     /** Grip end emitter. */

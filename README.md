@@ -4,7 +4,10 @@
   <img alt="Wonderland Engine Logo">
 </picture>
 
-# WE-IL: Wonderland Engine Interaction Library
+# Wonderland Engine Interaction Library
+
+> 🚧 This library is currently published as a release candidate. It's a work-in-progress and the
+> API might change slightly before reaching the first version. 🚧
 
 ## Features
 
@@ -13,6 +16,9 @@
 * Double-hand grabbing
 * Event system
 * Throwing
+* Constraints
+
+For more information, have a look at the [documentation](./DOC.md).
 
 ## Install
 
@@ -40,12 +46,6 @@ npm i path/to/weil
 
 ![Wonderland Engine interaction example](img/example.png)
 
-#### Playground
-
-* Single-hand grabbing
-* Double-hand grabbing
-
 ## Usage
 
-For more information about how to use the components, please refer to the [./DOC.md](documentation).
-
+Refer to the [documentation](./DOC.md) for a deep dive.
