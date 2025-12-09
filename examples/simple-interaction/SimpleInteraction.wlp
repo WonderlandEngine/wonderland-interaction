@@ -23,12 +23,6 @@
                     "type": "player-controller"
                 },
                 {
-                    "type": "locomotion-selector",
-                    "locomotion-selector": {
-                        "locomotionType": "SmoothLocomotion"
-                    }
-                },
-                {
                     "type": "player-rotate",
                     "player-rotate": {
                         "rotationType": "Snap",
@@ -67,13 +61,6 @@
                         "dynamicFriction": 0.0,
                         "bounciness": 0.0,
                         "angularDamping": 10.0
-                    }
-                },
-                {
-                    "type": "smooth-locomotion",
-                    "smooth-locomotion": {
-                        "inputBridgeObject": "14",
-                        "speed": 20.0
                     }
                 }
             ]

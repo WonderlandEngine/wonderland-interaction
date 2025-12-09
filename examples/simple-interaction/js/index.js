@@ -19,10 +19,8 @@ import {DefaultInputBridge} from 'wle-interaction';
 import {GrabPoint} from 'wle-interaction';
 import {Grabbable} from 'wle-interaction';
 import {Interactor} from 'wle-interaction';
-import {LocomotionSelector} from 'wle-interaction';
 import {PlayerController} from 'wle-interaction';
 import {PlayerRotate} from 'wle-interaction';
-import {SmoothLocomotion} from 'wle-interaction';
 /* wle:auto-imports:end */
 
 export default function(engine) {
@@ -37,9 +35,7 @@ engine.registerComponent(DefaultInputBridge);
 engine.registerComponent(GrabPoint);
 engine.registerComponent(Grabbable);
 engine.registerComponent(Interactor);
-engine.registerComponent(LocomotionSelector);
 engine.registerComponent(PlayerController);
 engine.registerComponent(PlayerRotate);
-engine.registerComponent(SmoothLocomotion);
 /* wle:auto-register:end */
 }

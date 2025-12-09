@@ -1,7 +1,12 @@
-import {Component, ForceMode, Object3D, PhysXComponent} from '@wonderlandengine/api';
+import {
+    Component,
+    ForceMode,
+    Object3D,
+    PhysXComponent,
+    property,
+} from '@wonderlandengine/api';
 import {vec3} from 'gl-matrix';
 import {ActiveCamera} from '../helpers/active-camera.js';
-import {LocomotionSelector} from './locomotion-selector.js';
 import {InputBridge, InputBridgeTypename} from './input-bridge.js';
 import {toRad} from '../utils/math.js';
 
@@ -50,9 +55,6 @@ export enum RotateState {
  *
  *
  * @see {@link InputBridge} for handling input from various input providers
- * @see {@link LocomotionSelector} for selecting the type of locomotion to use
- * @see {@link TeleportLocomotion} for teleport locomotion
- * @see {@link SmoothLocomotion} for smooth locomotion
  * @see {@link PlayerRotate} for rotating the player
  * @see {@link HeadCollissionMove} for pushing the player backwards when their head collides with a wall / object
  * @see {@link HeadCollissionFade} for fading to black when the player's head collides with a wall / object
@@ -60,22 +62,23 @@ export enum RotateState {
 export class PlayerController extends Component {
     static TypeName = 'player-controller';
 
-    private _physxComponent!: PhysXComponent;
+    @property.object()
+    inputBridgeObject: Object3D | null = null;
+
+    @property.float(10)
+    speed = 10;
+
+    private _physx!: PhysXComponent;
     private _headForward: vec3 = [0, 0, 0];
     private _activeCamera!: ActiveCamera;
     private _isRotating = false;
-    private _locomotionSelector!: LocomotionSelector;
     private _rotateState = RotateState.None;
 
-    start() {
-        const tempPhysx = this.object.getComponent(PhysXComponent);
-        if (!tempPhysx) {
-            throw new Error(
-                `player-controller(${this.object.name}): object does not have a Physx`
-            );
-        }
-        this._physxComponent = tempPhysx;
+    private _inputBridge!: InputBridge;
 
+    private _movement = vec3.create();
+
+    start() {
         const tempActiveCamera = this.object.getComponent(ActiveCamera);
         if (!tempActiveCamera) {
             throw new Error(
@@ -84,26 +87,46 @@ export class PlayerController extends Component {
         }
         this._activeCamera = tempActiveCamera;
 
-        const tempLocomotionSelector = this.object.getComponent(LocomotionSelector);
-        if (!tempLocomotionSelector) {
+        const {inputBridge, player} = getRequiredComponents(
+            this.object,
+            this.inputBridgeObject
+        );
+        this._inputBridge = inputBridge;
+    }
+
+    onActivate(): void {
+        const physx = this.object.getComponent(PhysXComponent);
+        if (!physx) {
             throw new Error(
-                `player-controller(${this.object.name}): object does not have a LocomotionSelector`
+                `player-controller(${this.object.name}): object does not have a Physx`
             );
         }
-        this._locomotionSelector = tempLocomotionSelector;
-
-        this._physxComponent.kinematic = this._locomotionSelector.isKinematic;
+        this._physx = physx;
+        this._physx.kinematic = true;
+        this._physx.active = false;
+        this._physx.active = true;
     }
 
     update(): void {
+        vec3.zero(this._movement);
+        this._inputBridge.getMovementAxis(this._movement);
+        const moving =
+            this._movement[0] !== 0 || this._movement[1] !== 0 || this._movement[2] !== 0;
+        vec3.scale(this._movement, this._movement, this.speed);
+
+        if (moving) {
+            this.move(this._movement);
+        }
+
         if (this._rotateState !== RotateState.Reset) {
             return;
         }
+
         /** @todo: Axis need to be locked after a rotation to prevent torque
          * when hitting walls. Wonderland Engine doesn't yet update axis lock on the fly,
          * the line below should be uncommented at version 1.2.0 */
         // this._physxComponent.angularLockAxis = LockAxis.X | LockAxis.Y | LockAxis.Z;
-        this._physxComponent.kinematic = this._locomotionSelector.isKinematic;
+        this._physx.kinematic = true;
         this._isRotating = false;
         this._rotateState = RotateState.None;
     }
@@ -113,7 +136,7 @@ export class PlayerController extends Component {
      * @param movement The direction to move in.
      */
     move(movement: vec3) {
-        if (this._isRotating || this._physxComponent.kinematic) {
+        if (this._isRotating || this.physx.kinematic) {
             // for now, don't move while rotating or when kinematic is on.
             // Because we use physics to move, we need to switch to kinematic mode
             // during rotation.
@@ -131,7 +154,7 @@ export class PlayerController extends Component {
         movement[1] = 0;
 
         // Add force to Physx Component to move the player
-        this._physxComponent.addForce(movement);
+        this._physx.addForce(movement);
     }
 
     /**
@@ -139,9 +162,9 @@ export class PlayerController extends Component {
      * Can be called every frame.
      */
     rotateSnap(angle: number) {
-        if (!this._physxComponent.kinematic) {
+        if (!this._physx.kinematic) {
             this._isRotating = true;
-            this._physxComponent.kinematic = true;
+            this._physx.kinematic = true;
             this._rotateState = RotateState.Reset;
         }
         const rot = vec3.set(_vectorA, 0, 1, 0);
@@ -153,7 +176,7 @@ export class PlayerController extends Component {
          * the line below should be uncommented at version 1.2.0 */
         // this._physxComponent.angularLockAxis = LockAxis.X | LockAxis.Z;
         const rot = vec3.set(_vectorA, 0, -toRad(angle), 0);
-        this._physxComponent.addTorque(rot, ForceMode.VelocityChange);
+        this._physx.addTorque(rot, ForceMode.VelocityChange);
         this._rotateState = RotateState.Reset;
     }
 
@@ -179,6 +202,6 @@ export class PlayerController extends Component {
     }
 
     get physx() {
-        return this._physxComponent;
+        return this._physx;
     }
 }
