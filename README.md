@@ -49,3 +49,9 @@ npm i path/to/weil
 ## Usage
 
 Refer to the [documentation](./DOC.md) for a deep dive.
+
+## Gallery
+
+https://github.com/user-attachments/assets/3867e909-9bfe-4b7c-9bea-c44b3e7bb1d5
+
+https://github.com/user-attachments/assets/ea50025c-96c6-4846-9695-38327a218bd2

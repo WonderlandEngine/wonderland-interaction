@@ -232,14 +232,15 @@
                 {
                     "type": "light",
                     "light": {
-                        "intensity": 3.3329999
+                        "intensity": 3.3329999,
+                        "shadows": true
                     }
                 }
             ],
             "translation": [
-                0.0,
-                1.6343142,
-                2.0
+                -0.8296068,
+                1.931138,
+                1.0258713
             ],
             "rotation": [
                 0.0,
@@ -1274,45 +1275,6 @@
                 }
             ]
         },
-        "247": {
-            "name": "DistanceRayLeft",
-            "parent": "130",
-            "components": [
-                {
-                    "type": "mesh"
-                },
-                {
-                    "type": "collision",
-                    "collision": {
-                        "collider": "box",
-                        "box": {
-                            "extents": [
-                                0.2,
-                                0.2,
-                                1.0
-                            ]
-                        },
-                        "groups": 128
-                    }
-                }
-            ],
-            "translation": [
-                0.0,
-                0.0,
-                -1.0499999
-            ],
-            "rotation": [
-                0.0,
-                0.0,
-                0.0,
-                1.0
-            ],
-            "scaling": [
-                1.0,
-                1.0,
-                1.0
-            ]
-        },
         "249": {
             "name": "Marker",
             "components": [
@@ -1339,43 +1301,6 @@
                 1.0,
                 1.0,
                 0.9999999
-            ]
-        },
-        "248": {
-            "name": "DistanceRayRight",
-            "parent": "129",
-            "translation": [
-                0.0,
-                0.0,
-                -2.0999999
-            ],
-            "rotation": [
-                0.0,
-                0.0,
-                0.0,
-                1.0
-            ],
-            "scaling": [
-                1.0,
-                1.0,
-                1.0
-            ],
-            "components": [
-                {
-                    "type": "collision",
-                    "collision": {
-                        "collider": "box",
-                        "box": {
-                            "extents": [
-                                0.2,
-                                0.2,
-                                2.0
-                            ]
-                        },
-                        "groups": 128
-                    },
-                    "active": true
-                }
             ]
         },
         "280": {
@@ -2614,7 +2539,7 @@
             "name": "Door",
             "parent": "349",
             "translation": [
-                -0.5696017,
+                -0.0696017,
                 1.0,
                 2.9212217
             ],
@@ -4037,12 +3962,12 @@
             "shader": "Phong",
             "Phong": {
                 "specularColor": [
-                    9.999899930335232e-7,
-                    9.99993744699168e-7,
-                    9.999999974752427e-7,
+                    0.1605535,
+                    0.0,
+                    0.2274509,
                     1.0
                 ],
-                "shininess": 1,
+                "shininess": 31,
                 "emissiveColor": [
                     0.2,
                     0.2,
@@ -4056,9 +3981,9 @@
                     1.0
                 ],
                 "diffuseColor": [
-                    0.5,
-                    0.5,
-                    0.5,
+                    0.5686274,
+                    0.5686274,
+                    0.5686274,
                     1.0
                 ]
             },
@@ -4099,9 +4024,9 @@
             "name": "Yellow",
             "Phong": {
                 "diffuseColor": [
-                    1.0,
-                    0.8039215,
-                    0.0,
+                    0.2745097,
+                    0.2745097,
+                    0.2745097,
                     1.0
                 ],
                 "specularColor": [
@@ -4117,8 +4042,8 @@
                     1.0
                 ],
                 "emissiveColor": [
-                    0.3843137,
-                    0.3089579,
+                    0.0,
+                    0.0,
                     0.0,
                     1.0
                 ],
@@ -4568,7 +4493,7 @@
         },
         "runtime": {
             "visualizeColliders": false,
-            "visualizePhysX": true,
+            "visualizePhysX": false,
             "loadUncompressedImagesAsBitmap": false
         },
         "physx": {

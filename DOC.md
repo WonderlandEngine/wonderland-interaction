@@ -3,11 +3,11 @@
 ## Interaction
 
 Interactions span multiple components:
-* **Interactor**: Initiating the interaction, e.g., Meta Quest controller
-* **GrabPoint**: Point of interaction with the interactor
+* **Interactor**: Initiates the interaction (e.g., Meta Quest controller)
+* **GrabPoint**: The point of interaction with the interactor
 * **Grabbable**: Linking one or multiple grab points together
 
-While the **interactor** starts the interaction with a **grab point**, the **grabbble** undergoes
+While the **interactor** initiates the interaction with a **grab point**, the **grabbble** undergoes
 the interaction.
 
 Example:
@@ -18,60 +18,81 @@ Door                        |  Grabbable Representation
 
 ### Interactor
 
-The interactor specifically:
-* Check for grab points to interact with either:
+* Check for grab points to interact with, either:
     * Based on distance
     * Via a native [Collision](https://wonderlandengine.com/jsapi/collisioncomponent/) component
     * Via a native [Physx](https://wonderlandengine.com/jsapi/physxcomponent/) component
 
-> By default, it uses the WebXR [squeezestart](https://developer.mozilla.org/en-US/docs/Web/API/XRSession/squeezestart_event) event to search for grabs
+> By default, it uses the WebXR [squeezestart](https://developer.mozilla.org/en-US/docs/Web/API/XRSession/squeezestart_event) event to search for grabs opportunities.
 
-The interactor **doesn't** track for controller transform, this must be achieved using the native [Input](https://wonderlandengine.com/jsapi/inputcomponent/) component, or your own version.
+The interactor **doesn't** track for controller transform; this must be achieved using [Input](https://wonderlandengine.com/jsapi/inputcomponent/), or your own component.
 
-Most of the time, you will want the `interactor` component is set on the controller or in the controller hierarchy:
+Most of the time, you will want the `interactor` component to be set on the controller or its hierarchy:
 
 Door                        |  Grabbable Representation
 :---------------------------: | :-----------------------------------:
 ![Door](./img/doc-interactor-scene-graph.png) | ![Door](./img/doc-interactor-component.png)
 
+> `TrackedSpace` is requiredif you plan on moving the player using the `player-controller` component.
+
 ### Grabbable
 
-The grabbable will undergo the effect of the interactor, based on which [grab point](#grab-point) was grabbed.
+The grabbable responds to the the interactor based on which [grab point](#grab-point) was grabbed.
 
-## Locomotion
+#### Transformation Type
 
-## Interactor / Interactable
+The grabbable can be transformed in two ways:
+* Using the interactor's position and rotation
+    * Achieved using `GrabRotationType.Hand`
+    * Used for a ball, a weapon, any object that should follow the hand
+* Using the interactor's position, but computing a rotation from it around the grabbable origin
+  * Achieved using `GrabRotationType.Hand`
+  * Used for for doors, levers, basically interactables that have a fixed origin
 
-The interactor
+Example of a grabbable using `GrabRotationType.Hand`:
 
-## Single-Hand
+https://github.com/user-attachments/assets/3867e909-9bfe-4b7c-9bea-c44b3e7bb1d5
 
-TODO
+Example of a grabbable using `GrabRotationType.AroundPivot`:
 
-## Single-Hand
+https://github.com/user-attachments/assets/ea50025c-96c6-4846-9695-38327a218bd2
 
-TODO
+#### Throw
 
-## Set up interaction
-- Enable Physx in project
-- Add `Interactor` to left and right controllers and set them accordingly
+If `Grabbable.canThrow` is `true`, the object will be thrown when the interactor releases it.
 
-## Player Controller
+This is accomplished using the grabbable physx component [linearVelocity](https://wonderlandengine.com/jsapi/physxcomponent/#linearVelocity) and [angularVelocity](https://wonderlandengine.com/jsapi/physxcomponent/#angularVelocity) properties.
 
-At the root of the xr rig is a `Player` object. The player object has a `wlei:player-controller` component and a `physx` component.
+### GrabPoint
 
-XR Rig:
-Player(Object)
-| wlei:player-controller
-| physx
-| wlei:locomotion-selector
-| wlei:smooth-locomotion
-| wlei:teleport-locomotion
-| wlei:player-rotate
-| wlei:input-bridge
-+ TrackedSpace (Object)
-  | player-height
+The `GrabPoint` component defines thye "link" between an interactor and a grabbable.
 
-### wlei:player-controller
+> By default, the `Grabbable` component will create a default `GrabPoint` on itself
 
-This is the heart of the player controller system. It uses physx to move the player around. Based on preferences the player
+In the `Playground.wlp` example, the `Ball` uses the default grabbable setup, i.e., no grab point is specified:
+
+Ball Hierarchy              |  Ball Properties
+:-------------------------: | :-----------------------------------:
+![Door](./img/doc-ball-scenegraph.png) | ![Door](./img/doc-ball-properties.png)
+
+#### Search
+
+By default, a grab point is grabbed by distance. No additional [collision](https://wonderlandengine.com/jsapi/collisioncomponent/) or
+[physx](https://wonderlandengine.com/jsapi/physxcomponent/) component is required.
+
+This behavior can be changed by setting the `GrabPoint.searchMode` property to `GrabSearchMode.Overlap`. In that case, the collision or physx component of the object is used as the grab point.
+
+#### Lerp
+
+When using a large grab distance, or a large collision box, the interaction between a grab point and the interactor can begin even when their origins don't perfectly match.
+
+`GrabPoint.snapLerp` can be used to customize how fast both origin will match. The higher the value, the faster
+the grab point and interactor origins will align.
+
+Example with lerp set to `1.0` (i.e., no lerp effect):
+
+https://github.com/user-attachments/assets/30f1d634-06ac-4733-ba7f-62067f1822b9
+
+Example with lerp set to `0.1`:
+
+https://github.com/user-attachments/assets/66f8263d-c0f5-4c9b-8063-fd10bb4640d8
