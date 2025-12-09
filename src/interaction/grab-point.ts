@@ -20,6 +20,8 @@ export enum GrabSearchMode {
      */
     Overlap = 1,
 }
+/** List of string keys for {@link GrabSearchMode}. */
+export const GrabSearchModeNames = ['Distance', 'Overlap'];
 
 /**
  * Describe how the {@link Grabbable} behave once the interaction starts
@@ -37,12 +39,17 @@ export enum GrabSnapMode {
      */
     PositionRotation = 1,
 }
+/** List of string keys for {@link GrabSnapMode}. */
+export const GrabSnapModeNames = ['None', 'PositionRotation'];
 
+/**
+ * Link used to specify how / where a {@link Grabbable} is grabbed.
+ */
 export class GrabPoint extends Component {
     static TypeName = 'grab-point';
 
     /** Snap mode, defaults to {@link GrabSnapMode.PositionRotation} */
-    @property.enum(['None', 'GrabToInteractor'], GrabSnapMode.PositionRotation)
+    @property.enum(GrabSnapModeNames, GrabSnapMode.PositionRotation)
     snap: GrabSnapMode = GrabSnapMode.PositionRotation;
 
     /**
@@ -59,7 +66,7 @@ export class GrabPoint extends Component {
     snapLerp: number = 0.75;
 
     /** Search mode, defaults to {@link GrabSearchMode.Distance} */
-    @property.enum(['Distance', 'Overlap'], 0)
+    @property.enum(GrabSearchModeNames, GrabSearchMode.Distance)
     searchMode: GrabSearchMode = GrabSearchMode.Distance;
 
     /**

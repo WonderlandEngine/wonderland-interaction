@@ -9,6 +9,17 @@
 > 🚧 This library is currently published as a release candidate. It's a work-in-progress and the
 > API might change slightly before reaching the first version. 🚧
 
+<div align="center">
+  <video
+    src="img/doc-ball.mp4" autoplay loop controls muted title="ball grabbable"
+    style="max-width: 420px;">
+  </video>
+  <video
+    src="img/doc-door.mp4" autoplay loop controls muted title="ball grabbable"
+    style="max-width: 420px;">
+  </video>
+</div>
+
 ## Features
 
 * Generic interactor / interactable
