@@ -20,27 +20,11 @@
             ],
             "components": [
                 {
-                    "type": "player-controller"
-                },
-                {
-                    "type": "player-rotate",
-                    "player-rotate": {
-                        "rotationType": "Snap",
-                        "rotationSpeed": 6.1999998,
-                        "inputBridgeObject": "14"
-                    }
-                },
-                {
-                    "type": "controls-vr",
-                    "controls-vr": {
-                        "leftControlObject": "130",
-                        "rightControlObject": "129"
-                    }
-                },
-                {
-                    "type": "input-bridge",
-                    "input-bridge": {
-                        "inputs": "14"
+                    "type": "player-controller",
+                    "player-controller": {
+                        "speed": 10.0,
+                        "rotationType": "Smooth",
+                        "rotationSpeed": 10.0
                     }
                 },
                 {
@@ -60,7 +44,9 @@
                         "staticFriction": 0.0,
                         "dynamicFriction": 0.0,
                         "bounciness": 0.0,
-                        "angularDamping": 10.0
+                        "angularDamping": 1.0,
+                        "mass": 1.0,
+                        "linearDamping": 1.0
                     }
                 }
             ]
@@ -4719,26 +4705,8 @@
             "importerName": "",
             "colorSpace": "srgb"
         },
-        "278": {
-            "fileName": "../throw/Throw.wlp",
-            "importerName": "",
-            "importPhysicalAsPhongMaterials": true,
-            "colorSpace": "srgb"
-        },
-        "279": {
-            "fileName": "../throw/.editor/state.json",
-            "importerName": "",
-            "importPhysicalAsPhongMaterials": true,
-            "colorSpace": "srgb"
-        },
         "280": {
             "fileName": "models/shotgun.glb",
-            "importerName": "",
-            "importPhysicalAsPhongMaterials": true,
-            "colorSpace": "srgb"
-        },
-        "281": {
-            "fileName": "models/shotgun-test.glb",
             "importerName": "",
             "importPhysicalAsPhongMaterials": true,
             "colorSpace": "srgb"

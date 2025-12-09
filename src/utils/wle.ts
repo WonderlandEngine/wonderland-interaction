@@ -1,5 +1,10 @@
 import {vec3, vec4} from 'gl-matrix';
-import {MeshComponent, Object3D} from '@wonderlandengine/api';
+import {
+    Component,
+    ComponentConstructor,
+    MeshComponent,
+    Object3D,
+} from '@wonderlandengine/api';
 
 /* Temporaries */
 const _vectorA = vec3.create();
@@ -121,3 +126,8 @@ export const radiusHierarchy = (function () {
         return radiusHierarchyRec(temp, object)[3];
     };
 })();
+
+export function componentError(component: Component, msg: string) {
+    const ctor = component.constructor as ComponentConstructor;
+    return `${ctor.TypeName}(${component.object.name}): ${msg}`;
+}

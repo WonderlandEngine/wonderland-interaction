@@ -1,12 +1,10 @@
-import {Component, NumberArray, Object3D} from '@wonderlandengine/api';
+import {Component, InputComponent, NumberArray, Object3D} from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
-import {ControlsKeyboard} from './controls-keyboard.js';
 import {vec3} from 'gl-matrix';
-import {ControlsVR} from './controls-vr.js';
-import {Handedness} from '../interaction/interactor.js';
-import {absMaxVec3} from '../utils/math.js';
+import {TempVec3} from '../internal-constants.js';
+import {componentError} from '../utils/wle.js';
 
-export const InputBridgeTypename = 'input-bridge';
+export const InputBridgeTypename = 'player-controller-input';
 
 /**
  * Defines an interface for bridging various input methods into a unified control scheme.
@@ -47,40 +45,48 @@ export const InputBridgeTypename = 'input-bridge';
  *}
  *```
  */
-export interface InputBridge extends Component {
+export interface PlayerControllerInput extends Component {
     /**
      * Get the rotation axis.
      *
      * @param out The destination array.
      * @returns The `out` parameter;
      */
-    getRotationAxis<T extends NumberArray>(out: T): T;
+    getRotationAxis(out: vec3): vec3;
     /**
      * Get the movement axis.
      *
      * @param out The destination array.
      * @returns The `out` parameter;
      */
-    getMovementAxis<T extends NumberArray>(out: T): T;
-
-    /**
-     * Get the position of the VR controller
-     *
-     * @param out The destination array.
-     * @param handedness the handedness of the controller.
-     * @returns true if the controller is active, false otherwise.
-     */
-    getControllerPosition(out: NumberArray, handedness: Handedness): boolean;
-
-    /**
-     * Get the forward direction of the VR controller.
-     *
-     * @param out The destination array.
-     * @param handedness the handedness of the controller.
-     * @returns true if the controller is active, false otherwise.
-     */
-    getControllerForward(out: NumberArray, handedness: Handedness): boolean;
+    getMovementAxis(out: vec3): vec3;
 }
+
+enum Direction {
+    Up = 0,
+    Down = 1,
+    Left = 2,
+    Right = 3,
+}
+
+/**
+ * KeyMap for Keyboard Inputs.
+ * If keys need to change or be added in the future, change here.
+ *
+ * @remarks
+ * Because KeyboardEvent.code is used there is no need to worry about keyboard layout.
+ * For example: KeyW is always Up, no matter if the keyboard is QWERTY or AZERTY.
+ */
+const KeyToDirection: {[key: string]: Direction} = {
+    ArrowUp: Direction.Up,
+    KeyW: Direction.Up,
+    ArrowRight: Direction.Right,
+    KeyD: Direction.Right,
+    ArrowDown: Direction.Down,
+    KeyS: Direction.Down,
+    ArrowLeft: Direction.Left,
+    KeyA: Direction.Left,
+};
 
 /**
  * A default implementation of `InputBridge` that handles input from
@@ -95,58 +101,122 @@ export interface InputBridge extends Component {
  * position and forward direction of VR controllers, offering a seamless input experience
  * regardless of the hardware used.
  */
-export class DefaultInputBridge extends Component implements InputBridge {
+export class DefaultInputBridge extends Component implements PlayerControllerInput {
     static TypeName = InputBridgeTypename;
 
+    @property.bool(true)
+    keyboard = true;
+
+    /* VR gamepads */
+
+    @property.bool(true)
+    vr = true;
+
     @property.object({required: true})
-    inputs!: Object3D;
+    leftControlObject!: Object3D;
 
-    private _keyboardController: ControlsKeyboard | null = null;
-    private _vrController: ControlsVR | null = null;
+    @property.object({required: true})
+    rightControlObject!: Object3D;
 
-    start(): void {
-        this._keyboardController = this.inputs.getComponent(ControlsKeyboard);
-        this._vrController = this.inputs.getComponent(ControlsVR);
+    @property.float(0.1)
+    deadzoneThreshold = 0.1;
+
+    /* Keyboard private attributes */
+
+    private _keyPress = [false, false, false, false];
+
+    /* VR gamepad private attributes */
+
+    private _inputLeft!: InputComponent;
+    private _inputRight!: InputComponent;
+
+    private _direction = vec3.create();
+    private _rotation = vec3.create();
+
+    onActivate(): void {
+        if (this.keyboard) {
+            /** @todo: Allow user to select dom element to listen to */
+            window.addEventListener('keydown', this._onKeyPressed);
+            window.addEventListener('keyup', this._onKeyReleased);
+        }
+
+        if (!this.vr) return;
+
+        const left = this.leftControlObject.getComponent(InputComponent);
+        if (!left) {
+            throw new Error(
+                componentError(this, 'leftControlObject does not have a InputComponent')
+            );
+        }
+        this._inputLeft = left;
+
+        const right = this.rightControlObject.getComponent(InputComponent);
+        if (!right) {
+            throw new Error(
+                componentError(this, 'rightControlObject does not have a InputComponent')
+            );
+        }
+        this._inputRight = right;
     }
 
-    getRotationAxis<T extends NumberArray>(out: T): T {
-        const dest = out as unknown as vec3;
-        vec3.zero(dest);
-        if (this._vrController?.active) {
-            vec3.copy(dest, this._vrController.getAxisRotation());
+    onDeactivate(): void {
+        window.removeEventListener('keydown', this._onKeyPressed);
+        window.removeEventListener('keyup', this._onKeyReleased);
+    }
+
+    update() {
+        vec3.zero(this._direction);
+        if (this._keyPress[Direction.Up]) this._direction[2] -= 1.0;
+        if (this._keyPress[Direction.Down]) this._direction[2] += 1.0;
+        if (this._keyPress[Direction.Left]) this._direction[0] -= 1.0;
+        if (this._keyPress[Direction.Right]) this._direction[0] += 1.0;
+
+        vec3.zero(this._rotation);
+
+        const axesLeft = this._inputLeft.xrInputSource?.gamepad?.axes;
+        if (
+            axesLeft &&
+            (Math.abs(axesLeft[2]) > this.deadzoneThreshold ||
+                Math.abs(axesLeft[3]) > this.deadzoneThreshold)
+        ) {
+            this._direction[0] = axesLeft[2];
+            this._direction[2] = axesLeft[3];
         }
+
+        const axesRight = this._inputRight.xrInputSource?.gamepad?.axes;
+        if (
+            axesRight &&
+            (Math.abs(axesRight[2]) > this.deadzoneThreshold ||
+                Math.abs(axesRight[3]) > this.deadzoneThreshold)
+        ) {
+            this._rotation[0] = axesRight[2];
+            this._rotation[2] = axesRight[3];
+        }
+    }
+
+    getRotationAxis(out: vec3) {
+        vec3.copy(out as vec3, this._rotation);
         return out;
     }
 
-    getMovementAxis<T extends NumberArray>(out: T): T {
-        const dest = out as unknown as vec3;
-        vec3.zero(dest);
-
-        // determine the movement axis with the highest values
-        if (this._keyboardController && this._keyboardController.active) {
-            vec3.copy(dest, this._keyboardController.getAxis());
-        }
-
-        if (this._vrController && this._vrController.active) {
-            absMaxVec3(dest, dest, this._vrController.getAxisMove());
-        }
-
+    getMovementAxis(out: vec3) {
+        vec3.copy(out as vec3, this._direction);
         return out;
     }
 
-    getControllerPosition(position: NumberArray, handedness: Handedness): boolean {
-        if (this._vrController && this._vrController.active) {
-            this._vrController.getObject(handedness).getPositionWorld(position);
-            return true;
+    /** @hidden */
+    private _onKeyPressed = (input: KeyboardEvent) => {
+        const direction = KeyToDirection[input.code];
+        if (direction !== undefined) {
+            this._keyPress[direction] = true;
         }
-        return false;
-    }
+    };
 
-    getControllerForward(forward: NumberArray, handedness: Handedness): boolean {
-        if (this._vrController && this._vrController.active) {
-            this._vrController.getObject(handedness).getForwardWorld(forward);
-            return true;
+    /** @hidden */
+    private _onKeyReleased = (input: KeyboardEvent) => {
+        const direction = KeyToDirection[input.code];
+        if (direction !== undefined) {
+            this._keyPress[direction] = false;
         }
-        return false;
-    }
+    };
 }
