@@ -1,111 +1,261 @@
-import {Component, ForceMode, Object3D, PhysXComponent} from '@wonderlandengine/api';
+import {
+    Component,
+    ForceMode,
+    InputComponent,
+    InputType,
+    LockAxis,
+    Object3D,
+    PhysXComponent,
+    property,
+    ViewComponent,
+    WonderlandEngine,
+} from '@wonderlandengine/api';
 import {vec3} from 'gl-matrix';
 import {ActiveCamera} from '../helpers/active-camera.js';
-import {LocomotionSelector} from './locomotion-selector.js';
-import {InputBridge, InputBridgeTypename} from './input-bridge.js';
+import {
+    DefaultPlayerControllerInput,
+    PlayerControllerInput,
+} from './player-controller-input.js';
 import {toRad} from '../utils/math.js';
+import {EPSILON, ZERO_VEC3} from '../constants.js';
+import {componentError} from '../utils/wle.js';
+import {TempVec3} from '../internal-constants.js';
 
 /* Temporaries */
-const tempCameraVec = vec3.create();
-const tempPlayerVec = vec3.create();
 const _vectorA = vec3.create();
 
-export function getRequiredComponents(
-    object: Object3D,
-    inputBridgeObject: Object3D | null
-): {player: PlayerController; inputBridge: InputBridge} {
-    const player = object.getComponent(PlayerController);
-    if (!player) {
-        throw new Error(
-            `player-controller(${object.name}): object does not have a PlayerController. This is required.`
-        );
-    }
-
-    const inputBridge =
-        inputBridgeObject?.getComponent(InputBridgeTypename) ||
-        object.getComponent(InputBridgeTypename);
-    if (!inputBridge) {
-        throw new Error(
-            `player-controller(${object.name}): object does not have a InputBridge and the inputBridgeObject parameter is not defined. One of these is required.`
-        );
-    }
-
-    return {player, inputBridge: inputBridge as InputBridge};
+/**
+ * The type of rotation to use when turning the player
+ */
+export enum RotationType {
+    None = 0,
+    /**
+     * Snap will rotate by a fix amount of degrees in a row.
+     *
+     * It's the most comfortable for most people.
+     */
+    Snap = 1,
+    /**
+     * Smooth rotation over multiple frame.
+     *
+     * Smooth rotation is the most immersive, but can cause motion sickness.
+     */
+    Smooth = 2,
 }
+/** List of string keys for {@link RotationType}. */
+export const RotationTypeNames = ['None', 'Snap', 'Smooth'];
 
-export enum RotateState {
+enum RotateState {
     None = 0,
     Reset = 1,
 }
 
 /**
  * This component is attached to the player object and is responsible for
- * controlling the player's movement.
+ * controlling the player's movement and rotation.
  *
  * It needs to have a physx component attached to it. And be on the root of the
  * player hierarchy.
  *
- * The player-controller is the main component for controlling the player's movement and
- * uses other components to implement the various things.
  *
- *
- * @see {@link InputBridge} for handling input from various input providers
- * @see {@link LocomotionSelector} for selecting the type of locomotion to use
- * @see {@link TeleportLocomotion} for teleport locomotion
- * @see {@link SmoothLocomotion} for smooth locomotion
- * @see {@link PlayerRotate} for rotating the player
- * @see {@link HeadCollissionMove} for pushing the player backwards when their head collides with a wall / object
- * @see {@link HeadCollissionFade} for fading to black when the player's head collides with a wall / object
+ * @see {@link PlayerControllerInput} for handling input from various input providers
  */
 export class PlayerController extends Component {
     static TypeName = 'player-controller';
 
-    private _physxComponent!: PhysXComponent;
-    private _headForward: vec3 = [0, 0, 0];
-    private _activeCamera!: ActiveCamera;
-    private _isRotating = false;
-    private _locomotionSelector!: LocomotionSelector;
-    private _rotateState = RotateState.None;
-
-    start() {
-        const tempPhysx = this.object.getComponent(PhysXComponent);
-        if (!tempPhysx) {
-            throw new Error(
-                `player-controller(${this.object.name}): object does not have a Physx`
-            );
-        }
-        this._physxComponent = tempPhysx;
-
-        const tempActiveCamera = this.object.getComponent(ActiveCamera);
-        if (!tempActiveCamera) {
-            throw new Error(
-                `player-controller(${this.object.name}): object does not have a ActiveCamera`
-            );
-        }
-        this._activeCamera = tempActiveCamera;
-
-        const tempLocomotionSelector = this.object.getComponent(LocomotionSelector);
-        if (!tempLocomotionSelector) {
-            throw new Error(
-                `player-controller(${this.object.name}): object does not have a LocomotionSelector`
-            );
-        }
-        this._locomotionSelector = tempLocomotionSelector;
-
-        this._physxComponent.kinematic = this._locomotionSelector.isKinematic;
+    static onRegister(engine: WonderlandEngine) {
+        engine.registerComponent(ActiveCamera);
+        engine.registerComponent(DefaultPlayerControllerInput);
     }
 
-    update(): void {
-        if (this._rotateState !== RotateState.Reset) {
-            return;
+    /** Object  */
+    @property.object()
+    inputObject: Object3D | null = null;
+
+    /* Locomotion properties */
+
+    @property.float(10)
+    speed = 10;
+
+    /* Rotation properties */
+
+    @property.enum(RotationTypeNames, RotationType.Snap)
+    rotationType = RotationType.Snap;
+
+    /**
+     * The number of degrees at which the player rotates when snap-rotating
+     */
+    @property.float(45)
+    snapDegrees = 45;
+
+    /**
+     * The speed at which the player rotates when smooth-rotating
+     */
+    @property.float(1)
+    rotationSpeed = 1;
+
+    private _physx!: PhysXComponent;
+    private _headForward: vec3 = [0, 0, 0];
+    private _activeCamera!: ActiveCamera;
+    private _rotateState = RotateState.None;
+
+    private _input!: PlayerControllerInput;
+
+    private _movement = vec3.create();
+    private _rotation = vec3.create();
+    private _previousType: RotationType = null!;
+
+    private _snapped = false;
+    private _lowThreshold = 0.2;
+    private _highThreshold = 0.5;
+
+    start() {
+        let maybeCamera = this.object.getComponent(ActiveCamera);
+        let maybeInput = (this.inputObject ?? this.object).getComponent(
+            DefaultPlayerControllerInput
+        );
+
+        let left: InputComponent | null = null;
+        let right: InputComponent | null = null;
+        let eyeLeft: InputComponent | null = null;
+        let eyeRight: InputComponent | null = null;
+
+        if (!maybeCamera || !maybeInput) {
+            const inputs = this.scene.getComponents(InputComponent);
+            for (const input of inputs) {
+                switch (input.inputType) {
+                    case InputType.ControllerLeft:
+                        left = input;
+                        break;
+                    case InputType.ControllerRight:
+                        right = input;
+                        break;
+                    case InputType.EyeLeft:
+                        eyeLeft = input;
+                        break;
+                    case InputType.EyeRight:
+                        eyeRight = input;
+                        break;
+                }
+            }
         }
-        /** @todo: Axis need to be locked after a rotation to prevent torque
-         * when hitting walls. Wonderland Engine doesn't yet update axis lock on the fly,
-         * the line below should be uncommented at version 1.2.0 */
-        // this._physxComponent.angularLockAxis = LockAxis.X | LockAxis.Y | LockAxis.Z;
-        this._physxComponent.kinematic = this._locomotionSelector.isKinematic;
-        this._isRotating = false;
-        this._rotateState = RotateState.None;
+
+        if (!maybeCamera) {
+            /* No ActiveCamera found, try our best to create one automatically */
+
+            const views = this.scene.getComponents(ViewComponent);
+            let mainView: ViewComponent | null = null;
+            for (const view of views) {
+                if (view.object.getComponent(InputComponent)) continue;
+                mainView = view;
+                break;
+            }
+            if (!eyeLeft) {
+                throw new Error(
+                    componentError(
+                        this,
+                        "'ActiveCamera' component not provided, and left eye couldn't be found"
+                    )
+                );
+            }
+            if (!eyeRight) {
+                throw new Error(
+                    componentError(
+                        this,
+                        "'ActiveCamera' component not provided, and right eye couldn't be found"
+                    )
+                );
+            }
+            if (!mainView) {
+                throw new Error(
+                    componentError(
+                        this,
+                        "'ActiveCamera' component not provided, and non VR view couldn't be found"
+                    )
+                );
+            }
+            maybeCamera = this.object.addComponent(ActiveCamera, {
+                nonVrCamera: mainView.object,
+                leftEye: eyeLeft.object,
+                rightEye: eyeRight.object,
+            });
+        }
+        this._activeCamera = maybeCamera;
+
+        if (!maybeInput) {
+            /* No input bridge found, try our best to create one automatically */
+
+            if (!left) {
+                throw new Error(
+                    componentError(
+                        this,
+                        "'PlayerControllerInput' component not provided, and left controller couldn't be found"
+                    )
+                );
+            }
+            if (!right) {
+                throw new Error(
+                    componentError(
+                        this,
+                        "'PlayerControllerInput' component not provided, and right controller couldn't be found"
+                    )
+                );
+            }
+            maybeInput = this.object.addComponent(DefaultPlayerControllerInput, {
+                leftControlObject: left.object,
+                rightControlObject: right.object,
+            });
+        }
+        this._input = maybeInput;
+    }
+
+    onActivate(): void {
+        const physx = this.object.getComponent(PhysXComponent);
+        if (!physx) {
+            throw new Error(componentError(this, 'Missing required physx component'));
+        }
+        this._physx = physx;
+    }
+
+    update(dt: number): void {
+        /* Rotation update */
+
+        if (this._rotateState === RotateState.Reset) {
+            this._physx.angularLockAxis = LockAxis.X | LockAxis.Y | LockAxis.Z;
+            this._physx.kinematic = false;
+            this._rotateState = RotateState.None;
+        }
+
+        if (this._previousType !== this.rotationType) {
+            /** @todo: Remove at 1.2.0, when the runtime supports updating
+             * lock axis in real time. */
+            const lockY = this.rotationType === RotationType.Smooth ? 0 : LockAxis.Y;
+            this._physx.angularLockAxis = LockAxis.X | lockY | LockAxis.Z;
+            this._physx.active = false;
+            this._physx.active = true;
+            this._previousType = this.rotationType;
+        }
+
+        vec3.zero(this._rotation);
+        this._input.getRotationAxis(this._rotation);
+        switch (this.rotationType) {
+            case RotationType.Snap:
+                this._rotatePlayerSnap();
+                break;
+            case RotationType.Smooth:
+                this._rotatePlayerSmooth(dt);
+                break;
+        }
+
+        /* Position update */
+
+        vec3.zero(this._movement);
+        this._input.getMovementAxis(this._movement);
+        vec3.scale(this._movement, this._movement, this.speed);
+
+        if (!vec3.equals(this._movement, ZERO_VEC3)) {
+            this.move(this._movement);
+        }
     }
 
     /**
@@ -113,10 +263,8 @@ export class PlayerController extends Component {
      * @param movement The direction to move in.
      */
     move(movement: vec3) {
-        if (this._isRotating || this._physxComponent.kinematic) {
-            // for now, don't move while rotating or when kinematic is on.
-            // Because we use physics to move, we need to switch to kinematic mode
-            // during rotation.
+        if (this._physx.kinematic) {
+            /* Skip movement in snap mode during a rotation */
             return;
         }
 
@@ -124,14 +272,12 @@ export class PlayerController extends Component {
         const currentCamera = this._activeCamera.current;
         currentCamera.getForwardWorld(this._headForward);
 
-        // Combine direction with headObject
-        vec3.transformQuat(movement, movement, currentCamera.getTransformWorld());
+        const direction = TempVec3.get();
+        vec3.transformQuat(direction, movement, currentCamera.getTransformWorld());
+        direction[1] = 0;
+        this._physx.addForce(direction);
 
-        // Do not move on Y axis
-        movement[1] = 0;
-
-        // Add force to Physx Component to move the player
-        this._physxComponent.addForce(movement);
+        TempVec3.free(1);
     }
 
     /**
@@ -139,9 +285,8 @@ export class PlayerController extends Component {
      * Can be called every frame.
      */
     rotateSnap(angle: number) {
-        if (!this._physxComponent.kinematic) {
-            this._isRotating = true;
-            this._physxComponent.kinematic = true;
+        if (!this._physx.kinematic) {
+            this._physx.kinematic = true;
             this._rotateState = RotateState.Reset;
         }
         const rot = vec3.set(_vectorA, 0, 1, 0);
@@ -149,36 +294,37 @@ export class PlayerController extends Component {
     }
 
     rotateSmooth(angle: number) {
-        /** @todo: Axis need to be unlocked before rotation.
-         * the line below should be uncommented at version 1.2.0 */
-        // this._physxComponent.angularLockAxis = LockAxis.X | LockAxis.Z;
+        this._physx.angularLockAxis = LockAxis.X | LockAxis.Z;
         const rot = vec3.set(_vectorA, 0, -toRad(angle), 0);
-        this._physxComponent.addTorque(rot, ForceMode.VelocityChange);
+        this._physx.addTorque(rot, ForceMode.VelocityChange);
         this._rotateState = RotateState.Reset;
     }
 
-    /**
-     * Sets the player's position and rotation.
-     * @param location the location to move to
-     * @param rotation the rotation to rotate to in radians
-     */
-    setPositionRotation(location: vec3, rotation: number) {
-        this.object.resetRotation();
-        this.object.rotateAxisAngleRadObject([0, 1, 0], rotation);
+    private _rotatePlayerSnap() {
+        const currentAxis = this._rotation[0];
 
-        // Correct for room scale
-        this._activeCamera.getPositionWorld(tempCameraVec);
-        this.object.getPositionWorld(tempPlayerVec);
+        if (Math.abs(currentAxis) < this._lowThreshold) {
+            this._snapped = false;
+            return;
+        }
 
-        vec3.sub(tempPlayerVec, tempCameraVec, tempPlayerVec);
-        tempPlayerVec[0] += location[0];
-        tempPlayerVec[1] = location[1];
-        tempPlayerVec[2] += location[2];
-
-        this.object.setPositionWorld(location);
+        // need to release trigger before snapping again
+        if (this._snapped || Math.abs(currentAxis) < this._highThreshold) {
+            return;
+        }
+        this._snapped = true;
+        let rotation = this.snapDegrees;
+        if (currentAxis < 0) {
+            rotation *= -1;
+        }
+        this.rotateSnap(rotation);
     }
 
-    get physx() {
-        return this._physxComponent;
+    private _rotatePlayerSmooth(dt: number) {
+        if (Math.abs(this._rotation[0]) < EPSILON) {
+            return;
+        }
+        const radians = this._rotation[0] * this.rotationSpeed * dt * 100;
+        this.rotateSmooth(radians);
     }
 }
