@@ -1,10 +1,24 @@
-import {Component, InputComponent, NumberArray, Object3D} from '@wonderlandengine/api';
-import {property} from '@wonderlandengine/api/decorators.js';
+import {Component, InputComponent, Object3D, property} from '@wonderlandengine/api';
 import {vec3} from 'gl-matrix';
-import {TempVec3} from '../internal-constants.js';
+
 import {componentError} from '../utils/wle.js';
 
-export const InputBridgeTypename = 'player-controller-input';
+/**
+ * Typename for a `PlayerControllerInput` component.
+ *
+ * Use this to create your own input component that can
+ * be retrieved by {@link PlayerController}:
+ *
+ * ```ts
+ * import {PlayerControllerInput, PlayerControllerInputTypename} fromn '@wonderlandengine/interaction';
+ *
+ * export class CustomPlayerInput implements PlayerControllerInput {
+ *     static TypeName = PlayerControllerInputTypename;
+ *     ...
+ * }
+ * ```
+ */
+export const PlayerControllerInputTypename = 'player-controller-input';
 
 /**
  * Defines an interface for bridging various input methods into a unified control scheme.
@@ -91,7 +105,7 @@ export class DefaultPlayerControllerInput
     extends Component
     implements PlayerControllerInput
 {
-    static TypeName = InputBridgeTypename;
+    static TypeName = PlayerControllerInputTypename;
 
     @property.bool(true)
     keyboard = true;
@@ -122,6 +136,7 @@ export class DefaultPlayerControllerInput
     private _direction = vec3.create();
     private _rotation = vec3.create();
 
+    /** @override */
     onActivate(): void {
         if (this.keyboard) {
             /** @todo: Allow user to select dom element to listen to */
@@ -148,11 +163,13 @@ export class DefaultPlayerControllerInput
         this._inputRight = right;
     }
 
+    /** @override */
     onDeactivate(): void {
         window.removeEventListener('keydown', this._onKeyPressed);
         window.removeEventListener('keyup', this._onKeyReleased);
     }
 
+    /** @override */
     update() {
         vec3.zero(this._direction);
         if (this._keyPress[Direction.Up]) this._direction[2] -= 1.0;
