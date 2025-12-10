@@ -17,12 +17,15 @@ import {
     PlayerControllerInput,
 } from './player-controller-input.js';
 import {toRad} from '../utils/math.js';
-import {EPSILON, ZERO_VEC3} from '../constants.js';
+import {EPSILON, UP, ZERO_VEC3} from '../constants.js';
 import {componentError} from '../utils/wle.js';
 import {TempVec3} from '../internal-constants.js';
 
-/* Temporaries */
-const _vectorA = vec3.create();
+/* Constants */
+
+const BASE_ROT_SPEED = 25;
+const SNAP_LOW_THRESHOLD = 0.2;
+const SNAP_HIGH_THRESHOLD = 0.2;
 
 /**
  * The type of rotation to use when turning the player
@@ -45,11 +48,6 @@ export enum RotationType {
 /** List of string keys for {@link RotationType}. */
 export const RotationTypeNames = ['None', 'Snap', 'Smooth'];
 
-enum RotateState {
-    None = 0,
-    Reset = 1,
-}
-
 /**
  * This component is attached to the player object and is responsible for
  * controlling the player's movement and rotation.
@@ -68,14 +66,19 @@ export class PlayerController extends Component {
         engine.registerComponent(DefaultPlayerControllerInput);
     }
 
+    /** Tracked space onto which the rotation is applied */
+    @property.object({required: true})
+    trackedSpace!: Object3D;
+
     /** Object  */
     @property.object()
     inputObject: Object3D | null = null;
 
     /* Locomotion properties */
 
-    @property.float(10)
-    speed = 10;
+    /** Walk speed multiplier. */
+    @property.float(1)
+    walkSpeed = 1;
 
     /* Rotation properties */
 
@@ -89,25 +92,18 @@ export class PlayerController extends Component {
     snapDegrees = 45;
 
     /**
-     * The speed at which the player rotates when smooth-rotating
+     * Rotation speed multiplier.
+     *
+     * @note Only used when {@link rotationType} is {@link RotationType.Smooth}.
      */
     @property.float(1)
     rotationSpeed = 1;
 
-    private _physx!: PhysXComponent;
-    private _headForward: vec3 = [0, 0, 0];
     private _activeCamera!: ActiveCamera;
-    private _rotateState = RotateState.None;
-
+    private _physx!: PhysXComponent;
     private _input!: PlayerControllerInput;
 
-    private _movement = vec3.create();
-    private _rotation = vec3.create();
-    private _previousType: RotationType = null!;
-
     private _snapped = false;
-    private _lowThreshold = 0.2;
-    private _highThreshold = 0.5;
 
     start() {
         let maybeCamera = this.object.getComponent(ActiveCamera);
@@ -215,47 +211,54 @@ export class PlayerController extends Component {
             throw new Error(componentError(this, 'Missing required physx component'));
         }
         this._physx = physx;
+        this._physx.angularLockAxis = LockAxis.X | LockAxis.Y | LockAxis.Z;
+
+        this._snapped = false;
     }
 
     update(dt: number): void {
         /* Rotation update */
 
-        if (this._rotateState === RotateState.Reset) {
-            this._physx.angularLockAxis = LockAxis.X | LockAxis.Y | LockAxis.Z;
-            this._physx.kinematic = false;
-            this._rotateState = RotateState.None;
-        }
+        const inputRotation = TempVec3.get();
+        this._input.getRotationAxis(inputRotation);
 
-        if (this._previousType !== this.rotationType) {
-            /** @todo: Remove at 1.2.0, when the runtime supports updating
-             * lock axis in real time. */
-            const lockY = this.rotationType === RotationType.Smooth ? 0 : LockAxis.Y;
-            this._physx.angularLockAxis = LockAxis.X | lockY | LockAxis.Z;
-            this._physx.active = false;
-            this._physx.active = true;
-            this._previousType = this.rotationType;
-        }
-
-        vec3.zero(this._rotation);
-        this._input.getRotationAxis(this._rotation);
+        let rotation = 0.0;
         switch (this.rotationType) {
-            case RotationType.Snap:
-                this._rotatePlayerSnap();
+            case RotationType.Snap: {
+                const value = inputRotation[0];
+                if (Math.abs(value) < SNAP_LOW_THRESHOLD) {
+                    this._snapped = false;
+                    break;
+                }
+                /* Need to release trigger before snapping again */
+                if (this._snapped || Math.abs(value) < SNAP_HIGH_THRESHOLD) {
+                    break;
+                }
+                this._snapped = true;
+                rotation = value < 0 ? -this.snapDegrees : this.snapDegrees;
                 break;
-            case RotationType.Smooth:
-                this._rotatePlayerSmooth(dt);
+            }
+            case RotationType.Smooth: {
+                const value = inputRotation[0];
+                if (Math.abs(value) > EPSILON) {
+                    rotation = value * this.rotationSpeed * dt * BASE_ROT_SPEED;
+                }
                 break;
+            }
+        }
+        if (Math.abs(rotation) > EPSILON) {
+            this.trackedSpace.rotateAxisAngleDegLocal(UP, -rotation);
         }
 
         /* Position update */
 
-        vec3.zero(this._movement);
-        this._input.getMovementAxis(this._movement);
-        vec3.scale(this._movement, this._movement, this.speed);
-
-        if (!vec3.equals(this._movement, ZERO_VEC3)) {
-            this.move(this._movement);
+        const movement = TempVec3.get();
+        this._input.getMovementAxis(movement);
+        if (!vec3.equals(movement, ZERO_VEC3)) {
+            this.move(movement);
         }
+
+        TempVec3.free(2);
     }
 
     /**
@@ -263,68 +266,16 @@ export class PlayerController extends Component {
      * @param movement The direction to move in.
      */
     move(movement: vec3) {
-        if (this._physx.kinematic) {
-            /* Skip movement in snap mode during a rotation */
-            return;
-        }
-
-        // Move according to headObject Forward Direction
         const currentCamera = this._activeCamera.current;
-        currentCamera.getForwardWorld(this._headForward);
 
         const direction = TempVec3.get();
         vec3.transformQuat(direction, movement, currentCamera.getTransformWorld());
         direction[1] = 0;
-        this._physx.addForce(direction);
+        vec3.normalize(direction, direction);
+        vec3.scale(direction, direction, this.walkSpeed);
 
-        TempVec3.free(1);
-    }
+        this._physx.linearVelocity = direction;
 
-    /**
-     * Rotates the player on the Y axis for the given amount of degrees.
-     * Can be called every frame.
-     */
-    rotateSnap(angle: number) {
-        if (!this._physx.kinematic) {
-            this._physx.kinematic = true;
-            this._rotateState = RotateState.Reset;
-        }
-        const rot = vec3.set(_vectorA, 0, 1, 0);
-        this.object.rotateAxisAngleDegObject(rot, -angle);
-    }
-
-    rotateSmooth(angle: number) {
-        this._physx.angularLockAxis = LockAxis.X | LockAxis.Z;
-        const rot = vec3.set(_vectorA, 0, -toRad(angle), 0);
-        this._physx.addTorque(rot, ForceMode.VelocityChange);
-        this._rotateState = RotateState.Reset;
-    }
-
-    private _rotatePlayerSnap() {
-        const currentAxis = this._rotation[0];
-
-        if (Math.abs(currentAxis) < this._lowThreshold) {
-            this._snapped = false;
-            return;
-        }
-
-        // need to release trigger before snapping again
-        if (this._snapped || Math.abs(currentAxis) < this._highThreshold) {
-            return;
-        }
-        this._snapped = true;
-        let rotation = this.snapDegrees;
-        if (currentAxis < 0) {
-            rotation *= -1;
-        }
-        this.rotateSnap(rotation);
-    }
-
-    private _rotatePlayerSmooth(dt: number) {
-        if (Math.abs(this._rotation[0]) < EPSILON) {
-            return;
-        }
-        const radians = this._rotation[0] * this.rotationSpeed * dt * 100;
-        this.rotateSmooth(radians);
+        TempVec3.free();
     }
 }
