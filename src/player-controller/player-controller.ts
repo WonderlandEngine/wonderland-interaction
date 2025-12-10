@@ -2,26 +2,26 @@ import {
     Component,
     ForceMode,
     InputComponent,
+    InputType,
     LockAxis,
     Object3D,
     PhysXComponent,
     property,
+    ViewComponent,
     WonderlandEngine,
 } from '@wonderlandengine/api';
 import {vec3} from 'gl-matrix';
 import {ActiveCamera} from '../helpers/active-camera.js';
 import {
-    DefaultInputBridge,
-    InputBridgeTypename,
+    DefaultPlayerControllerInput,
     PlayerControllerInput,
-} from './input-bridge.js';
+} from './player-controller-input.js';
 import {toRad} from '../utils/math.js';
-import {EPSILON} from '../constants.js';
+import {EPSILON, ZERO_VEC3} from '../constants.js';
 import {componentError} from '../utils/wle.js';
+import {TempVec3} from '../internal-constants.js';
 
 /* Temporaries */
-const tempCameraVec = vec3.create();
-const tempPlayerVec = vec3.create();
 const _vectorA = vec3.create();
 
 /**
@@ -58,20 +58,19 @@ enum RotateState {
  * player hierarchy.
  *
  *
- * @see {@link InputBridge} for handling input from various input providers
- * @see {@link PlayerRotate} for rotating the player
- * @see {@link HeadCollissionMove} for pushing the player backwards when their head collides with a wall / object
- * @see {@link HeadCollissionFade} for fading to black when the player's head collides with a wall / object
+ * @see {@link PlayerControllerInput} for handling input from various input providers
  */
 export class PlayerController extends Component {
     static TypeName = 'player-controller';
 
     static onRegister(engine: WonderlandEngine) {
-        engine.registerComponent(DefaultInputBridge);
+        engine.registerComponent(ActiveCamera);
+        engine.registerComponent(DefaultPlayerControllerInput);
     }
 
+    /** Object  */
     @property.object()
-    inputBridgeObject: Object3D | null = null;
+    inputObject: Object3D | null = null;
 
     /* Locomotion properties */
 
@@ -98,10 +97,9 @@ export class PlayerController extends Component {
     private _physx!: PhysXComponent;
     private _headForward: vec3 = [0, 0, 0];
     private _activeCamera!: ActiveCamera;
-    private _isRotating = false;
     private _rotateState = RotateState.None;
 
-    private _inputBridge!: PlayerControllerInput;
+    private _input!: PlayerControllerInput;
 
     private _movement = vec3.create();
     private _rotation = vec3.create();
@@ -112,57 +110,109 @@ export class PlayerController extends Component {
     private _highThreshold = 0.5;
 
     start() {
-        const tempActiveCamera = this.object.getComponent(ActiveCamera);
-        if (!tempActiveCamera) {
-            throw new Error(componentError(this, 'object does not have a ActiveCamera'));
-        }
-        this._activeCamera = tempActiveCamera;
-
-        const maybeInput = (this.inputBridgeObject ?? this.object).getComponent(
-            DefaultInputBridge
+        let maybeCamera = this.object.getComponent(ActiveCamera);
+        let maybeInput = (this.inputObject ?? this.object).getComponent(
+            DefaultPlayerControllerInput
         );
-        if (maybeInput) {
-            this._inputBridge = maybeInput;
-            return;
-        }
 
-        /* No input bridge found, try our best to create one automatically */
-
-        const inputs = this.scene.getComponents(InputComponent);
         let left: InputComponent | null = null;
         let right: InputComponent | null = null;
-        for (const input of inputs) {
-            if (input.handedness === 'left') left = input;
-            else if (input.handedness === 'right') right = input;
+        let eyeLeft: InputComponent | null = null;
+        let eyeRight: InputComponent | null = null;
+
+        if (!maybeCamera || !maybeInput) {
+            const inputs = this.scene.getComponents(InputComponent);
+            for (const input of inputs) {
+                switch (input.inputType) {
+                    case InputType.ControllerLeft:
+                        left = input;
+                        break;
+                    case InputType.ControllerRight:
+                        right = input;
+                        break;
+                    case InputType.EyeLeft:
+                        eyeLeft = input;
+                        break;
+                    case InputType.EyeRight:
+                        eyeRight = input;
+                        break;
+                }
+            }
         }
 
-        if (!left) {
-            throw new Error(
-                componentError(
-                    this,
-                    "PlayerControllerInput not provided, and couldn't find left input component"
-                )
-            );
-        }
-        if (!right) {
-            throw new Error(
-                componentError(
-                    this,
-                    "PlayerControllerInput not provided, and couldn't find right input component"
-                )
-            );
-        }
+        if (!maybeCamera) {
+            /* No ActiveCamera found, try our best to create one automatically */
 
-        this._inputBridge = this.object.addComponent(DefaultInputBridge, {
-            leftControlObject: left.object,
-            rightControlObject: right.object,
-        });
+            const views = this.scene.getComponents(ViewComponent);
+            let mainView: ViewComponent | null = null;
+            for (const view of views) {
+                if (view.object.getComponent(InputComponent)) continue;
+                mainView = view;
+                break;
+            }
+            if (!eyeLeft) {
+                throw new Error(
+                    componentError(
+                        this,
+                        "'ActiveCamera' component not provided, and left eye couldn't be found"
+                    )
+                );
+            }
+            if (!eyeRight) {
+                throw new Error(
+                    componentError(
+                        this,
+                        "'ActiveCamera' component not provided, and right eye couldn't be found"
+                    )
+                );
+            }
+            if (!mainView) {
+                throw new Error(
+                    componentError(
+                        this,
+                        "'ActiveCamera' component not provided, and non VR view couldn't be found"
+                    )
+                );
+            }
+            maybeCamera = this.object.addComponent(ActiveCamera, {
+                nonVrCamera: mainView.object,
+                leftEye: eyeLeft.object,
+                rightEye: eyeRight.object,
+            });
+        }
+        this._activeCamera = maybeCamera;
+
+        if (!maybeInput) {
+            /* No input bridge found, try our best to create one automatically */
+
+            if (!left) {
+                throw new Error(
+                    componentError(
+                        this,
+                        "'PlayerControllerInput' component not provided, and left controller couldn't be found"
+                    )
+                );
+            }
+            if (!right) {
+                throw new Error(
+                    componentError(
+                        this,
+                        "'PlayerControllerInput' component not provided, and right controller couldn't be found"
+                    )
+                );
+            }
+            maybeInput = this.object.addComponent(DefaultPlayerControllerInput, {
+                leftControlObject: left.object,
+                rightControlObject: right.object,
+            });
+        }
+        this._input = maybeInput;
     }
 
     onActivate(): void {
         const physx = this.object.getComponent(PhysXComponent);
         if (!physx) {
-            throw new Error(componentError(this, 'object does not have a Physx'));
+            throw new Error(componentError(this, 'Missing required physx component'));
         }
         this._physx = physx;
     }
@@ -173,7 +223,6 @@ export class PlayerController extends Component {
         if (this._rotateState === RotateState.Reset) {
             this._physx.angularLockAxis = LockAxis.X | LockAxis.Y | LockAxis.Z;
             this._physx.kinematic = false;
-            this._isRotating = false;
             this._rotateState = RotateState.None;
         }
 
@@ -188,7 +237,7 @@ export class PlayerController extends Component {
         }
 
         vec3.zero(this._rotation);
-        this._inputBridge.getRotationAxis(this._rotation);
+        this._input.getRotationAxis(this._rotation);
         switch (this.rotationType) {
             case RotationType.Snap:
                 this._rotatePlayerSnap();
@@ -201,12 +250,10 @@ export class PlayerController extends Component {
         /* Position update */
 
         vec3.zero(this._movement);
-        this._inputBridge.getMovementAxis(this._movement);
+        this._input.getMovementAxis(this._movement);
         vec3.scale(this._movement, this._movement, this.speed);
 
-        const moving =
-            this._movement[0] !== 0 || this._movement[1] !== 0 || this._movement[2] !== 0;
-        if (moving) {
+        if (!vec3.equals(this._movement, ZERO_VEC3)) {
             this.move(this._movement);
         }
     }
@@ -216,10 +263,8 @@ export class PlayerController extends Component {
      * @param movement The direction to move in.
      */
     move(movement: vec3) {
-        if (this._isRotating || this._physx.kinematic) {
-            // For now, don't move while rotating or when kinematic is on.
-            // Because we use physics to move, we need to switch to kinematic mode
-            // during rotation.
+        if (this._physx.kinematic) {
+            /* Skip movement in snap mode during a rotation */
             return;
         }
 
@@ -227,14 +272,12 @@ export class PlayerController extends Component {
         const currentCamera = this._activeCamera.current;
         currentCamera.getForwardWorld(this._headForward);
 
-        // Combine direction with headObject
-        vec3.transformQuat(movement, movement, currentCamera.getTransformWorld());
+        const direction = TempVec3.get();
+        vec3.transformQuat(direction, movement, currentCamera.getTransformWorld());
+        direction[1] = 0;
+        this._physx.addForce(direction);
 
-        // Do not move on Y axis
-        movement[1] = 0;
-
-        // Add force to Physx Component to move the player
-        this._physx.addForce(movement);
+        TempVec3.free(1);
     }
 
     /**
@@ -243,7 +286,6 @@ export class PlayerController extends Component {
      */
     rotateSnap(angle: number) {
         if (!this._physx.kinematic) {
-            this._isRotating = true;
             this._physx.kinematic = true;
             this._rotateState = RotateState.Reset;
         }

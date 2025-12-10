@@ -9,7 +9,7 @@ export const InputBridgeTypename = 'player-controller-input';
 /**
  * Defines an interface for bridging various input methods into a unified control scheme.
  *
- * The `InputBridge` serves as an abstraction layer that enables an application to
+ * The `PlayerControllerInput` serves as an abstraction layer that enables an application to
  * process input data from different sources such as keyboards, game controllers,
  * and VR controllers in a consistent manner. Implementations of this interface should
  * provide mechanisms to interpret and translate these diverse inputs into a set
@@ -18,11 +18,11 @@ export const InputBridgeTypename = 'player-controller-input';
  *
  * @example
  * ```js
- * export class CustomInputBridge extends Component implements InputBridge {
+ * export class CustomInput extends Component implements PlayerControllerInput {
  *   static TypeName = InputBridgeTypename;
  *
  *   \/** @override *\/
- *   getRotationAxis<T extends NumberArray>(out: T): T {
+ *   getRotationAxis(out: vec3) {
  *       // Always rotate by 10 degrees around the. You can input your own values here,
  *       // coming from a keyboard, the network, etc...
  *       out[1] = 10;
@@ -30,17 +30,11 @@ export const InputBridgeTypename = 'player-controller-input';
  *   }
  *
  *   \/** @override *\/
- *   getMovementAxis<T extends NumberArray>(out: T): T {
+ *   getMovementAxis(out: vec3) {
  *       // Always move to the right. You can input your own values here,
  *       // coming from a keyboard, the network, etc...
  *       out[0] = 1;
  *       return out;
- *   }
- *   getControllerPosition(position: NumberArray, handedness: Handedness): boolean {
- *       return false;
- *   }
- *   getControllerForward(forward: NumberArray, handedness: Handedness): boolean {
- *       return false;
  *   }
  *}
  *```
@@ -89,19 +83,14 @@ const KeyToDirection: {[key: string]: Direction} = {
 };
 
 /**
- * A default implementation of `InputBridge` that handles input from
- * default providers:
- * - Keyboard component {@link ControlsKeyboard}
- * - VR controller component {@link ControlsVR}
- *
- * @remarks
- * `DefaultInputBridge` integrates with the underlying input systems provided by
- * Wonderland Engine, gathering input data and converting it into a consistent format.
- * This class allows you to query for movement and rotation data, as well as the
- * position and forward direction of VR controllers, offering a seamless input experience
- * regardless of the hardware used.
+ * A default implementation of that handles input from:
+ * - Keyboard
+ * - VR controller
  */
-export class DefaultInputBridge extends Component implements PlayerControllerInput {
+export class DefaultPlayerControllerInput
+    extends Component
+    implements PlayerControllerInput
+{
     static TypeName = InputBridgeTypename;
 
     @property.bool(true)
@@ -194,11 +183,13 @@ export class DefaultInputBridge extends Component implements PlayerControllerInp
         }
     }
 
+    /** @override */
     getRotationAxis(out: vec3) {
         vec3.copy(out as vec3, this._rotation);
         return out;
     }
 
+    /** @override */
     getMovementAxis(out: vec3) {
         vec3.copy(out as vec3, this._direction);
         return out;

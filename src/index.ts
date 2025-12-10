@@ -11,4 +11,5 @@ export * from './utils/math.js';
 export * from './utils/activate-children.js';
 export * from './utils/wle.js';
 
-export * from './player-controller/index.js';
+export * from './player-controller/player-controller-input.js';
+export * from './player-controller/player-controller.js';

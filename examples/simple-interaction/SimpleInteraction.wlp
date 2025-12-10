@@ -28,14 +28,6 @@
                     }
                 },
                 {
-                    "type": "active-camera",
-                    "active-camera": {
-                        "nonVrCamera": "17",
-                        "leftEye": "18",
-                        "rightEye": "19"
-                    }
-                },
-                {
                     "type": "physx",
                     "physx": {
                         "sphere": {
@@ -46,7 +38,17 @@
                         "bounciness": 0.0,
                         "angularDamping": 1.0,
                         "mass": 1.0,
-                        "linearDamping": 1.0
+                        "linearDamping": 1.0,
+                        "shape": "capsule",
+                        "rotationOffset": [
+                            0.0,
+                            0.0,
+                            0.7071068,
+                            0.7071068
+                        ],
+                        "capsule": {
+                            "halfHeight": 0.15
+                        }
                     }
                 }
             ]
@@ -4433,8 +4435,7 @@
             "version": [
                 1,
                 5,
-                0,
-                8
+                0
             ]
         },
         "xr": {
