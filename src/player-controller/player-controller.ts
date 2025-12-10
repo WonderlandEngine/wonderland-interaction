@@ -1,6 +1,5 @@
 import {
     Component,
-    ForceMode,
     InputComponent,
     InputType,
     LockAxis,
@@ -16,7 +15,6 @@ import {
     DefaultPlayerControllerInput,
     PlayerControllerInput,
 } from './player-controller-input.js';
-import {toRad} from '../utils/math.js';
 import {EPSILON, UP, ZERO_VEC3} from '../constants.js';
 import {componentError} from '../utils/wle.js';
 import {TempVec3} from '../internal-constants.js';
@@ -49,12 +47,10 @@ export enum RotationType {
 export const RotationTypeNames = ['None', 'Snap', 'Smooth'];
 
 /**
- * This component is attached to the player object and is responsible for
- * controlling the player's movement and rotation.
+ * Simpler character controller for smooth locomotin.
  *
  * It needs to have a physx component attached to it. And be on the root of the
  * player hierarchy.
- *
  *
  * @see {@link PlayerControllerInput} for handling input from various input providers
  */
@@ -70,7 +66,11 @@ export class PlayerController extends Component {
     @property.object({required: true})
     trackedSpace!: Object3D;
 
-    /** Object  */
+    /**
+     * Object containing the {@link PlayerControllerInput} to read inputs from.
+     *
+     * @note If not provided, this component will create a default one.
+     */
     @property.object()
     inputObject: Object3D | null = null;
 
@@ -99,12 +99,31 @@ export class PlayerController extends Component {
     @property.float(1)
     rotationSpeed = 1;
 
+    /**
+     * Input to feed the controller.
+     *
+     * Using a non-component input is valid, e.g.,
+     *
+     * ```ts
+     * import {PlayerControllerInput} fromn '@wonderlandengine/interaction';
+     *
+     * class Input implements PlayerControllerInput {
+     *     getRotationAxis(out: vec3) {
+     *         out[0] = 1.0;
+     *     }
+     * }
+     *
+     * controller.input = new Input();
+     * ```
+     */
+    input!: PlayerControllerInput;
+
     private _activeCamera!: ActiveCamera;
     private _physx!: PhysXComponent;
-    private _input!: PlayerControllerInput;
 
     private _snapped = false;
 
+    /** @override */
     start() {
         let maybeCamera = this.object.getComponent(ActiveCamera);
         let maybeInput = (this.inputObject ?? this.object).getComponent(
@@ -202,9 +221,10 @@ export class PlayerController extends Component {
                 rightControlObject: right.object,
             });
         }
-        this._input = maybeInput;
+        this.input = maybeInput;
     }
 
+    /** @override */
     onActivate(): void {
         const physx = this.object.getComponent(PhysXComponent);
         if (!physx) {
@@ -216,11 +236,12 @@ export class PlayerController extends Component {
         this._snapped = false;
     }
 
+    /** @override */
     update(dt: number): void {
         /* Rotation update */
 
         const inputRotation = TempVec3.get();
-        this._input.getRotationAxis(inputRotation);
+        this.input.getRotationAxis(inputRotation);
 
         let rotation = 0.0;
         switch (this.rotationType) {
@@ -253,7 +274,7 @@ export class PlayerController extends Component {
         /* Position update */
 
         const movement = TempVec3.get();
-        this._input.getMovementAxis(movement);
+        this.input.getMovementAxis(movement);
         if (!vec3.equals(movement, ZERO_VEC3)) {
             this.move(movement);
         }

@@ -7,10 +7,20 @@ const _pointB = vec3.create();
 const _rotationA = quat.create();
 const _rotationB = quat.create();
 
+/**
+ * Convert degrees to radians.
+ *
+ * @param degrees Value, in **degrees**.
+ */
 export function toRad(degrees: number) {
     return (degrees * Math.PI) / 180.0;
 }
 
+/**
+ * Convert radians to degrees.
+ *
+ * @param degrees Value, in **radians**.
+ */
 export function toDegree(radians: number) {
     return (radians * 180) / Math.PI;
 }
@@ -30,6 +40,14 @@ export function quatDelta(out: quat, src: quat, dst: quat): quat {
     return quat.normalize(out, out);
 }
 
+/**
+ * Check whether two points are **almost** equal.
+ *
+ * @param a Source point.
+ * @param b Target point.
+ * @param epsilon Epsilon threshold.
+ * @returns `true` if almost equal, `false` otherwise.
+ */
 export function isPointEqual(a: vec3, b: vec3, epsilon: number) {
     return (
         Math.abs(a[0] - b[0]) < epsilon &&
@@ -38,6 +56,14 @@ export function isPointEqual(a: vec3, b: vec3, epsilon: number) {
     );
 }
 
+/**
+ * Check whether two rotations are **almost** equal.
+ *
+ * @param a Source rotation.
+ * @param b Target rotation.
+ * @param epsilon Epsilon threshold.
+ * @returns `true` if almost equal, `false` otherwise.
+ */
 export function isQuatEqual(a: quat, b: quat, epsilon: number) {
     return Math.abs(vec4.dot(a, b)) >= 1 - epsilon;
 }

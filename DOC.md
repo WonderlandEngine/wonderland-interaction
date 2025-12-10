@@ -96,3 +96,34 @@ https://github.com/user-attachments/assets/30f1d634-06ac-4733-ba7f-62067f1822b9
 Example with lerp set to `0.1`:
 
 https://github.com/user-attachments/assets/66f8263d-c0f5-4c9b-8063-fd10bb4640d8
+
+## Locomotion
+
+### PlayerController
+
+The `player-controller` is a simple smooth locomotion implementation, based on the **physics**
+engine.
+
+> The locomotion isn't implemented using using kinematic.
+
+Example of a hierarchy setup to use locomotion:
+
+Player Hierarchy              |  Player Properties
+:-------------------------: | :-----------------------------------:
+![Player Scene Graph](./img/doc-player-scenegraph.png) | ![Player Properties](./img/doc-player-properties.png)
+
+> The `physx` component is mandatory and used for the movements.
+
+#### Properties
+
+![Player Scene Graph](./img/doc-player-controller.png)
+
+`trackedSpace` is the only **required** property, used for the rotation.
+
+#### Rotation Type
+
+* Snap: Rotate by a `snapDegrees` amount
+    * The input initiating the rotation must be released to rotate again
+* Smooth: Rotate smoothly with speed `rotationSpeed`
+
+> Smooth rotation should be used carefully as it can induce heavy motion sickness.
