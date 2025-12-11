@@ -250,13 +250,13 @@ export class Interactor extends Component {
      * currently bound interactable.
      */
     public stopInteraction() {
-        if (this._grabbable) {
+        if (this._grabbable && !this._grabbable.isDestroyed) {
             this._grabbable.release(this);
             this._onGripEnd.notify(this._grabbable);
         }
         this._grabbable = null;
 
-        if (this.meshRoot) {
+        if (this.meshRoot && !this.meshRoot.isDestroyed) {
             setComponentsActive(this.meshRoot, true, MeshComponent);
         }
     }

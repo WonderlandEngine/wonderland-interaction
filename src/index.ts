@@ -1,3 +1,4 @@
+export * from './constraints.js';
 export * from './history-tracker.js';
 export * from './interaction/grab-point.js';
 
