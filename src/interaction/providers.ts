@@ -34,21 +34,6 @@ export function rotateAroundPivot(out: quat, axis: vec3, handle: vec3): quat {
     return out;
 }
 
-export function rotateAroundPivotDual(out: quat, axis: vec3, handle1: vec3, handle2: vec3) {
-    const worldUp = vec3.dot(axis, UP) < 0.5 ? UP : FORWARD;
-    const forward = vec3.cross(TempVec3.get(), worldUp, axis);
-    vec3.normalize(forward, forward);
-
-    const rotationA = rotateAroundPivotForward(out, axis, forward, handle1);
-    const rotationB = rotateAroundPivotForward(TempQuat.get(), axis, forward, handle2);
-    quat.lerp(out, rotationA, rotationB, 0.5);
-    quat.normalize(out, out);
-
-    TempVec3.free();
-    TempQuat.free();
-    return out;
-}
-
 export function rotateFreeDual(source: vec3, target: vec3, up: vec3, out: quat) {
     const mat = mat4.lookAt(TempMat4.get(), source, target, up);
     mat4.invert(mat, mat);
