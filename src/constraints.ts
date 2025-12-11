@@ -7,15 +7,15 @@ import {TempQuat, TempVec3} from './internal-constants.js';
 function initializeBounds(min: vec3, max: vec3, outMin: vec3, outMax: vec3) {
     vec3.set(
         outMin,
-        Number.POSITIVE_INFINITY,
-        Number.POSITIVE_INFINITY,
-        Number.POSITIVE_INFINITY
-    );
-    vec3.set(
-        outMax,
         Number.NEGATIVE_INFINITY,
         Number.NEGATIVE_INFINITY,
         Number.NEGATIVE_INFINITY
+    );
+    vec3.set(
+        outMax,
+        Number.POSITIVE_INFINITY,
+        Number.POSITIVE_INFINITY,
+        Number.POSITIVE_INFINITY
     );
     /* Could be unrolled, but it's unlikely to have performance issues */
     for (let i = 0; i < 3; ++i) {
@@ -24,6 +24,16 @@ function initializeBounds(min: vec3, max: vec3, outMin: vec3, outMax: vec3) {
         outMax[i] = max[i];
     }
 }
+
+enum EulerOrder {
+    xyz = 0,
+    xzy,
+    yxz,
+    yzx,
+    zxy,
+    zyx,
+}
+const EulerOrderNames = ['xyz', 'xzy', 'yxz', 'yzx', 'zxy', 'zyx'];
 
 /**
  * Translation constraint components for **local** position.
@@ -166,6 +176,9 @@ export class RotationConstraint extends Component {
     @property.vector3(-1, -1, -1)
     max!: Float32Array;
 
+    @property.enum(['xyz', 'xzy', 'yxz', 'yzx', 'zxy', 'zyx'], 'zyx')
+    order: EulerOrder = EulerOrder.zyx;
+
     private _grabbable: Grabbable | null = null;
 
     /** @override */
@@ -203,7 +216,13 @@ export class RotationConstraint extends Component {
         vec3.min(angles, angles, max);
         vec3.max(angles, angles, min);
 
-        quat.fromEuler(rot, angles[0], angles[1], angles[2]);
+        quat.fromEuler(
+            rot,
+            angles[0],
+            angles[1],
+            angles[2],
+            EulerOrderNames[this.order] as any
+        );
         this.object.setRotationLocal(rot);
 
         TempVec3.free(3);

@@ -54,23 +54,6 @@ export enum GrabType {
     Dual,
 }
 
-export class Constraints {
-    @property.bool()
-    lockX: boolean = false;
-
-    @property.bool()
-    lockY: boolean = false;
-
-    @property.bool()
-    lockZ: boolean = false;
-
-    @property.vector3(1, 1, 1)
-    min!: Float32Array;
-
-    @property.vector3(-1, -1, -1)
-    max!: Float32Array;
-}
-
 function axis(axis: PivotAxis.X | PivotAxis.Y | PivotAxis.Z) {
     switch (axis) {
         case PivotAxis.X:
@@ -199,12 +182,8 @@ export class Grabbable extends Component {
     @property.enum(PivotAxisNames, PivotAxis.Y)
     public pivotAxis: PivotAxis = PivotAxis.Y;
 
-    /*
-     * Constraint Properties
-     */
-
-    @property.record(Constraints)
-    public translationConstraints: Constraints = null!;
+    @property.bool(false)
+    public invertRotation = false;
 
     /** Public Attributes */
 
@@ -469,6 +448,8 @@ export class Grabbable extends Component {
             this.object,
             positionWorld
         );
+        vec3.normalize(localPos, localPos);
+        vec3.scale(localPos, localPos, this.invertRotation ? -1 : 1);
 
         if (this.pivotAxis !== PivotAxis.None) {
             rotateAroundPivot(out, axis(this.pivotAxis), localPos);
@@ -494,12 +475,22 @@ export class Grabbable extends Component {
             this.object,
             secondaryWorld
         );
-        rotateAroundPivotDual(
-            out,
-            axis(this.pivotAxis as any),
-            primaryLocalPos,
-            secondaryLocalPos
-        );
+
+        if (this.pivotAxis !== PivotAxis.None) {
+            rotateAroundPivotDual(
+                out,
+                axis(this.pivotAxis as any),
+                primaryLocalPos,
+                secondaryLocalPos
+            );
+        } else {
+            const avg = vec3.lerp(primaryLocalPos, primaryLocalPos, secondaryLocalPos, 0.5);
+            vec3.normalize(avg, avg);
+            vec3.scale(avg, avg, this.invertRotation ? -1 : 1);
+
+            quat.rotationTo(out, FORWARD, avg);
+            quat.normalize(out, out);
+        }
 
         TempVec3.free(2);
         return out;
@@ -646,14 +637,6 @@ export class Grabbable extends Component {
                         !isPointEqual(pos, currentPos, GRAB_EPSILON_DIST) ||
                         !isQuatEqual(rot, currentRot, GRAB_EPSILON_ANGLE);
                 }
-
-                console.log(
-                    `${isPointEqual(pos, currentPos, GRAB_EPSILON_DIST)} ${isQuatEqual(
-                        rot,
-                        currentRot,
-                        GRAB_EPSILON_ANGLE
-                    )}`
-                );
 
                 TempDualQuat.free();
                 break;
