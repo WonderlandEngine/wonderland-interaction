@@ -22,7 +22,6 @@ import {GrabPoint, GrabSnapMode} from './grab-point.js';
 import {
     computeLocalPositionForPivot,
     rotateAroundPivot,
-    rotateAroundPivotDual,
     rotateFreeDual,
 } from './providers.js';
 import {FORWARD, RIGHT, UP} from '../constants.js';
@@ -462,37 +461,19 @@ export class Grabbable extends Component {
         return out;
     }
 
+    /**
+     * Compute the rotation around the pivot using two positions.
+     *
+     * @param out Result quaternion.
+     * @param primaryWorld First position, in **world space**.
+     * @param secondaryWorld Second position, in **world space**.
+     * @returns The `out` parameter.
+     */
     protected rotationAroundPivotDual(out: quat, primaryWorld: vec3, secondaryWorld: vec3) {
-        /* Use grabbable parent space for the rotation to avoid taking into account
-         * the actual grabbable rotation undergoing. */
-        const primaryLocalPos = computeLocalPositionForPivot(
-            TempVec3.get(),
-            this.object,
-            primaryWorld
-        );
-        const secondaryLocalPos = computeLocalPositionForPivot(
-            TempVec3.get(),
-            this.object,
-            secondaryWorld
-        );
+        const avg = vec3.lerp(TempVec3.get(), primaryWorld, secondaryWorld, 0.5);
+        this.rotationAroundPivot(out, avg);
 
-        if (this.pivotAxis !== PivotAxis.None) {
-            rotateAroundPivotDual(
-                out,
-                axis(this.pivotAxis as any),
-                primaryLocalPos,
-                secondaryLocalPos
-            );
-        } else {
-            const avg = vec3.lerp(primaryLocalPos, primaryLocalPos, secondaryLocalPos, 0.5);
-            vec3.normalize(avg, avg);
-            vec3.scale(avg, avg, this.invertRotation ? -1 : 1);
-
-            quat.rotationTo(out, FORWARD, avg);
-            quat.normalize(out, out);
-        }
-
-        TempVec3.free(2);
+        TempVec3.free();
         return out;
     }
 
