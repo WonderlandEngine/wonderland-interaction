@@ -25,7 +25,6 @@ import {
     rotateAroundPivotDual,
     rotateFreeDual,
 } from './providers.js';
-import {Axis, AxisNames} from '../enums.js';
 import {FORWARD, RIGHT, UP} from '../constants.js';
 import {TempDualQuat, TempQuat, TempVec3} from '../internal-constants.js';
 
@@ -39,6 +38,15 @@ export enum GrabRotationType {
     Hand = 0,
     AroundPivot,
 }
+const GrabRotationTypeNames = ['Hand', 'AroundPivot'];
+
+export enum PivotAxis {
+    None = 0,
+    X = 1,
+    Y = 2,
+    Z = 3,
+}
+export const PivotAxisNames = ['None', 'X', 'Y', 'Z'];
 
 export enum GrabType {
     Single,
@@ -63,13 +71,13 @@ export class Constraints {
     max!: Float32Array;
 }
 
-function axis(axis: Axis) {
+function axis(axis: PivotAxis.X | PivotAxis.Y | PivotAxis.Z) {
     switch (axis) {
-        case Axis.X:
+        case PivotAxis.X:
             return RIGHT;
-        case Axis.Y:
+        case PivotAxis.Y:
             return UP;
-        case Axis.Z:
+        case PivotAxis.Z:
             return FORWARD;
     }
 }
@@ -98,7 +106,7 @@ export class Grabbable extends Component {
         engine.registerComponent(GrabPoint);
     }
 
-    /** Properties. */
+    /** Properties */
 
     /**
      * Main handle.
@@ -184,12 +192,12 @@ export class Grabbable extends Component {
     @property.bool(false)
     public autoSetPrimaryGrab = false;
 
-    @property.enum(['Hand', 'AroundPivot'], GrabRotationType.Hand)
+    @property.enum(GrabRotationTypeNames, GrabRotationType.Hand)
     public rotationType = GrabRotationType.Hand;
 
     /** Pivot axis used when {@link rotationType} is set to {@link GrabRotationType.AroundPivot} */
-    @property.enum(AxisNames, Axis.Y)
-    public pivotAxis: Axis = Axis.Y;
+    @property.enum(PivotAxisNames, PivotAxis.Y)
+    public pivotAxis: PivotAxis = PivotAxis.Y;
 
     /*
      * Constraint Properties
@@ -198,7 +206,11 @@ export class Grabbable extends Component {
     @property.record(Constraints)
     public translationConstraints: Constraints = null!;
 
+    /** Public Attributes */
+
     handles: GrabPoint[] = [];
+
+    onUpdate = new Emitter();
 
     /** Private Attributes. */
 
@@ -313,6 +325,8 @@ export class Grabbable extends Component {
         } else {
             this._history.update(this.object, dt);
         }
+
+        this.onUpdate.notify();
     }
 
     /**
@@ -449,13 +463,19 @@ export class Grabbable extends Component {
      */
     protected rotationAroundPivot(out: quat, positionWorld: vec3) {
         /* Use grabbable parent space for the rotation to avoid taking into account
-         * the actual grabbable rotation undergoing. */
+         * the actual undergoing grabbable rotation. */
         const localPos = computeLocalPositionForPivot(
             TempVec3.get(),
             this.object,
             positionWorld
         );
-        rotateAroundPivot(out, axis(this.pivotAxis), localPos);
+
+        if (this.pivotAxis !== PivotAxis.None) {
+            rotateAroundPivot(out, axis(this.pivotAxis), localPos);
+        } else {
+            quat.rotationTo(out, FORWARD, localPos);
+            quat.normalize(out, out);
+        }
 
         TempVec3.free();
         return out;
@@ -476,7 +496,7 @@ export class Grabbable extends Component {
         );
         rotateAroundPivotDual(
             out,
-            axis(this.pivotAxis),
+            axis(this.pivotAxis as any),
             primaryLocalPos,
             secondaryLocalPos
         );
@@ -627,10 +647,18 @@ export class Grabbable extends Component {
                         !isQuatEqual(rot, currentRot, GRAB_EPSILON_ANGLE);
                 }
 
+                console.log(
+                    `${isPointEqual(pos, currentPos, GRAB_EPSILON_DIST)} ${isQuatEqual(
+                        rot,
+                        currentRot,
+                        GRAB_EPSILON_ANGLE
+                    )}`
+                );
+
                 TempDualQuat.free();
                 break;
             }
-            case GrabRotationType.AroundPivot:
+            case GrabRotationType.AroundPivot: {
                 // TODO: Handle position?
                 const rot = this.rotationAroundPivot(TempQuat.get(), handPosition);
                 quat.multiply(rot, rot, this._defaultGrabTransform as quat);
@@ -638,9 +666,8 @@ export class Grabbable extends Component {
 
                 TempQuat.free();
                 break;
+            }
         }
-
-        this._applyConstraints(grab);
     }
 
     /**
@@ -654,7 +681,6 @@ export class Grabbable extends Component {
         const secondaryWorld = secondaryInteractor.object.getPositionWorld(TempVec3.get());
 
         const primaryHandle = this.handles[primaryGrab.handleId];
-        const secondaryHandle = this.handles[this._grabData[1].handleId];
 
         switch (this.rotationType) {
             case GrabRotationType.Hand:
@@ -708,8 +734,6 @@ export class Grabbable extends Component {
                     TempVec3.free(2);
                     TempDualQuat.free(2);
                     TempQuat.free();
-
-                    this._applyConstraints(primaryGrab);
                 }
                 break;
             case GrabRotationType.AroundPivot:
@@ -726,56 +750,6 @@ export class Grabbable extends Component {
                 }
                 break;
         }
-
-        TempVec3.free(2);
-    }
-
-    private _applyConstraints(grab: GrabData) {
-        // TODO: Constraint rotation
-
-        if (
-            !this.translationConstraints.lockX &&
-            !this.translationConstraints.lockY &&
-            !this.translationConstraints.lockZ
-        ) {
-            return;
-        }
-
-        const localPos = this.object.getPositionLocal(TempVec3.get());
-
-        const min = this.translationConstraints.min;
-        const max = this.translationConstraints.max;
-        const validX = min[0] < max[0];
-        const validY = min[1] < max[1];
-        const validZ = min[2] < max[2];
-
-        const bounds = vec3.set(
-            TempVec3.get(),
-            validX ? min[0] : Number.NEGATIVE_INFINITY,
-            validY ? min[1] : Number.NEGATIVE_INFINITY,
-            validZ ? min[2] : Number.NEGATIVE_INFINITY
-        );
-        vec3.max(localPos, localPos, bounds);
-
-        vec3.set(
-            bounds,
-            validX ? max[0] : Number.POSITIVE_INFINITY,
-            validY ? max[1] : Number.POSITIVE_INFINITY,
-            validZ ? max[2] : Number.POSITIVE_INFINITY
-        );
-        vec3.min(localPos, localPos, bounds);
-
-        if (this.translationConstraints.lockX) {
-            localPos[0] = this._savedLocalPosition[0];
-        }
-        if (this.translationConstraints.lockY) {
-            localPos[1] = this._savedLocalPosition[1];
-        }
-        if (this.translationConstraints.lockZ) {
-            localPos[2] = this._savedLocalPosition[2];
-        }
-
-        this.object.setPositionLocal(localPos);
 
         TempVec3.free(2);
     }

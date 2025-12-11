@@ -17,6 +17,8 @@ import {GrabPoint} from 'wle-interaction';
 import {Grabbable} from 'wle-interaction';
 import {Interactor} from 'wle-interaction';
 import {PlayerController} from 'wle-interaction';
+import {RotationConstraint} from 'wle-interaction';
+import {TranslationConstraint} from 'wle-interaction';
 /* wle:auto-imports:end */
 
 export default function(engine) {
@@ -29,5 +31,7 @@ engine.registerComponent(GrabPoint);
 engine.registerComponent(Grabbable);
 engine.registerComponent(Interactor);
 engine.registerComponent(PlayerController);
+engine.registerComponent(RotationConstraint);
+engine.registerComponent(TranslationConstraint);
 /* wle:auto-register:end */
 }
