@@ -505,7 +505,7 @@ export class Grabbable extends Component {
             case GrabRotationType.AroundPivot: {
                 const out = this._defaultGrabTransform as quat;
                 this.rotationAroundPivot(out, source.getPositionWorld());
-                // computeRelativeRotation(this.object.getRotationLocal(), out, out);
+                computeRelativeRotation(this.object.getRotationLocal(), out, out);
                 break;
             }
             case GrabRotationType.Hand:
