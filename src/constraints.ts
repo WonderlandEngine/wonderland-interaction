@@ -1,7 +1,7 @@
 import {Component, property} from '@wonderlandengine/api';
 import {quat, vec3} from 'gl-matrix';
 import {Grabbable} from './interaction/grabbable.js';
-import {toDegree} from './utils/math.js';
+import {getEulerFromQuat, toDegree} from './utils/math.js';
 import {TempQuat, TempVec3} from './internal-constants.js';
 
 function initializeBounds(min: vec3, max: vec3, outMin: vec3, outMax: vec3) {
@@ -108,34 +108,6 @@ export class TranslationConstraint extends Component {
     };
 }
 
-function getEulerFromQuat(out: vec3, q: quat) {
-    const [x, y, z, w] = q;
-
-    // Roll (x-axis rotation)
-    const sinr_cosp = 2 * (w * x + y * z);
-    const cosr_cosp = 1 - 2 * (x * x + y * y);
-    const roll = Math.atan2(sinr_cosp, cosr_cosp);
-
-    // Pitch (y-axis rotation)
-    const sinp = 2 * (w * y - z * x);
-    let pitch;
-    if (Math.abs(sinp) >= 1) {
-        pitch = (Math.sign(sinp) * Math.PI) / 2; // use 90 degrees if out of range
-    } else {
-        pitch = Math.asin(sinp);
-    }
-
-    // Yaw (z-axis rotation)
-    const siny_cosp = 2 * (w * z + x * y);
-    const cosy_cosp = 1 - 2 * (y * y + z * z);
-    const yaw = Math.atan2(siny_cosp, cosy_cosp);
-
-    out[0] = roll;
-    out[1] = pitch;
-    out[2] = yaw;
-    return out;
-}
-
 /**
  * Rotation constraint components for **local** position.
  *
@@ -203,6 +175,8 @@ export class RotationConstraint extends Component {
     }
 
     private _update = () => {
+        if (!this.active) return;
+
         const min = TempVec3.get();
         const max = TempVec3.get();
         initializeBounds(this.min, this.max, min, max);

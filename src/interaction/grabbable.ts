@@ -15,6 +15,7 @@ import {HistoryTracker} from '../history-tracker.js';
 import {
     computeRelativeRotation,
     computeRelativeTransform,
+    getEulerFromQuat,
     isPointEqual,
     isQuatEqual,
 } from '../utils/math.js';
@@ -180,6 +181,10 @@ export class Grabbable extends Component {
     /** Pivot axis used when {@link rotationType} is set to {@link GrabRotationType.AroundPivot} */
     @property.enum(PivotAxisNames, PivotAxis.Y)
     public pivotAxis: PivotAxis = PivotAxis.Y;
+
+    /** Pivot axis used when {@link rotationType} is set to {@link GrabRotationType.AroundPivot} */
+    @property.enum(PivotAxisNames, PivotAxis.None)
+    public pivotAxis2: PivotAxis = PivotAxis.None;
 
     @property.bool(false)
     public invertRotation = false;
@@ -454,11 +459,15 @@ export class Grabbable extends Component {
             rotateAroundPivot(out, axis(this.pivotAxis), localPos);
         } else {
             quat.rotationTo(out, FORWARD, localPos);
-            quat.normalize(out, out);
+        }
+
+        if (this.pivotAxis2 !== PivotAxis.None) {
+            const r2 = rotateAroundPivot(quat.create(), axis(this.pivotAxis2), localPos);
+            quat.multiply(out, r2, out);
         }
 
         TempVec3.free();
-        return out;
+        return quat.normalize(out, out);
     }
 
     /**
@@ -490,12 +499,13 @@ export class Grabbable extends Component {
         this._lerp = handle.snap != GrabSnapMode.None;
 
         this.object.getPositionLocal(this._savedLocalPosition);
+        quat.identity(this._defaultGrabTransform);
 
         switch (this.rotationType) {
             case GrabRotationType.AroundPivot: {
                 const out = this._defaultGrabTransform as quat;
                 this.rotationAroundPivot(out, source.getPositionWorld());
-                computeRelativeRotation(this.object.getRotationLocal(), out, out);
+                // computeRelativeRotation(this.object.getRotationLocal(), out, out);
                 break;
             }
             case GrabRotationType.Hand:

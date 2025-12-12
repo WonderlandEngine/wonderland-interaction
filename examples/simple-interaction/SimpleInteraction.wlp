@@ -3,9 +3,9 @@
         "14": {
             "name": "Player",
             "scaling": [
-                0.9999591,
+                0.999958,
                 1.0,
-                0.9999552
+                0.999953
             ],
             "components": [
                 {
@@ -27,15 +27,15 @@
                 }
             ],
             "rotation": [
-                -4.1448782894804026e-7,
+                -0.0000036,
                 0.0816791,
-                -2.1687311857476746e-7,
+                -1.08178497271183e-7,
                 0.9966586
             ],
             "translation": [
-                -0.3591462,
-                0.1030089,
-                -1.713101
+                1.6029883,
+                0.4105427,
+                -2.0297
             ]
         },
         "15": {
@@ -3727,9 +3727,9 @@
                 0.2
             ],
             "translation": [
-                0.0,
-                1.75,
-                2.7196087
+                1.2488263,
+                1.0418623,
+                -2.5178742
             ],
             "rotation": [
                 0.0,
@@ -4027,6 +4027,258 @@
                 0.0,
                 2.0,
                 0.0
+            ]
+        },
+        "399": {
+            "name": "Turret",
+            "translation": [
+                3.5,
+                0.0,
+                -0.0640923
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "parent": "333"
+        },
+        "400": {
+            "name": "Platform",
+            "translation": [
+                0.0,
+                0.5,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                0.2,
+                0.5,
+                0.2
+            ],
+            "parent": "399",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "material": "25",
+                        "mesh": "8"
+                    }
+                }
+            ]
+        },
+        "401": {
+            "name": "Bar",
+            "translation": [
+                0.0,
+                0.9499456,
+                0.00604
+            ],
+            "rotation": [
+                0.0059593,
+                0.0,
+                0.0,
+                0.9999822
+            ],
+            "scaling": [
+                0.0199999,
+                0.2499999,
+                0.0199999
+            ],
+            "parent": "399",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "material": "25",
+                        "mesh": "11"
+                    }
+                }
+            ]
+        },
+        "402": {
+            "name": "Grabbable",
+            "translation": [
+                -6.955630169613869e-7,
+                1.2000031,
+                -6.09307505783363e-7
+            ],
+            "scaling": [
+                1.0000005,
+                0.9999845,
+                0.9999861
+            ],
+            "parent": "399",
+            "components": [
+                {
+                    "type": "grabbable",
+                    "grabbable": {
+                        "canThrow": false,
+                        "handleObjects": [
+                            "403",
+                            "406"
+                        ],
+                        "invertRotation": false,
+                        "pivotAxis": "Z",
+                        "rotationType": "AroundPivot",
+                        "pivotAxis2": "Y",
+                        "releaseDistance": 58.25
+                    }
+                },
+                {
+                    "type": "debug",
+                    "active": false
+                }
+            ]
+        },
+        "403": {
+            "name": "HandleLeft",
+            "translation": [
+                0.0943281,
+                0.0016236,
+                0.0825171
+            ],
+            "rotation": [
+                4.067686276698623e-8,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                0.0149999,
+                0.1,
+                0.0149999
+            ],
+            "parent": "402",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "material": "22",
+                        "mesh": "8"
+                    }
+                }
+            ]
+        },
+        "404": {
+            "name": "Cannon",
+            "rotation": [
+                1.5711140832763704e-8,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                0.25,
+                0.025,
+                0.025
+            ],
+            "parent": "402",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "material": "26",
+                        "mesh": "8"
+                    }
+                }
+            ],
+            "translation": [
+                -0.3110921,
+                0.0,
+                -0.0000114
+            ]
+        },
+        "405": {
+            "name": "Base",
+            "rotation": [
+                1.5711140832763704e-8,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                0.1,
+                0.075,
+                0.075
+            ],
+            "parent": "402",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "material": "26",
+                        "mesh": "8"
+                    }
+                }
+            ]
+        },
+        "406": {
+            "name": "HandleRight",
+            "translation": [
+                0.1,
+                0.0016306,
+                -0.0947202
+            ],
+            "rotation": [
+                5.7249064155939784e-8,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                0.0149999,
+                0.1,
+                0.0149999
+            ],
+            "parent": "402",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "material": "22",
+                        "mesh": "8"
+                    }
+                }
+            ]
+        },
+        "407": {
+            "name": "Text",
+            "translation": [
+                0.0,
+                2.0,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "parent": "399",
+            "components": [
+                {
+                    "type": "text",
+                    "text": {
+                        "text": "Rotation constraints"
+                    }
+                }
             ]
         }
     },

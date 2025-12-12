@@ -1,7 +1,7 @@
 import {mat4, quat, vec3} from 'gl-matrix';
 import {FORWARD, UP} from '../constants.js';
 import {Object3D} from '@wonderlandengine/api';
-import {TempMat4, TempQuat, TempVec3} from '../internal-constants.js';
+import {TempMat4, TempVec3} from '../internal-constants.js';
 
 function rotateAroundPivotForward(
     out: quat,

@@ -19,6 +19,7 @@ import {Interactor} from 'wle-interaction';
 import {PlayerController} from 'wle-interaction';
 import {RotationConstraint} from 'wle-interaction';
 import {TranslationConstraint} from 'wle-interaction';
+import {Debug} from './debug.js';
 /* wle:auto-imports:end */
 
 export default function(engine) {
@@ -33,5 +34,6 @@ engine.registerComponent(Interactor);
 engine.registerComponent(PlayerController);
 engine.registerComponent(RotationConstraint);
 engine.registerComponent(TranslationConstraint);
+engine.registerComponent(Debug);
 /* wle:auto-register:end */
 }
