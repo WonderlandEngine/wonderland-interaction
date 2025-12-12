@@ -877,7 +877,12 @@
                     "active": true
                 },
                 {
-                    "type": "interactor"
+                    "type": "interactor",
+                    "interactor": {
+                        "visualStateOnGrab": "Hidden",
+                        "trackedSpace": "205",
+                        "meshRoot": "95"
+                    }
                 },
                 {
                     "type": "physx",
@@ -927,7 +932,10 @@
                 {
                     "type": "interactor",
                     "interactor": {
-                        "handedness": "left"
+                        "handedness": "Left",
+                        "trackedSpace": "205",
+                        "meshRoot": "53",
+                        "visualStateOnGrab": "Hidden"
                     }
                 },
                 {
@@ -1073,7 +1081,7 @@
                 {
                     "type": "text",
                     "text": {
-                        "text": "Thanks!"
+                        "text": "Reset"
                     }
                 }
             ],
@@ -1101,7 +1109,7 @@
                 {
                     "type": "text",
                     "text": {
-                        "text": "Welcome to\nWonderland",
+                        "text": "Reset\ntargets & balls ",
                         "material": "201"
                     }
                 }
@@ -2440,177 +2448,15 @@
                 "file": "default"
             }
         },
-        "234": {
-            "link": {
-                "name": "lib\\Color.glsl",
-                "file": "default"
-            }
-        },
-        "235": {
-            "link": {
-                "name": "lib\\Compatibility.glsl",
-                "file": "default"
-            }
-        },
-        "236": {
-            "link": {
-                "name": "lib\\CoordinateSystems.glsl",
-                "file": "default"
-            }
-        },
-        "237": {
-            "link": {
-                "name": "lib\\GI.glsl",
-                "file": "default"
-            }
-        },
-        "238": {
-            "link": {
-                "name": "lib\\Inputs.glsl",
-                "file": "default"
-            }
-        },
-        "239": {
-            "link": {
-                "name": "lib\\Lights.glsl",
-                "file": "default"
-            }
-        },
-        "240": {
-            "link": {
-                "name": "lib\\Materials.glsl",
-                "file": "default"
-            }
-        },
-        "241": {
-            "link": {
-                "name": "lib\\Math.glsl",
-                "file": "default"
-            }
-        },
-        "242": {
-            "link": {
-                "name": "lib\\Packing.glsl",
-                "file": "default"
-            }
-        },
-        "243": {
-            "link": {
-                "name": "lib\\Quaternion.glsl",
-                "file": "default"
-            }
-        },
-        "244": {
-            "link": {
-                "name": "lib\\Slug.frag.glsl",
-                "file": "default"
-            }
-        },
-        "245": {
-            "link": {
-                "name": "lib\\Slug.vert.glsl",
-                "file": "default"
-            }
-        },
-        "246": {
-            "link": {
-                "name": "lib\\Surface.glsl",
-                "file": "default"
-            }
-        },
-        "247": {
-            "link": {
-                "name": "lib\\Textures.glsl",
-                "file": "default"
-            }
-        },
-        "249": {
-            "link": {
-                "name": "lib\\Uniforms.glsl",
-                "file": "default"
-            }
-        },
         "250": {
             "link": {
                 "name": "AtmosphericSky.frag",
                 "file": "default"
             }
         },
-        "251": {
+        "264": {
             "link": {
-                "name": "lib\\Compatibility.glsl",
-                "file": "default"
-            }
-        },
-        "252": {
-            "link": {
-                "name": "lib\\GI.glsl",
-                "file": "default"
-            }
-        },
-        "253": {
-            "link": {
-                "name": "lib\\Inputs.glsl",
-                "file": "default"
-            }
-        },
-        "254": {
-            "link": {
-                "name": "lib\\Lights.glsl",
-                "file": "default"
-            }
-        },
-        "255": {
-            "link": {
-                "name": "lib\\Materials.glsl",
-                "file": "default"
-            }
-        },
-        "256": {
-            "link": {
-                "name": "lib\\MorphTargets.glsl",
-                "file": "default"
-            }
-        },
-        "257": {
-            "link": {
-                "name": "lib\\Packing.glsl",
-                "file": "default"
-            }
-        },
-        "258": {
-            "link": {
-                "name": "lib\\PhysicalBSDF.glsl",
-                "file": "default"
-            }
-        },
-        "259": {
-            "link": {
-                "name": "lib\\SkyProcedural.glsl",
-                "file": "default"
-            }
-        },
-        "260": {
-            "link": {
-                "name": "lib\\Slug.frag.glsl",
-                "file": "default"
-            }
-        },
-        "261": {
-            "link": {
-                "name": "lib\\Slug.vert.glsl",
-                "file": "default"
-            }
-        },
-        "262": {
-            "link": {
-                "name": "lib\\Surface.glsl",
-                "file": "default"
-            }
-        },
-        "263": {
-            "link": {
-                "name": "lib\\Textures.glsl",
+                "name": "Color.frag",
                 "file": "default"
             }
         }
@@ -2620,8 +2466,8 @@
             "name": "Throw.wlp",
             "version": [
                 1,
-                4,
-                2
+                5,
+                0
             ]
         },
         "xr": {
@@ -2652,7 +2498,8 @@
         },
         "runtime": {
             "visualizeColliders": true,
-            "visualizePhysX": true
+            "visualizePhysX": true,
+            "loadUncompressedImagesAsBitmap": false
         },
         "physx": {
             "enable": true
@@ -2813,32 +2660,50 @@
                 "name": "AtmosphericSky",
                 "file": "default"
             }
+        },
+        "250": {
+            "link": {
+                "name": "Color",
+                "file": "default"
+            }
+        },
+        "251": {
+            "link": {
+                "name": "VertexColor",
+                "file": "default"
+            }
         }
     },
     "files": {
         "250": {
             "fileName": "models/oculus-touch-v2-left.glb",
-            "importerName": ""
+            "importerName": "",
+            "colorSpace": "srgb"
         },
         "251": {
             "fileName": "models/oculus-touch-v2-right.glb",
-            "importerName": ""
+            "importerName": "",
+            "colorSpace": "srgb"
         },
         "252": {
             "fileName": "models/hand-left.glb",
-            "importerName": ""
+            "importerName": "",
+            "colorSpace": "srgb"
         },
         "253": {
             "fileName": "models/hand-right.glb",
-            "importerName": ""
+            "importerName": "",
+            "colorSpace": "srgb"
         },
         "254": {
             "fileName": "models/button.glb",
-            "importerName": ""
+            "importerName": "",
+            "colorSpace": "srgb"
         },
         "255": {
             "fileName": "models/teleport-indicator.glb",
-            "importerName": ""
+            "importerName": "",
+            "colorSpace": "srgb"
         }
     },
     "fonts": {
@@ -2851,5 +2716,118 @@
     },
     "languages": {},
     "morphTargets": {},
-    "particleEffects": {}
+    "particleEffects": {},
+    "audioClips": {},
+    "shaderChunks": {
+        "1": {
+            "link": {
+                "name": "lib\\Color.glsl",
+                "file": "default"
+            }
+        },
+        "2": {
+            "link": {
+                "name": "lib\\Compatibility.glsl",
+                "file": "default"
+            }
+        },
+        "3": {
+            "link": {
+                "name": "lib\\CoordinateSystems.glsl",
+                "file": "default"
+            }
+        },
+        "4": {
+            "link": {
+                "name": "lib\\GI.glsl",
+                "file": "default"
+            }
+        },
+        "5": {
+            "link": {
+                "name": "lib\\Inputs.glsl",
+                "file": "default"
+            }
+        },
+        "6": {
+            "link": {
+                "name": "lib\\Lights.glsl",
+                "file": "default"
+            }
+        },
+        "7": {
+            "link": {
+                "name": "lib\\Materials.glsl",
+                "file": "default"
+            }
+        },
+        "8": {
+            "link": {
+                "name": "lib\\Math.glsl",
+                "file": "default"
+            }
+        },
+        "9": {
+            "link": {
+                "name": "lib\\MorphTargets.glsl",
+                "file": "default"
+            }
+        },
+        "10": {
+            "link": {
+                "name": "lib\\Packing.glsl",
+                "file": "default"
+            }
+        },
+        "11": {
+            "link": {
+                "name": "lib\\PhysicalBSDF.glsl",
+                "file": "default"
+            }
+        },
+        "12": {
+            "link": {
+                "name": "lib\\Quaternion.glsl",
+                "file": "default"
+            }
+        },
+        "13": {
+            "link": {
+                "name": "lib\\SkyProcedural.glsl",
+                "file": "default"
+            }
+        },
+        "14": {
+            "link": {
+                "name": "lib\\Slug.frag.glsl",
+                "file": "default"
+            }
+        },
+        "15": {
+            "link": {
+                "name": "lib\\Slug.vert.glsl",
+                "file": "default"
+            }
+        },
+        "16": {
+            "link": {
+                "name": "lib\\Surface.glsl",
+                "file": "default"
+            }
+        },
+        "17": {
+            "link": {
+                "name": "lib\\Textures.glsl",
+                "file": "default"
+            }
+        },
+        "18": {
+            "link": {
+                "name": "lib\\Uniforms.glsl",
+                "file": "default"
+            }
+        }
+    },
+    "probeVolumeScenarios": {},
+    "plugins": {}
 }
