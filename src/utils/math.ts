@@ -1,5 +1,5 @@
 import {Object3D} from '@wonderlandengine/api';
-import {quat, quat2, vec3, vec4} from 'gl-matrix';
+import {quat, quat2, vec3} from 'gl-matrix';
 
 /**
  * Convert degrees to radians.

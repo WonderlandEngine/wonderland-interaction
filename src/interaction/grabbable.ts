@@ -18,7 +18,12 @@ import {
     isPointEqual,
     toRad,
 } from '../utils/math.js';
-import {GrabPoint, GrabSnapMode} from './grab-point.js';
+import {
+    GrabPoint,
+    GrabSnapMode,
+    InteractorVisualState,
+    InteractorVisualStateNames,
+} from './grab-point.js';
 import {
     computeLocalPositionForPivot,
     rotateAroundPivot,
@@ -173,6 +178,14 @@ export class Grabbable extends Component {
 
     @property.bool(false)
     public invertRotation = false;
+
+    /**
+     * Visual state to apply to the interactor once interaction occurs.
+     *
+     * @note Behavior overriden by {@link GrabPoint.interactorVisualState} if set.
+     */
+    @property.enum(InteractorVisualStateNames, InteractorVisualState.None)
+    interactorVisualState = InteractorVisualState.None;
 
     /** Public Attributes */
 
@@ -521,7 +534,7 @@ export class Grabbable extends Component {
             interactorUp.getForwardWorld(up);
         }
 
-        const pivotRotation = rotateFreeDual(source, target, up, TempQuat.get());
+        const pivotRotation = rotateFreeDual(TempQuat.get(), source, target, up);
         quat.multiply(pivotRotation, pivotRotation, this._defaultGrabTransform as quat);
         const pivotToWorld = quat2.fromRotationTranslation(
             TempDualQuat.get(),
