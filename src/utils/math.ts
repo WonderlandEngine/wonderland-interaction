@@ -1,6 +1,5 @@
 import {Object3D} from '@wonderlandengine/api';
 import {quat, quat2, vec3, vec4} from 'gl-matrix';
-import {FORWARD, UP} from '../constants.js';
 
 /** Temporaries. */
 const _pointA = vec3.create();
@@ -66,7 +65,7 @@ export function isPointEqual(a: vec3, b: vec3, epsilon: number) {
  * @returns `true` if almost equal, `false` otherwise.
  */
 export function isQuatEqual(a: quat, b: quat, epsilon: number) {
-    return Math.abs(vec4.dot(a, b)) >= 1 - epsilon;
+    return quat.getAngle(a, b) < epsilon;
 }
 
 /**
