@@ -1,12 +1,6 @@
 import {Object3D} from '@wonderlandengine/api';
 import {quat, quat2, vec3, vec4} from 'gl-matrix';
 
-/** Temporaries. */
-const _pointA = vec3.create();
-const _pointB = vec3.create();
-const _rotationA = quat.create();
-const _rotationB = quat.create();
-
 /**
  * Convert degrees to radians.
  *
@@ -23,21 +17,6 @@ export function toRad(degrees: number) {
  */
 export function toDegree(radians: number) {
     return (radians * 180) / Math.PI;
-}
-
-/**
- * Compute the delta between `src` and the `dst` quaternion.
- *
- * @param out The output.
- * @param src The source quaternion.
- * @param dst The destination quaternion.
- *
- * @returns The `out` parameter.
- */
-export function quatDelta(out: quat, src: quat, dst: quat): quat {
-    // Detla = to * inverse(from).
-    quat.multiply(out, quat.invert(_rotationA, src), dst);
-    return quat.normalize(out, out);
 }
 
 /**
@@ -71,41 +50,53 @@ export function isQuatEqual(a: quat, b: quat, epsilon: number) {
 /**
  * Compute the relative transformation from source to target.
  *
- * @remarks
+ * @note
  * - The result transform is expressed in the target's space.
  * - In order to get the world transform of `source`, the target's world
  *   transform will need to be multiplied by the result of this function.
  *
+ * @param out The destination.
  * @param source The source object.
  * @param target The target object.
- * @param out The destination.
  * @returns The `out` parameter.
  */
-export function computeRelativeTransform(
-    source: Object3D,
-    target: Object3D,
-    out: quat2
-): quat2 {
-    const handToLocal = target.getRotationWorld(_rotationA);
-    quat.invert(handToLocal, handToLocal);
+export const computeRelativeTransform = (function () {
+    const _rotation = quat.create();
+    const _pointA = vec3.create();
+    const _pointB = vec3.create();
 
-    /* Transform rotation into target's space */
-    const rot = source.getRotationWorld(_rotationB);
-    quat.multiply(rot, handToLocal, rot);
-    quat.normalize(rot, rot);
+    return function (out: quat2, source: Object3D, target: Object3D) {
+        const handToLocal = target.getRotationWorld(_rotation);
+        quat.invert(handToLocal, handToLocal);
 
-    /* Transform position into target's space */
-    const position = source.getPositionWorld(_pointA);
-    const handPosition = target.getPositionWorld(_pointB);
-    vec3.sub(position, position, handPosition);
-    vec3.transformQuat(position, position, handToLocal);
+        /* Transform rotation into target's space */
+        source.getRotationWorld(out as quat);
+        quat.multiply(out as quat, handToLocal, out as quat);
+        quat.normalize(out, out);
 
-    return quat2.fromRotationTranslation(out, rot, position);
-}
+        /* Transform position into target's space */
+        const position = source.getPositionWorld(_pointA);
+        const handPosition = target.getPositionWorld(_pointB);
+        vec3.sub(position, position, handPosition);
+        vec3.transformQuat(position, position, handToLocal);
 
-export function computeRelativeRotation(source: quat, target: quat, out: quat) {
-    const toLocal = quat.copy(_rotationA, target);
-    quat.invert(toLocal, toLocal);
-    quat.multiply(out, toLocal, source);
-    return quat.normalize(out, out);
-}
+        return quat2.fromRotationTranslation(out, out, position);
+    };
+})();
+
+/**
+ * Compute the relative rotation from source to target.
+ *
+ * @param out The destination.
+ * @param source The source rotation.
+ * @param target The target rotation.
+ * @returns The `out` parameter.
+ */
+export const computeRelativeRotation = (function () {
+    return function (out: quat, source: quat, target: quat) {
+        quat.copy(out, target);
+        quat.invert(out, out);
+        quat.multiply(out, out, source);
+        return quat.normalize(out, out);
+    };
+})();

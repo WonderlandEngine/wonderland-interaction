@@ -594,18 +594,18 @@ export class Grabbable extends Component {
 
                     const objectRotation = this.object.getRotationWorld(TempQuat.get());
                     computeRelativeRotation(
+                        this._defaultGrabTransform as quat,
                         objectRotation,
-                        handRotation,
-                        this._defaultGrabTransform as quat
+                        handRotation
                     );
 
                     TempVec3.free(2);
                     TempQuat.free();
                 } else {
                     computeRelativeTransform(
+                        this._defaultGrabTransform,
                         this.object,
-                        source,
-                        this._defaultGrabTransform
+                        source
                     );
                 }
                 break;
@@ -624,13 +624,13 @@ export class Grabbable extends Component {
                     pos
                 );
                 computeRelativeRotation(
-                    rot,
                     this._defaultGrabTransform,
+                    rot,
                     this._defaultGrabTransform
                 );
                 computeRelativeRotation(
-                    pivotRot,
                     this._pivotGrabTransform,
+                    pivotRot,
                     this._pivotGrabTransform
                 );
 
