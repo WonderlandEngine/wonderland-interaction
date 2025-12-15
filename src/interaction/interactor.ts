@@ -12,7 +12,12 @@ import {
 import {property} from '@wonderlandengine/api/decorators.js';
 
 import {Grabbable} from './grabbable.js';
-import {GrabSearchMode, GrabPoint} from './grab-point.js';
+import {
+    GrabSearchMode,
+    GrabPoint,
+    InteractorVisualState,
+    InteractorVisualStateNames,
+} from './grab-point.js';
 import {setComponentsActive} from '../utils/activate-children.js';
 
 /** Represents whether the user's left or right hand is being used. */
@@ -20,13 +25,6 @@ export enum Handedness {
     Left = 0,
     Right,
 }
-
-export enum InteractorVisualState {
-    None = 0,
-    Visible,
-    Hidden,
-}
-export const InteractorVisualStateNames = ['None', 'Visible', 'Hidden'];
 
 /**
  * Manages interaction capabilities of a VR controller or a similar input device.
@@ -158,6 +156,9 @@ export class Interactor extends Component {
         this._onGripStart.notify(interactable);
 
         let hidden = this.visualStateOnGrab === InteractorVisualState.Hidden;
+        if (interactable.interactorVisualState !== InteractorVisualState.None) {
+            hidden = interactable.interactorVisualState === InteractorVisualState.Hidden;
+        }
         if (handle.interactorVisualState !== InteractorVisualState.None) {
             hidden = handle.interactorVisualState === InteractorVisualState.Hidden;
         }

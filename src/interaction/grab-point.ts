@@ -1,9 +1,12 @@
 import {Component, property} from '@wonderlandengine/api';
-import {
-    Interactor,
-    InteractorVisualState,
-    InteractorVisualStateNames,
-} from './interactor.js';
+import {Interactor} from './interactor.js';
+
+export enum InteractorVisualState {
+    None = 0,
+    Visible,
+    Hidden,
+}
+export const InteractorVisualStateNames = ['None', 'Visible', 'Hidden'];
 
 /**
  * Describe how the {@link Interactor} interacts with a {@link GrabPoint}.
