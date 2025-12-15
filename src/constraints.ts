@@ -2,7 +2,7 @@ import {Component, property} from '@wonderlandengine/api';
 import {quat, vec3} from 'gl-matrix';
 import {Grabbable} from './interaction/grabbable.js';
 import {toDegree} from './utils/math.js';
-import {TempQuat, TempVec3} from './internal-constants.js';
+import {TempVec3} from './internal-constants.js';
 
 function initializeBounds(min: vec3, max: vec3, outMin: vec3, outMax: vec3) {
     vec3.set(
@@ -24,16 +24,6 @@ function initializeBounds(min: vec3, max: vec3, outMin: vec3, outMax: vec3) {
         outMax[i] = max[i];
     }
 }
-
-enum EulerOrder {
-    xyz = 0,
-    xzy,
-    yxz,
-    yzx,
-    zxy,
-    zyx,
-}
-const EulerOrderNames = ['xyz', 'xzy', 'yxz', 'yzx', 'zxy', 'zyx'];
 
 /**
  * Translation constraint components for **local** position.
@@ -146,6 +136,15 @@ function getEulerFromQuat(out: vec3, q: quat) {
 export class RotationConstraint extends Component {
     static TypeName = 'rotation-constraint';
 
+    @property.bool(false)
+    lockX = false;
+
+    @property.bool(false)
+    lockY = false;
+
+    @property.bool(false)
+    lockZ = false;
+
     /**
      * Minimum allowed rotation, in **degrees**, in **local space**.
      *
@@ -158,7 +157,7 @@ export class RotationConstraint extends Component {
      * constraint.max[0] = -1;
      * ```
      */
-    @property.vector3(1, 1, 1)
+    @property.vector3()
     min!: Float32Array;
 
     /**
@@ -173,59 +172,36 @@ export class RotationConstraint extends Component {
      * constraint.max[0] = -1;
      * ```
      */
-    @property.vector3(-1, -1, -1)
+    @property.vector3()
     max!: Float32Array;
 
-    @property.enum(['xyz', 'xzy', 'yxz', 'yzx', 'zxy', 'zyx'], 'zyx')
-    order: EulerOrder = EulerOrder.zyx;
-
-    private _grabbable: Grabbable | null = null;
+    private _locked = [false, false, false];
 
     /** @override */
     onActivate(): void {
-        this._grabbable = this.object.getComponent(Grabbable);
-        if (this._grabbable) {
-            /** @todo: Will not be required once the engine allows to order update. */
-            this._grabbable.onUpdate.add(this._update);
-        }
-    }
-
-    /** @override */
-    onDeactivate(): void {
-        if (this._grabbable && !this._grabbable.isDestroyed) {
-            this._grabbable.onUpdate.remove(this._update);
-        }
+        this._locked[0] = this.lockX;
+        this._locked[1] = this.lockY;
+        this._locked[2] = this.lockZ;
     }
 
     /** @override */
     update(): void {
-        this._update();
-    }
+        const rot = this.object.getRotationLocal(quat.create());
 
-    private _update = () => {
         const min = TempVec3.get();
         const max = TempVec3.get();
         initializeBounds(this.min, this.max, min, max);
 
-        const rot = this.object.getRotationLocal(TempQuat.get());
-
         const angles = getEulerFromQuat(TempVec3.get(), rot);
         for (let i = 0; i < 3; ++i) {
-            angles[i] = toDegree(angles[i]);
+            angles[i] = !this._locked[i] ? toDegree(angles[i]) : 0;
         }
         vec3.min(angles, angles, max);
         vec3.max(angles, angles, min);
 
-        quat.fromEuler(
-            rot,
-            angles[0],
-            angles[1],
-            angles[2],
-            EulerOrderNames[this.order] as any
-        );
+        quat.fromEuler(rot, angles[0], angles[1], angles[2]);
         this.object.setRotationLocal(rot);
 
         TempVec3.free(3);
-        TempQuat.free();
-    };
+    }
 }

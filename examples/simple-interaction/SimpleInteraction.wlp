@@ -3,9 +3,9 @@
         "14": {
             "name": "Player",
             "scaling": [
-                0.9999591,
+                0.9999576,
                 1.0,
-                0.9999552
+                0.9999521
             ],
             "components": [
                 {
@@ -27,15 +27,15 @@
                 }
             ],
             "rotation": [
-                -4.1448782894804026e-7,
-                0.0816791,
-                -2.1687311857476746e-7,
-                0.9966586
+                -0.0000021,
+                0.669678,
+                0.0000011,
+                0.7426515
             ],
             "translation": [
-                -0.3591462,
-                0.1030089,
-                -1.713101
+                1.6070376,
+                0.1030082,
+                -2.6944336
             ]
         },
         "15": {
@@ -3523,163 +3523,6 @@
                 0.0
             ]
         },
-        "383": {
-            "name": "Joystick",
-            "parent": "349",
-            "translation": [
-                2.0,
-                0.0,
-                3.0
-            ],
-            "rotation": [
-                0.0,
-                0.0,
-                0.0,
-                1.0
-            ],
-            "scaling": [
-                1.0,
-                1.0,
-                1.0
-            ]
-        },
-        "384": {
-            "name": "Platform",
-            "parent": "383",
-            "components": [
-                {
-                    "type": "mesh",
-                    "mesh": {
-                        "material": "25",
-                        "mesh": "8"
-                    }
-                }
-            ],
-            "scaling": [
-                0.2,
-                0.3499999,
-                0.2
-            ],
-            "translation": [
-                0.0,
-                0.3499999,
-                0.0
-            ],
-            "rotation": [
-                0.0,
-                0.0,
-                0.0,
-                1.0
-            ]
-        },
-        "385": {
-            "name": "Bar",
-            "parent": "386",
-            "components": [
-                {
-                    "type": "mesh",
-                    "mesh": {
-                        "mesh": "11",
-                        "material": "26"
-                    }
-                }
-            ],
-            "scaling": [
-                0.0199999,
-                0.25,
-                0.0199999
-            ],
-            "translation": [
-                0.0,
-                0.25,
-                0.0030622
-            ],
-            "rotation": [
-                -1.1849824232967876e-8,
-                0.0,
-                0.0,
-                1.0
-            ]
-        },
-        "386": {
-            "name": "Grabbable",
-            "parent": "383",
-            "components": [
-                {
-                    "type": "grabbable",
-                    "grabbable": {
-                        "canThrow": false,
-                        "rotationType": "AroundPivot",
-                        "handleObjects": [
-                            "387"
-                        ],
-                        "pivotAxis": "None"
-                    }
-                },
-                {
-                    "type": "rotation-constraint",
-                    "rotation-constraint": {
-                        "min": [
-                            -30.0,
-                            -89.0,
-                            -30.0
-                        ],
-                        "max": [
-                            30.0,
-                            89.0,
-                            30.0
-                        ],
-                        "order": "zxy"
-                    },
-                    "active": true
-                }
-            ],
-            "translation": [
-                0.0,
-                0.6999999,
-                -0.0000012
-            ],
-            "rotation": [
-                0.0059594,
-                0.0,
-                0.0,
-                0.9999822
-            ],
-            "scaling": [
-                1.0,
-                0.9999866,
-                0.9999872
-            ]
-        },
-        "387": {
-            "name": "Handle",
-            "parent": "386",
-            "components": [
-                {
-                    "type": "mesh",
-                    "mesh": {
-                        "material": "22",
-                        "mesh": "8"
-                    }
-                }
-            ],
-            "scaling": [
-                0.035,
-                0.035,
-                0.035
-            ],
-            "translation": [
-                0.0,
-                0.5144916,
-                0.0057868
-            ],
-            "rotation": [
-                -0.0,
-                0.0,
-                0.0,
-                1.0
-            ]
-        },
         "388": {
             "name": "Tip",
             "translation": [
@@ -3738,241 +3581,6 @@
                 1.0
             ]
         },
-        "389": {
-            "name": "Turret",
-            "translation": [
-                2.0,
-                0.0,
-                -0.0640923
-            ],
-            "rotation": [
-                0.0,
-                0.0,
-                0.0,
-                1.0
-            ],
-            "scaling": [
-                1.0,
-                1.0,
-                1.0
-            ],
-            "parent": "333"
-        },
-        "390": {
-            "name": "Platform",
-            "translation": [
-                0.0,
-                0.5,
-                0.0
-            ],
-            "rotation": [
-                0.0,
-                0.0,
-                0.0,
-                1.0
-            ],
-            "scaling": [
-                0.2,
-                0.5,
-                0.2
-            ],
-            "parent": "389",
-            "components": [
-                {
-                    "type": "mesh",
-                    "mesh": {
-                        "material": "25",
-                        "mesh": "8"
-                    }
-                }
-            ]
-        },
-        "391": {
-            "name": "Bar",
-            "translation": [
-                0.0,
-                0.9499456,
-                0.00604
-            ],
-            "rotation": [
-                0.0059593,
-                0.0,
-                0.0,
-                0.9999822
-            ],
-            "scaling": [
-                0.0199999,
-                0.2499999,
-                0.0199999
-            ],
-            "parent": "389",
-            "components": [
-                {
-                    "type": "mesh",
-                    "mesh": {
-                        "material": "25",
-                        "mesh": "11"
-                    }
-                }
-            ]
-        },
-        "392": {
-            "name": "Grabbable",
-            "translation": [
-                0.0,
-                1.2,
-                -0.0000011
-            ],
-            "scaling": [
-                1.0,
-                0.9999845,
-                0.9999851
-            ],
-            "parent": "389",
-            "components": [
-                {
-                    "type": "grabbable",
-                    "grabbable": {
-                        "canThrow": false,
-                        "handleObjects": [
-                            "393",
-                            "396"
-                        ],
-                        "pivotAxis": "None",
-                        "rotationType": "AroundPivot",
-                        "invertRotation": true
-                    }
-                },
-                {
-                    "type": "rotation-constraint",
-                    "active": true,
-                    "rotation-constraint": {
-                        "max": [
-                            85.0,
-                            89.0,
-                            0.0
-                        ],
-                        "min": [
-                            -85.0,
-                            -89.0,
-                            0.0
-                        ],
-                        "order": "zyx"
-                    }
-                }
-            ]
-        },
-        "393": {
-            "name": "HandleLeft",
-            "rotation": [
-                4.067686276698623e-8,
-                0.0,
-                0.0,
-                1.0
-            ],
-            "scaling": [
-                0.0149999,
-                0.1,
-                0.0149999
-            ],
-            "parent": "392",
-            "components": [
-                {
-                    "type": "mesh",
-                    "mesh": {
-                        "material": "22",
-                        "mesh": "8"
-                    }
-                }
-            ],
-            "translation": [
-                -0.1,
-                0.0016236,
-                0.1346447
-            ]
-        },
-        "394": {
-            "name": "Cannon",
-            "parent": "392",
-            "components": [
-                {
-                    "type": "mesh",
-                    "mesh": {
-                        "mesh": "8",
-                        "material": "26"
-                    }
-                }
-            ],
-            "scaling": [
-                0.025,
-                0.025,
-                0.25
-            ],
-            "translation": [
-                0.0,
-                -0.0034847,
-                -0.2927927
-            ],
-            "rotation": [
-                1.5711140832763704e-8,
-                0.0,
-                0.0,
-                1.0
-            ]
-        },
-        "395": {
-            "name": "Base",
-            "rotation": [
-                1.5711140832763704e-8,
-                0.0,
-                0.0,
-                1.0
-            ],
-            "scaling": [
-                0.1,
-                0.075,
-                0.075
-            ],
-            "parent": "392",
-            "components": [
-                {
-                    "type": "mesh",
-                    "mesh": {
-                        "material": "26",
-                        "mesh": "8"
-                    }
-                }
-            ]
-        },
-        "396": {
-            "name": "HandleRight",
-            "translation": [
-                0.1,
-                0.0016307,
-                0.1346587
-            ],
-            "rotation": [
-                5.7249064155939784e-8,
-                0.0,
-                0.0,
-                1.0
-            ],
-            "scaling": [
-                0.0149999,
-                0.1,
-                0.0149999
-            ],
-            "parent": "392",
-            "components": [
-                {
-                    "type": "mesh",
-                    "mesh": {
-                        "material": "22",
-                        "mesh": "8"
-                    }
-                }
-            ]
-        },
         "397": {
             "name": "Description",
             "scaling": [
@@ -4001,8 +3609,285 @@
                 1.0
             ]
         },
-        "398": {
+        "399": {
+            "name": "Turret",
+            "translation": [
+                2.2171654,
+                0.0,
+                -0.0640925
+            ],
+            "rotation": [
+                1.1239548314279091e-7,
+                -0.7071069,
+                -4.215169013832565e-8,
+                0.7071065
+            ],
+            "scaling": [
+                0.9999998,
+                1.0,
+                0.9999999
+            ],
+            "parent": "333"
+        },
+        "400": {
+            "name": "Platform",
+            "translation": [
+                0.0,
+                0.5,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                0.2,
+                0.5,
+                0.2
+            ],
+            "parent": "399",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "material": "25",
+                        "mesh": "8"
+                    }
+                }
+            ]
+        },
+        "401": {
+            "name": "Bar",
+            "translation": [
+                0.0,
+                0.9499456,
+                0.00604
+            ],
+            "rotation": [
+                0.0059593,
+                0.0,
+                0.0,
+                0.9999822
+            ],
+            "scaling": [
+                0.0199999,
+                0.2499999,
+                0.0199999
+            ],
+            "parent": "399",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "material": "25",
+                        "mesh": "11"
+                    }
+                }
+            ]
+        },
+        "402": {
+            "name": "Grabbable",
+            "translation": [
+                0.0,
+                0.0,
+                -0.0000011
+            ],
+            "scaling": [
+                1.0,
+                0.9999845,
+                0.999985
+            ],
+            "parent": "408",
+            "components": [
+                {
+                    "type": "grabbable",
+                    "grabbable": {
+                        "canThrow": false,
+                        "handleObjects": [
+                            "403",
+                            "406"
+                        ],
+                        "invertRotation": true,
+                        "pivotAxis": "Z",
+                        "rotationType": "AroundPivot",
+                        "secondaryPivotAxis": "Y",
+                        "secondaryPivot": "408"
+                    }
+                },
+                {
+                    "type": "rotation-constraint",
+                    "rotation-constraint": {
+                        "lockY": true,
+                        "lockX": true,
+                        "min": [
+                            0.0,
+                            0.0,
+                            -45.0
+                        ],
+                        "max": [
+                            0.0,
+                            0.0,
+                            45.0
+                        ]
+                    }
+                }
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ]
+        },
+        "403": {
+            "name": "HandleLeft",
+            "translation": [
+                0.132612,
+                0.0016236,
+                0.090511
+            ],
+            "rotation": [
+                4.067686276698623e-8,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                0.0149999,
+                0.1,
+                0.0149999
+            ],
+            "parent": "402",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "material": "22",
+                        "mesh": "8"
+                    }
+                }
+            ]
+        },
+        "404": {
+            "name": "Cannon",
+            "translation": [
+                -0.3322957,
+                -0.0034847,
+                -0.0281998
+            ],
+            "scaling": [
+                0.25,
+                0.025,
+                0.025
+            ],
+            "parent": "402",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "material": "26",
+                        "mesh": "8"
+                    }
+                }
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ]
+        },
+        "405": {
+            "name": "Base",
+            "rotation": [
+                1.5711140832763704e-8,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                0.1,
+                0.075,
+                0.075
+            ],
+            "parent": "402",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "material": "26",
+                        "mesh": "8"
+                    }
+                }
+            ]
+        },
+        "406": {
+            "name": "HandleRight",
+            "translation": [
+                0.149093,
+                0.0016306,
+                -0.0792731
+            ],
+            "rotation": [
+                5.724906415593978e-8,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                0.0149999,
+                0.1,
+                0.0149999
+            ],
+            "parent": "402",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "material": "22",
+                        "mesh": "8"
+                    }
+                }
+            ]
+        },
+        "407": {
             "name": "Text",
+            "translation": [
+                0.0,
+                2.0,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.7071068,
+                0.0,
+                0.7071068
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "parent": "399",
+            "components": [
+                {
+                    "type": "text",
+                    "text": {
+                        "text": "Rotation constraints"
+                    }
+                }
+            ]
+        },
+        "408": {
+            "name": "Base",
+            "parent": "399",
+            "translation": [
+                -0.0043096,
+                1.1949079,
+                0.0
+            ],
             "rotation": [
                 0.0,
                 0.0,
@@ -4014,19 +3899,24 @@
                 1.0,
                 1.0
             ],
-            "parent": "389",
             "components": [
                 {
-                    "type": "text",
-                    "text": {
-                        "text": "Rotation constraints"
+                    "type": "rotation-constraint",
+                    "rotation-constraint": {
+                        "lockX": true,
+                        "lockZ": true,
+                        "min": [
+                            0.0,
+                            -75.0,
+                            0.0
+                        ],
+                        "max": [
+                            0.0,
+                            75.0,
+                            0.0
+                        ]
                     }
                 }
-            ],
-            "translation": [
-                0.0,
-                2.0,
-                0.0
             ]
         }
     },

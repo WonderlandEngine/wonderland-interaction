@@ -40,12 +40,11 @@ export enum GrabRotationType {
 const GrabRotationTypeNames = ['Hand', 'AroundPivot'];
 
 export enum PivotAxis {
-    None = 0,
-    X = 1,
-    Y = 2,
-    Z = 3,
+    X = 0,
+    Y,
+    Z,
 }
-export const PivotAxisNames = ['None', 'X', 'Y', 'Z'];
+export const PivotAxisNames = ['X', 'Y', 'Z'];
 
 export enum GrabType {
     Single,
@@ -181,6 +180,13 @@ export class Grabbable extends Component {
     @property.enum(PivotAxisNames, PivotAxis.Y)
     public pivotAxis: PivotAxis = PivotAxis.Y;
 
+    @property.object()
+    public secondaryPivot: Object3D | null = null;
+
+    /** Pivot axis used when {@link rotationType} is set to {@link GrabRotationType.AroundPivot} */
+    @property.enum(PivotAxisNames, PivotAxis.Y)
+    public secondaryPivotAxis: PivotAxis = PivotAxis.Y;
+
     @property.bool(false)
     public invertRotation = false;
 
@@ -210,12 +216,7 @@ export class Grabbable extends Component {
      */
     private _defaultGrabTransform: quat2 = quat2.create();
 
-    /**
-     * Local position saved on grab start
-     *
-     * @hidden
-     */
-    private _savedLocalPosition = vec3.create();
+    private _pivotGrabTransform = quat.create();
 
     /**
      * `true` if the grabbable is currently getting snapped onto the interactor.
@@ -439,9 +440,7 @@ export class Grabbable extends Component {
      * @param out Destination quaternion
      * @param positionWorld Anchor point, in **world space**.
      */
-    protected rotationAroundPivot(out: quat, positionWorld: vec3) {
-        /* Use grabbable parent space for the rotation to avoid taking into account
-         * the actual undergoing grabbable rotation. */
+    protected rotationAroundPivot(out: quat, pivotOut: quat, positionWorld: vec3) {
         const localPos = computeLocalPositionForPivot(
             TempVec3.get(),
             this.object,
@@ -449,16 +448,21 @@ export class Grabbable extends Component {
         );
         vec3.normalize(localPos, localPos);
         vec3.scale(localPos, localPos, this.invertRotation ? -1 : 1);
-
-        if (this.pivotAxis !== PivotAxis.None) {
-            rotateAroundPivot(out, axis(this.pivotAxis), localPos);
-        } else {
-            quat.rotationTo(out, FORWARD, localPos);
-            quat.normalize(out, out);
-        }
-
+        rotateAroundPivot(out, axis(this.pivotAxis), localPos);
         TempVec3.free();
-        return out;
+
+        quat.identity(pivotOut);
+        if (!this.secondaryPivot) return;
+
+        const pos = computeLocalPositionForPivot(
+            TempVec3.get(),
+            this.secondaryPivot,
+            positionWorld
+        );
+        vec3.normalize(pos, pos);
+        vec3.scale(pos, pos, this.invertRotation ? -1 : 1);
+        rotateAroundPivot(pivotOut, axis(this.secondaryPivotAxis), pos);
+        TempVec3.free();
     }
 
     /**
@@ -471,7 +475,7 @@ export class Grabbable extends Component {
      */
     protected rotationAroundPivotDual(out: quat, primaryWorld: vec3, secondaryWorld: vec3) {
         const avg = vec3.lerp(TempVec3.get(), primaryWorld, secondaryWorld, 0.5);
-        this.rotationAroundPivot(out, avg);
+        // this.rotationAroundPivot(out, avg);
 
         TempVec3.free();
         return out;
@@ -489,13 +493,29 @@ export class Grabbable extends Component {
         const source = handle.snap != GrabSnapMode.None ? handle.object : interactor;
         this._lerp = handle.snap != GrabSnapMode.None;
 
-        this.object.getPositionLocal(this._savedLocalPosition);
+        quat2.identity(this._defaultGrabTransform);
+        quat.identity(this._pivotGrabTransform);
 
         switch (this.rotationType) {
             case GrabRotationType.AroundPivot: {
-                const out = this._defaultGrabTransform as quat;
-                this.rotationAroundPivot(out, source.getPositionWorld());
-                computeRelativeRotation(this.object.getRotationLocal(), out, out);
+                const rot = this.object.getRotationLocal();
+                const pivotRot = quat.create();
+                this.secondaryPivot?.getRotationLocal(pivotRot);
+                this.rotationAroundPivot(
+                    this._defaultGrabTransform,
+                    this._pivotGrabTransform,
+                    source.getPositionWorld()
+                );
+                computeRelativeRotation(
+                    rot,
+                    this._defaultGrabTransform,
+                    this._defaultGrabTransform
+                );
+                computeRelativeRotation(
+                    pivotRot,
+                    this._pivotGrabTransform,
+                    this._pivotGrabTransform
+                );
                 break;
             }
             case GrabRotationType.Hand:
@@ -624,11 +644,18 @@ export class Grabbable extends Component {
             }
             case GrabRotationType.AroundPivot: {
                 // TODO: Handle position?
-                const rot = this.rotationAroundPivot(TempQuat.get(), handPosition);
+                const rot = TempQuat.get();
+                const pivotRot = TempQuat.get();
+                this.rotationAroundPivot(rot, pivotRot, handPosition);
+
                 quat.multiply(rot, rot, this._defaultGrabTransform as quat);
                 this.object.setRotationLocal(rot);
+                if (this.secondaryPivot) {
+                    quat.multiply(pivotRot, pivotRot, this._pivotGrabTransform as quat);
+                    this.secondaryPivot.setRotationLocal(pivotRot);
+                }
 
-                TempQuat.free();
+                TempQuat.free(2);
                 break;
             }
         }

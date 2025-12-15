@@ -1,5 +1,6 @@
 import {Object3D} from '@wonderlandengine/api';
 import {quat, quat2, vec3, vec4} from 'gl-matrix';
+import {FORWARD, UP} from '../constants.js';
 
 /** Temporaries. */
 const _pointA = vec3.create();
