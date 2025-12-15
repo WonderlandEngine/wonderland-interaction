@@ -36,18 +36,6 @@ export function isPointEqual(a: vec3, b: vec3, epsilon: number) {
 }
 
 /**
- * Check whether two rotations are **almost** equal.
- *
- * @param a Source rotation.
- * @param b Target rotation.
- * @param epsilon Epsilon threshold.
- * @returns `true` if almost equal, `false` otherwise.
- */
-export function isQuatEqual(a: quat, b: quat, epsilon: number) {
-    return quat.getAngle(a, b) < epsilon;
-}
-
-/**
  * Compute the relative transformation from source to target.
  *
  * @note
