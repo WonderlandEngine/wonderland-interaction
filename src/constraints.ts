@@ -1,6 +1,5 @@
 import {Component, property} from '@wonderlandengine/api';
 import {quat, vec3} from 'gl-matrix';
-import {Grabbable} from './interaction/grabbable.js';
 import {toDegree} from './utils/math.js';
 import {TempVec3} from './internal-constants.js';
 
@@ -61,30 +60,8 @@ export class TranslationConstraint extends Component {
     @property.vector3(-1, -1, -1)
     max!: Float32Array;
 
-    private _grabbable: Grabbable | null = null;
-
-    /** @override */
-    onActivate(): void {
-        this._grabbable = this.object.getComponent(Grabbable);
-        if (this._grabbable) {
-            /** @todo: Will not be required once the engine allows to order update. */
-            this._grabbable.onUpdate.add(this._update);
-        }
-    }
-
-    /** @override */
-    onDeactivate(): void {
-        if (this._grabbable && !this._grabbable.isDestroyed) {
-            this._grabbable.onUpdate.remove(this._update);
-        }
-    }
-
     /** @override */
     update(): void {
-        this._update();
-    }
-
-    private _update = () => {
         const min = TempVec3.get();
         const max = TempVec3.get();
         initializeBounds(this.min, this.max, min, max);
@@ -95,7 +72,7 @@ export class TranslationConstraint extends Component {
         this.object.setPositionLocal(pos);
 
         TempVec3.free(3);
-    };
+    }
 }
 
 function getEulerFromQuat(out: vec3, q: quat) {
@@ -187,6 +164,9 @@ export class RotationConstraint extends Component {
     /** @override */
     update(): void {
         const rot = this.object.getRotationLocal(quat.create());
+
+        /** @todo: Split 1/2/3 DoF constraints.
+         * The current constraint logic is too simplistic and will not hold */
 
         const min = TempVec3.get();
         const max = TempVec3.get();

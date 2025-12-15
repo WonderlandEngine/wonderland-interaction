@@ -46,12 +46,6 @@ export enum PivotAxis {
 }
 export const PivotAxisNames = ['X', 'Y', 'Z'];
 
-export enum GrabType {
-    Single,
-    SingleOrDual,
-    Dual,
-}
-
 function axis(axis: PivotAxis.X | PivotAxis.Y | PivotAxis.Z) {
     switch (axis) {
         case PivotAxis.X:
@@ -162,17 +156,6 @@ export class Grabbable extends Component {
     @property.int(0)
     public distanceHandle = 0;
 
-    /**
-     * If `true`, the primary grab will be set to
-     * the first grab point that has been interacted with.
-     *
-     * For a weapon, you generally want that option to be `false`
-     * and to always set the trigger grab as the first grab point, i.e.,
-     * the primary grab.
-     */
-    @property.bool(false)
-    public autoSetPrimaryGrab = false;
-
     @property.enum(GrabRotationTypeNames, GrabRotationType.Hand)
     public rotationType = GrabRotationType.Hand;
 
@@ -193,8 +176,6 @@ export class Grabbable extends Component {
     /** Public Attributes */
 
     handles: GrabPoint[] = [];
-
-    onUpdate = new Emitter();
 
     /** Private Attributes. */
 
@@ -293,6 +274,23 @@ export class Grabbable extends Component {
             this._updateTransformSingleHand(index);
         }
 
+        if (this.rotationType === GrabRotationType.AroundPivot) {
+            const pos = this.computeInteractorsCenterPosition(TempVec3.get());
+            const rot = TempQuat.get();
+            const pivotRot = TempQuat.get();
+            this.rotationAroundPivot(rot, pivotRot, pos);
+
+            quat.multiply(rot, rot, this._defaultGrabTransform as quat);
+            this.object.setRotationLocal(rot);
+            if (this.secondaryPivot) {
+                quat.multiply(pivotRot, pivotRot, this._pivotGrabTransform as quat);
+                this.secondaryPivot.setRotationLocal(pivotRot);
+            }
+
+            TempVec3.free();
+            TempQuat.free(2);
+        }
+
         const xrPose = anyGrab!.interactor.xrPose;
         if (xrPose && this.useControllerVelocityData) {
             this._history.updateFromPose(
@@ -304,8 +302,6 @@ export class Grabbable extends Component {
         } else {
             this._history.update(this.object, dt);
         }
-
-        this.onUpdate.notify();
     }
 
     /**
@@ -368,12 +364,7 @@ export class Grabbable extends Component {
         this._history.reset(this.object);
         this._setKinematicState(true);
 
-        if (this._grabData.length === 1) {
-            this.initializeGrab();
-        } else {
-            this.initializeDualGrab();
-        }
-
+        this.initializeGrab();
         this._onGrabStart.notify(this);
     }
 
@@ -481,30 +472,103 @@ export class Grabbable extends Component {
         return out;
     }
 
+    protected computeInteractorsCenterPosition(out: vec3) {
+        this.primaryGrab!.interactor.object.getPositionWorld(out);
+
+        const secondary = this.secondaryGrab?.interactor.object;
+        if (!secondary) return out;
+
+        const secondPos = secondary.getPositionWorld(TempVec3.get());
+        vec3.lerp(out, out, secondPos, 0.5);
+        TempVec3.free();
+
+        return out;
+    }
+
     /**
      * Initialize single hand grab
      *
      * @note Triggered when single grab occurs, or when second hand is released.
      */
     protected initializeGrab() {
-        const grab = this._grabData[0];
-        const interactor = grab.interactor.object;
-        const handle = this.handles[grab.handleId];
-        const source = handle.snap != GrabSnapMode.None ? handle.object : interactor;
-        this._lerp = handle.snap != GrabSnapMode.None;
-
         quat2.identity(this._defaultGrabTransform);
         quat.identity(this._pivotGrabTransform);
 
+        const primaryHandle = this.handles[this._grabData[0].handleId];
+        const primaryInteractor = this._grabData[0].interactor.object;
+        this._lerp = primaryHandle.snap != GrabSnapMode.None;
+
+        /* Switch between handle or interactor for snapping */
+        const source =
+            primaryHandle.snap != GrabSnapMode.None
+                ? primaryHandle.object
+                : primaryInteractor;
+
+        const sourcePosWorld = source.getPositionWorld(TempVec3.get());
+        const targetPosWorld: vec3 = vec3.copy(TempVec3.get(), sourcePosWorld);
+
+        let secondaryInteractor: Object3D | null = null;
+        if (this._grabData.length > 1) {
+            const secondaryHandle = this.handles[this._grabData[1].handleId];
+            secondaryInteractor = this._grabData[1].interactor.object;
+
+            const target =
+                secondaryHandle.snap != GrabSnapMode.None
+                    ? secondaryHandle.object
+                    : secondaryInteractor;
+
+            target.getPositionWorld(targetPosWorld);
+        }
+
         switch (this.rotationType) {
+            case GrabRotationType.Hand: {
+                if (secondaryInteractor) {
+                    const interactorUp = secondaryInteractor!.getUpWorld(TempVec3.get());
+                    const up = TempVec3.get();
+                    this._useUpOrientation = vec3.dot(interactorUp, UP) >= 0.5;
+                    if (this._useUpOrientation) {
+                        vec3.copy(up, interactorUp);
+                    } else {
+                        secondaryInteractor.getForwardWorld(up);
+                    }
+
+                    const handRotation = rotateFreeDual(
+                        sourcePosWorld,
+                        targetPosWorld,
+                        up,
+                        this._defaultGrabTransform as quat
+                    );
+
+                    const objectRotation = this.object.getRotationWorld(TempQuat.get());
+                    computeRelativeRotation(
+                        objectRotation,
+                        handRotation,
+                        this._defaultGrabTransform as quat
+                    );
+
+                    TempVec3.free(2);
+                    TempQuat.free();
+                } else {
+                    computeRelativeTransform(
+                        this.object,
+                        source,
+                        this._defaultGrabTransform
+                    );
+                }
+                break;
+            }
             case GrabRotationType.AroundPivot: {
                 const rot = this.object.getRotationLocal();
                 const pivotRot = quat.create();
+
+                const pos = TempVec3.get();
+                vec3.lerp(pos, sourcePosWorld, targetPosWorld, 0.5);
+
                 this.secondaryPivot?.getRotationLocal(pivotRot);
                 this.rotationAroundPivot(
                     this._defaultGrabTransform,
                     this._pivotGrabTransform,
-                    source.getPositionWorld()
+                    pos
                 );
                 computeRelativeRotation(
                     rot,
@@ -516,84 +580,8 @@ export class Grabbable extends Component {
                     this._pivotGrabTransform,
                     this._pivotGrabTransform
                 );
-                break;
-            }
-            case GrabRotationType.Hand:
-                computeRelativeTransform(this.object, source, this._defaultGrabTransform);
-                break;
-        }
-    }
 
-    /**
-     * Initialize double hand grab
-     */
-    protected initializeDualGrab() {
-        if (!this.autoSetPrimaryGrab && this._grabData[0].handleId !== 0) {
-            /* For main grab point to be primary handle */
-            const first = this._grabData[0];
-            this._grabData[0] = this._grabData[1];
-            this._grabData[1] = first;
-        }
-
-        const primaryHandle = this.handles[this._grabData[0].handleId];
-        const primaryInteractor = this._grabData[0].interactor.object;
-
-        const secondaryHandle = this.handles[this._grabData[1].handleId];
-        const secondaryInteractor = this._grabData[1].interactor.object;
-
-        /* Switch between handle or interactor for snapping */
-        const source =
-            primaryHandle.snap != GrabSnapMode.None
-                ? primaryHandle.object
-                : primaryInteractor;
-        const target =
-            secondaryHandle.snap != GrabSnapMode.None
-                ? secondaryHandle.object
-                : secondaryInteractor;
-
-        const sourcePosWorld = source.getPositionWorld(TempVec3.get());
-        const targetPosWorld = target!.getPositionWorld(TempVec3.get());
-
-        switch (this.rotationType) {
-            case GrabRotationType.AroundPivot: {
-                this.rotationAroundPivotDual(
-                    this._defaultGrabTransform as quat,
-                    sourcePosWorld,
-                    targetPosWorld
-                );
-                computeRelativeRotation(
-                    this.object.getRotationLocal(),
-                    this._defaultGrabTransform as quat,
-                    this._defaultGrabTransform as quat
-                );
-                break;
-            }
-            case GrabRotationType.Hand: {
-                const interactorUp = secondaryInteractor!.getUpWorld(TempVec3.get());
-                const up = TempVec3.get();
-                this._useUpOrientation = vec3.dot(interactorUp, UP) >= 0.5;
-                if (this._useUpOrientation) {
-                    vec3.copy(up, interactorUp);
-                } else {
-                    secondaryInteractor.getForwardWorld(up);
-                }
-
-                const handRotation = rotateFreeDual(
-                    sourcePosWorld,
-                    targetPosWorld,
-                    up,
-                    this._defaultGrabTransform as quat
-                );
-
-                const objectRotation = this.object.getRotationWorld(TempQuat.get());
-                computeRelativeRotation(
-                    objectRotation,
-                    handRotation,
-                    this._defaultGrabTransform as quat
-                );
-
-                TempVec3.free(2);
-                TempQuat.free();
+                TempVec3.free(1);
                 break;
             }
         }
@@ -607,64 +595,46 @@ export class Grabbable extends Component {
      * @param index The index of the handle to update the transform from.
      */
     private _updateTransformSingleHand(index: number) {
+        if (this.rotationType !== GrabRotationType.Hand) return;
+
         const grab = this._grabData[index]!;
         const hand = grab.interactor.object;
-        const handPosition = hand.getPositionWorld();
 
-        switch (this.rotationType) {
-            case GrabRotationType.Hand: {
-                /* `grab.transform` is in the hand space, thus multiplyig
-                 * the hand transform by the object's transform leads to
-                 * its world space transform. */
-                const transform = hand.getTransformWorld(TempDualQuat.get());
-                quat2.multiply(transform, transform, this._defaultGrabTransform);
+        /* `grab.transform` is in the hand space, thus multiplyig
+         * the hand transform by the object's transform leads to
+         * its world space transform. */
+        const transform = hand.getTransformWorld(TempDualQuat.get());
+        quat2.multiply(transform, transform, this._defaultGrabTransform);
 
-                const handle = this.handles[grab.handleId];
-                const lerp = this._lerp ? clamp(handle.snapLerp, 0, 1) : 1.0;
+        const handle = this.handles[grab.handleId];
+        const lerp = this._lerp ? clamp(handle.snapLerp, 0, 1) : 1.0;
 
-                const currentPos = this.object.getPositionWorld();
-                const pos = quat2.getTranslation(vec3.create(), transform);
-                vec3.lerp(pos, currentPos, pos, lerp);
+        const currentPos = this.object.getPositionWorld();
+        const pos = quat2.getTranslation(vec3.create(), transform);
+        vec3.lerp(pos, currentPos, pos, lerp);
 
-                const currentRot = this.object.getRotationWorld();
-                const rot = quat2.getReal(quat.create(), transform as quat);
-                quat.lerp(rot, currentRot, rot, lerp);
-                quat.normalize(rot, rot);
-                this.object.setPositionWorld(pos);
-                this.object.setRotationWorld(rot);
+        const currentRot = this.object.getRotationWorld();
+        const rot = quat2.getReal(quat.create(), transform as quat);
+        quat.lerp(rot, currentRot, rot, lerp);
+        quat.normalize(rot, rot);
+        this.object.setPositionWorld(pos);
+        this.object.setRotationWorld(rot);
 
-                if (this._lerp) {
-                    this._lerp =
-                        !isPointEqual(pos, currentPos, GRAB_EPSILON_DIST) ||
-                        !isQuatEqual(rot, currentRot, GRAB_EPSILON_ANGLE);
-                }
-
-                TempDualQuat.free();
-                break;
-            }
-            case GrabRotationType.AroundPivot: {
-                // TODO: Handle position?
-                const rot = TempQuat.get();
-                const pivotRot = TempQuat.get();
-                this.rotationAroundPivot(rot, pivotRot, handPosition);
-
-                quat.multiply(rot, rot, this._defaultGrabTransform as quat);
-                this.object.setRotationLocal(rot);
-                if (this.secondaryPivot) {
-                    quat.multiply(pivotRot, pivotRot, this._pivotGrabTransform as quat);
-                    this.secondaryPivot.setRotationLocal(pivotRot);
-                }
-
-                TempQuat.free(2);
-                break;
-            }
+        if (this._lerp) {
+            this._lerp =
+                !isPointEqual(pos, currentPos, GRAB_EPSILON_DIST) ||
+                !isQuatEqual(rot, currentRot, GRAB_EPSILON_ANGLE);
         }
+
+        TempDualQuat.free();
     }
 
     /**
      * Compute the transform of this grabbable based on both handles.
      */
     private _updateTransformDoubleHand() {
+        if (this.rotationType !== GrabRotationType.Hand) return;
+
         const primaryGrab = this._grabData[0];
         const primaryInteractor = this._grabData[0]!.interactor;
         const secondaryInteractor = this._grabData[1]!.interactor;
@@ -673,74 +643,44 @@ export class Grabbable extends Component {
 
         const primaryHandle = this.handles[primaryGrab.handleId];
 
-        switch (this.rotationType) {
-            case GrabRotationType.Hand:
-                {
-                    /* Pivot */
-                    const up = TempVec3.get();
-                    if (this._useUpOrientation) {
-                        secondaryInteractor.object.getUpWorld(up);
-                    } else {
-                        secondaryInteractor.object.getForwardWorld(up);
-                    }
-
-                    const pivotRotation = rotateFreeDual(
-                        primaryWorld,
-                        secondaryWorld,
-                        up,
-                        TempQuat.get()
-                    );
-                    quat.multiply(
-                        pivotRotation,
-                        pivotRotation,
-                        this._defaultGrabTransform as quat
-                    );
-                    const pivotToWorld = quat2.fromRotationTranslation(
-                        TempDualQuat.get(),
-                        pivotRotation,
-                        primaryWorld
-                    );
-
-                    // TODO: Lerp second hand.
-
-                    /* Object to handle */
-
-                    const objectToPivotVec = vec3.subtract(
-                        TempVec3.get(),
-                        this.object.getPositionWorld(),
-                        primaryHandle.object.getPositionWorld()
-                    );
-                    const objectToPivot = quat2.fromTranslation(
-                        TempDualQuat.get(),
-                        objectToPivotVec
-                    );
-
-                    const transform = quat2.multiply(
-                        objectToPivot,
-                        objectToPivot,
-                        pivotToWorld
-                    );
-                    this.object.setTransformWorld(transform);
-
-                    TempVec3.free(2);
-                    TempDualQuat.free(2);
-                    TempQuat.free();
-                }
-                break;
-            case GrabRotationType.AroundPivot:
-                {
-                    const rot = this.rotationAroundPivotDual(
-                        TempQuat.get(),
-                        primaryWorld,
-                        secondaryWorld
-                    );
-                    quat.multiply(rot, rot, this._defaultGrabTransform as quat);
-                    this.object.setRotationLocal(rot);
-
-                    TempQuat.free();
-                }
-                break;
+        /* Pivot */
+        const up = TempVec3.get();
+        if (this._useUpOrientation) {
+            secondaryInteractor.object.getUpWorld(up);
+        } else {
+            secondaryInteractor.object.getForwardWorld(up);
         }
+
+        const pivotRotation = rotateFreeDual(
+            primaryWorld,
+            secondaryWorld,
+            up,
+            TempQuat.get()
+        );
+        quat.multiply(pivotRotation, pivotRotation, this._defaultGrabTransform as quat);
+        const pivotToWorld = quat2.fromRotationTranslation(
+            TempDualQuat.get(),
+            pivotRotation,
+            primaryWorld
+        );
+
+        // TODO: Lerp second hand.
+
+        /* Object to handle */
+
+        const objectToPivotVec = vec3.subtract(
+            TempVec3.get(),
+            this.object.getPositionWorld(),
+            primaryHandle.object.getPositionWorld()
+        );
+        const objectToPivot = quat2.fromTranslation(TempDualQuat.get(), objectToPivotVec);
+
+        const transform = quat2.multiply(objectToPivot, objectToPivot, pivotToWorld);
+        this.object.setTransformWorld(transform);
+
+        TempVec3.free(2);
+        TempDualQuat.free(2);
+        TempQuat.free();
 
         TempVec3.free(2);
     }
