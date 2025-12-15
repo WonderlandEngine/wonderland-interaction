@@ -48,6 +48,8 @@ export function computeLocalPositionForPivot(
     target: Object3D,
     positionWorld: vec3
 ): vec3 {
+    /* Use grabbable parent space for the rotation to avoid taking into account
+     * the actual undergoing grabbable rotation. */
     const parent = target.parent ?? target.scene.wrap(0);
     const handParentSpace = parent.transformPointInverseWorld(
         TempVec3.get(),

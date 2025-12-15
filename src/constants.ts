@@ -12,6 +12,8 @@ export const RIGHT = vec3.set(vec3.create(), 1, 0, 0);
 export const UP = vec3.set(vec3.create(), 0, 1, 0);
 /** z axis. */
 export const FORWARD = vec3.set(vec3.create(), 0, 0, -1);
+/**  */
+export const GLOBAL_FRAME = [RIGHT, UP, FORWARD];
 
 export const QUAT_FORWARD = quat.create();
 export const QUAT_RIGHT = quat.rotationTo(quat.create(), FORWARD, RIGHT);
