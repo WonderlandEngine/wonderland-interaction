@@ -3,11 +3,11 @@ import {
     CollisionComponent,
     CollisionEventType,
     Component,
-    Emitter,
+    InputComponent,
     MeshComponent,
     Object3D,
     PhysXComponent,
-    Scene,
+    WonderlandEngine,
 } from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
 
@@ -18,13 +18,8 @@ import {
     InteractorVisualState,
     InteractorVisualStateNames,
 } from './grab-point.js';
-import {setComponentsActive} from '../utils/activate-children.js';
-
-/** Represents whether the user's left or right hand is being used. */
-export enum Handedness {
-    Left = 0,
-    Right,
-}
+import {componentError, setComponentsActive} from '../utils/wle.js';
+import {DefaultInteractorInput, InteractorInput} from './interactor-input.js';
 
 /**
  * Manages interaction capabilities of a VR controller or a similar input device.
@@ -35,19 +30,14 @@ export enum Handedness {
 export class Interactor extends Component {
     static TypeName = 'interactor';
 
-    /** Properties. */
+    static onRegister(engine: WonderlandEngine) {
+        engine.registerComponent(DefaultInteractorInput);
+    }
 
-    /**
-     * If `true`, automatically setup events from gamepad.
-     * Set this to `false` to use your own input mappings or
-     * gamepad library.
-     */
-    @property.bool(true)
-    public useDefaultInputs = true;
+    /** Properties */
 
-    /** Handedness value. Compare against {@link Handedness}. */
-    @property.enum(['Left', 'Right'], Handedness.Right)
-    public handedness!: number;
+    @property.object()
+    public inputObject!: Object3D;
 
     @property.object()
     meshRoot: Object3D | null = null;
@@ -59,6 +49,8 @@ export class Interactor extends Component {
     trackedSpace: Object3D = null!;
 
     /** Private Attributes. */
+
+    private _input!: InteractorInput;
 
     /** Collision component of this object. */
     private _collision: CollisionComponent = null!;
@@ -75,31 +67,14 @@ export class Interactor extends Component {
     /** Cached interactable after it's gripped. */
     private _grabbable: Grabbable | null = null;
 
-    /** Grip start emitter. */
-    private readonly _onGripStart: Emitter<[Grabbable]> = new Emitter();
-    /** Grip end emitter. */
-    private readonly _onGripEnd: Emitter<[Grabbable]> = new Emitter();
-
-    /** @hidden */
-    private readonly _onPreRender = () => {
-        if (!this.#xrInputSource) return;
-
-        if (!this.#xrInputSource!.gripSpace) {
-            this.#xrPose = null;
-            return;
-        }
-        const pose = this.engine.xr!.frame!.getPose(
-            this.#xrInputSource!.gripSpace,
-            this.#referenceSpace!
-        );
-        this.#xrPose = pose ?? null;
+    private _onGrabStart = () => {
+        this.checkForNearbyInteractables();
     };
 
-    #xrInputSource: XRInputSource | null = null;
-    #referenceSpace: XRReferenceSpace | XRBoundedReferenceSpace | null = null;
-    #xrPose: XRPose | null = null;
-    #onSessionStart = this._startSession.bind(this);
-    #onSessionEnd = this._endSession.bind(this);
+    private _onGrabEnd = () => {
+        this.stopInteraction();
+    };
+
     #currentlyCollidingWith: GrabPoint | null = null;
 
     /**
@@ -117,15 +92,41 @@ export class Interactor extends Component {
         if (!this._collision && !this._physx) {
             throw new Error('grabber.start(): No collision or physx component found');
         }
+
+        let maybeInput = (this.inputObject ?? this.object).getComponent(
+            DefaultInteractorInput
+        );
+
+        if (!maybeInput) {
+            const search = (object: Object3D): InputComponent | null => {
+                const input = object.getComponent(InputComponent);
+                if (input) return input;
+                return object.parent ? search(object.parent) : null;
+            };
+            const input = search(this.object);
+            if (!input) {
+                throw new Error(
+                    componentError(
+                        this,
+                        "'InteractoInput' component not provided, and no native input component could found"
+                    )
+                );
+            }
+            maybeInput = this.object.addComponent(DefaultInteractorInput, {
+                inputObject: input.object,
+            });
+        }
+
+        this._input = maybeInput;
     }
 
     onActivate(): void {
-        this.engine.onXRSessionStart.add(this.#onSessionStart);
-        this.engine.onXRSessionEnd.add(this.#onSessionEnd);
-
         if (!this._collision) {
             this._physxCallback = this._physx.onCollision(this.onPhysxCollision);
         }
+
+        this._input.onGrabStart.add(this._onGrabStart);
+        this._input.onGrabEnd.add(this._onGrabEnd);
     }
 
     onDeactivate(): void {
@@ -133,9 +134,11 @@ export class Interactor extends Component {
             this._physx.removeCollisionCallback(this._physxCallback);
             this._physxCallback = null;
         }
-        this.engine.onXRSessionStart.add(this.#onSessionStart);
-        this.engine.onXRSessionEnd.add(this.#onSessionEnd);
-        this._endSession();
+
+        if (!this._input.isDestroyed) {
+            this._input.onGrabStart.remove(this._onGrabStart);
+            this._input.onGrabEnd.remove(this._onGrabEnd);
+        }
     }
 
     /**
@@ -153,7 +156,6 @@ export class Interactor extends Component {
 
         this._grabbable = interactable;
         interactable.grab(this, handleId);
-        this._onGripStart.notify(interactable);
 
         let hidden = this.visualStateOnGrab === InteractorVisualState.Hidden;
         if (interactable.interactorVisualState !== InteractorVisualState.None) {
@@ -253,34 +255,12 @@ export class Interactor extends Component {
     public stopInteraction() {
         if (this._grabbable && !this._grabbable.isDestroyed) {
             this._grabbable.release(this);
-            this._onGripEnd.notify(this._grabbable);
         }
         this._grabbable = null;
 
         if (this.meshRoot && !this.meshRoot.isDestroyed) {
             setComponentsActive(this.meshRoot, true, MeshComponent);
         }
-    }
-
-    /** Notified on a grip start. */
-    get onGripStart(): Emitter<[Grabbable]> {
-        return this._onGripStart;
-    }
-
-    /** Notified on a grip end. */
-    get onGripEnd(): Emitter<[Grabbable]> {
-        return this._onGripEnd;
-    }
-
-    /**
-     * Current [XR pose](https://developer.mozilla.org/en-US/docs/Web/API/XRPose).
-     *
-     * @remarks
-     * This is only available when a XR session is started **and** during a frame, i.e.,
-     * during a component's update phase.
-     */
-    get xrPose(): XRPose | null {
-        return this.#xrPose;
     }
 
     /**
@@ -291,66 +271,8 @@ export class Interactor extends Component {
         return this._grabbable;
     }
 
-    private _startSession(session: XRSession) {
-        this.#referenceSpace =
-            this.engine.xr!.referenceSpaceForType('local-floor') ??
-            this.engine.xr!.referenceSpaceForType('local');
-
-        session.addEventListener('inputsourceschange', this.#inputSourceChangedEvent);
-
-        if (!this.useDefaultInputs) {
-            return;
-        }
-
-        session.addEventListener('selectstart', this.#selectStartEvent);
-        session.addEventListener('selectend', this.#selectEndEvent);
-
-        const scene = this.scene as Scene;
-        scene.onPreRender.add(this._onPreRender);
+    /** {@link InteractorInput} */
+    get input(): InteractorInput {
+        return this._input;
     }
-
-    private _endSession() {
-        const session = this.engine.xr?.session;
-        if (session) {
-            session.removeEventListener(
-                'inputsourceschange',
-                this.#inputSourceChangedEvent
-            );
-            session.removeEventListener('selectstart', this.#selectStartEvent);
-            session.removeEventListener('selectend', this.#selectEndEvent);
-        }
-        this.#referenceSpace = null;
-        this.#xrInputSource = null;
-        this.stopInteraction();
-        const scene = this.scene as Scene;
-        scene.onPreRender.remove(this._onPreRender);
-    }
-
-    #inputSourceChangedEvent = (event: XRInputSourceChangeEvent) => {
-        for (const item of event.removed) {
-            if (item === this.#xrInputSource) {
-                this.#xrInputSource = null;
-                break;
-            }
-        }
-        const handedness = this.handedness === Handedness.Left ? 'left' : 'right';
-        for (const item of event.added) {
-            if (item.handedness === handedness) {
-                this.#xrInputSource = item;
-                break;
-            }
-        }
-    };
-
-    #selectStartEvent = (event: XRInputSourceEvent) => {
-        if (this.#xrInputSource === event.inputSource) {
-            this.checkForNearbyInteractables();
-        }
-    };
-
-    #selectEndEvent = (event: XRInputSourceEvent) => {
-        if (this.#xrInputSource === event.inputSource) {
-            this.stopInteraction();
-        }
-    };
 }

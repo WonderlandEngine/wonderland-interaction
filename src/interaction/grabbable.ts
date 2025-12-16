@@ -1,4 +1,4 @@
-import {vec3, quat2, quat, mat4, vec4} from 'gl-matrix';
+import {vec3, quat2, quat} from 'gl-matrix';
 import {
     clamp,
     Component,
@@ -362,7 +362,7 @@ export class Grabbable extends Component {
             this.object.setRotationLocal(rotation);
         }
 
-        const xrPose = this.primaryGrab!.interactor.xrPose;
+        const xrPose = this.primaryGrab!.interactor.input.xrPose;
         if (xrPose && this.useControllerVelocityData) {
             this._history.updateFromPose(
                 xrPose,

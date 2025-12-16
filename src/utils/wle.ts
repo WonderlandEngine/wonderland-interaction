@@ -2,13 +2,30 @@ import {vec3, vec4} from 'gl-matrix';
 import {
     Component,
     ComponentConstructor,
+    InputComponent,
+    InputType,
     MeshComponent,
     Object3D,
+    Prefab,
 } from '@wonderlandengine/api';
 
 /* Temporaries */
 const _vectorA = vec3.create();
 const _boundingSphere = vec4.create();
+
+/**
+ * Convert a TypeScript syntactic sugar enum to a list of keys.
+ *
+ * This method filters the reverse mapping from value to key.
+ *
+ * @note Index mapping must be contiguous and 0-based.
+ *
+ * @param e Enum to retrieve the keys from
+ * @returns The list of keys
+ */
+export function enumStringKeys<T extends object>(e: T): (keyof T)[] {
+    return Object.keys(e).filter((v) => isNaN(v as unknown as number)) as (keyof T)[];
+}
 
 /**
  * Merges two bounding spheres into one that encompasses both.
@@ -126,6 +143,33 @@ export const radiusHierarchy = (function () {
         return radiusHierarchyRec(temp, object)[3];
     };
 })();
+
+/**
+ * Recursively sets the active state of the given object and all its children.
+ * @param object The object to set the active state of.
+ * @param active The state to set.
+ *
+ * @example
+ * ```js
+ * // turn off all components on this object and its children
+ * setComponentsActive(this.someObject, undefined, false);
+ * ```
+ */
+export function setComponentsActive(
+    object: Object3D,
+    active: boolean,
+    typeClass?: ComponentConstructor
+) {
+    // TODO: Fix typing in wonderlandengine/api
+    const components = object.getComponents(typeClass as any);
+    for (const comp of components) {
+        comp.active = active;
+    }
+    const children = object.children;
+    for (const child of children) {
+        setComponentsActive(child, active, typeClass);
+    }
+}
 
 export function componentError(component: Component, msg: string) {
     const ctor = component.constructor as ComponentConstructor;
