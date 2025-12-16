@@ -3,16 +3,16 @@
         "14": {
             "name": "Player",
             "scaling": [
-                0.9999476,
+                0.9999481,
                 1.0,
-                0.9999477
+                0.9999481
             ],
             "components": [
                 {
                     "type": "player-controller",
                     "player-controller": {
                         "speed": 1.0,
-                        "transformType": "Smooth",
+                        "transformType": "Snap",
                         "rotationSpeed": 1.0,
                         "trackedSpace": "205"
                     }
@@ -30,15 +30,9 @@
                 }
             ],
             "translation": [
-                0.1154934,
+                0.1154935,
                 0.0532887,
-                2.0781853
-            ],
-            "rotation": [
-                -2.330564115027301e-7,
-                1.0,
-                -4.986453632227494e-7,
-                5.750515015279234e-7
+                2.0781865
             ]
         },
         "15": {
