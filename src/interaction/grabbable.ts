@@ -282,6 +282,9 @@ export class Grabbable extends Component {
 
         if (!this.isGrabbed) return;
 
+        const primaryInteractor = this.primaryGrab!.interactor.object;
+        const secondaryInteractor = this.secondaryGrab?.interactor.object ?? null;
+
         const currentPos = vec3.create();
         const currentRot = quat.create();
         if (this._computeWorldSpace) {
@@ -298,47 +301,12 @@ export class Grabbable extends Component {
         const position = vec3.create();
         vec3.copy(position, currentPos);
 
-        switch (this.transformType) {
-            case GrabTransformType.Hand: {
-                const transform = TempDualQuat.get();
-                if (this.secondaryGrab) {
-                    const source = this.primaryGrab!.interactor.object.getPositionWorld();
-                    const target = this.secondaryGrab.interactor.object.getPositionWorld();
-                    this.transformDualHand(
-                        transform,
-                        this.secondaryGrab.interactor.object,
-                        source,
-                        target
-                    );
-                } else {
-                    this.transformHand(transform, 0);
-                }
-                quat2.getTranslation(position, transform);
-                quat2.getReal(rotation, transform as quat);
-                TempDualQuat.free();
-                break;
-            }
-            case GrabTransformType.AroundPivot: {
-                const pos = this.computeInteractorsCenterPosition(TempVec3.get());
-                const pivotRot = TempQuat.get();
-                this.rotationAroundPivot(rotation, pivotRot, pos);
-                quat.multiply(rotation, rotation, this._relativeGrabTransform as quat);
+        const transform = TempDualQuat.get();
+        const pivotRot = TempQuat.get();
 
-                if (this.secondaryPivot) {
-                    quat.multiply(pivotRot, pivotRot, this._pivotGrabTransform as quat);
-                    this.secondaryPivot.setRotationLocal(pivotRot);
-                }
-
-                TempVec3.free();
-                TempQuat.free();
-                break;
-            }
-            default:
-                console.warn(
-                    componentError(this, `Unrecognized type ${this.transformType}`)
-                );
-                break;
-        }
+        this.computeTransform(transform, pivotRot, primaryInteractor, secondaryInteractor);
+        quat2.getTranslation(position, transform);
+        quat2.getReal(rotation, transform as quat);
         quat.normalize(rotation, rotation);
 
         if (this._lerp) {
@@ -366,6 +334,13 @@ export class Grabbable extends Component {
             this.object.setPositionLocal(position);
             this.object.setRotationLocal(rotation);
         }
+
+        if (this.secondaryPivot) {
+            this.secondaryPivot.setRotationLocal(pivotRot);
+        }
+
+        TempQuat.free();
+        TempDualQuat.free();
 
         const xrPose = this.primaryGrab!.interactor.input.xrPose;
         if (xrPose && this.useControllerVelocityData) {
@@ -506,14 +481,53 @@ export class Grabbable extends Component {
         return this._grabData[1];
     }
 
-    protected transformHand(out: quat2, index: number) {
-        const grab = this._grabData[index]!;
-        const hand = grab.interactor.object;
+    protected computeTransform(
+        out: quat2,
+        pivotOut: quat,
+        primary: Object3D,
+        secondary: Object3D | null
+    ) {
+        quat2.identity(out);
+        quat.identity(pivotOut);
 
+        const source = primary.getPositionWorld();
+        const target = vec3.copy(TempVec3.get(), source);
+        if (secondary) {
+            secondary.getPositionWorld(target);
+        }
+
+        switch (this.transformType) {
+            case GrabTransformType.Hand: {
+                if (secondary) {
+                    const interactor = this.secondaryGrab?.interactor.object ?? secondary;
+                    this.transformDualHand(out, interactor, source, target);
+                } else {
+                    this.transformHand(out, primary);
+                }
+                break;
+            }
+            case GrabTransformType.AroundPivot: {
+                const pos = vec3.lerp(TempVec3.get(), source, target, 0.5);
+                this.rotationAroundPivot(out, pivotOut, pos);
+                quat2.fromRotationTranslation(out, out, this.object.getPositionLocal());
+                TempVec3.free();
+                break;
+            }
+            default:
+                console.warn(
+                    componentError(this, `Unrecognized type ${this.transformType}`)
+                );
+                break;
+        }
+
+        TempVec3.free();
+    }
+
+    protected transformHand(out: quat2, source: Object3D) {
         /* `_relativeGrabTransform` is in the hand space, thus multiplyig
          * the hand transform by the object's transform leads to
          * its world space transform. */
-        hand.getTransformWorld(out);
+        source.getTransformWorld(out);
         quat2.multiply(out, out, this._relativeGrabTransform);
         return out;
     }
@@ -577,10 +591,13 @@ export class Grabbable extends Component {
         vec3.normalize(localPos, localPos);
         vec3.scale(localPos, localPos, this.invertRotation ? -1 : 1);
         rotateAroundPivot(out, axis(this.pivotAxis), localPos);
+        quat.multiply(out, out, this._relativeGrabTransform as quat);
         TempVec3.free();
 
-        quat.identity(pivotOut);
-        if (!this.secondaryPivot) return;
+        if (!this.secondaryPivot) {
+            quat.identity(pivotOut);
+            return;
+        }
 
         const pos = computeLocalPositionForPivot(
             TempVec3.get(),
@@ -590,20 +607,8 @@ export class Grabbable extends Component {
         vec3.normalize(pos, pos);
         vec3.scale(pos, pos, this.invertRotation ? -1 : 1);
         rotateAroundPivot(pivotOut, axis(this.secondaryPivotAxis), pos);
+        quat.multiply(pivotOut, pivotOut, this._pivotGrabTransform as quat);
         TempVec3.free();
-    }
-
-    protected computeInteractorsCenterPosition(out: vec3) {
-        this.primaryGrab!.interactor.object.getPositionWorld(out);
-
-        const secondary = this.secondaryGrab?.interactor.object;
-        if (!secondary) return out;
-
-        const secondPos = secondary.getPositionWorld(TempVec3.get());
-        vec3.lerp(out, out, secondPos, 0.5);
-        TempVec3.free();
-
-        return out;
     }
 
     /**
@@ -615,9 +620,6 @@ export class Grabbable extends Component {
         this._setKinematicState(true);
         this._lerp = true;
 
-        quat2.identity(this._relativeGrabTransform);
-        quat.identity(this._pivotGrabTransform);
-
         const primaryHandle = this.grabPoints[this._grabData[0].handleId];
         const primaryInteractor = this._grabData[0].interactor.object;
 
@@ -627,87 +629,53 @@ export class Grabbable extends Component {
                 ? primaryHandle.object
                 : primaryInteractor;
 
-        const sourcePosWorld = source.getPositionWorld(TempVec3.get());
-        const targetPosWorld: vec3 = vec3.copy(TempVec3.get(), sourcePosWorld);
-
         let secondaryInteractor: Object3D | null = null;
+        let target: Object3D | null = null;
         if (this._grabData.length > 1) {
             const secondaryHandle = this.grabPoints[this._grabData[1].handleId];
             secondaryInteractor = this._grabData[1].interactor.object;
 
-            const target =
+            target =
                 secondaryHandle.snap != GrabSnapMode.None
                     ? secondaryHandle.object
                     : secondaryInteractor;
-
-            target.getPositionWorld(targetPosWorld);
 
             const interactorUp = secondaryInteractor!.getUpWorld(TempVec3.get());
             this._useUpOrientation = vec3.dot(interactorUp, UP) >= 0.5;
             TempVec3.free();
         }
 
-        switch (this.transformType) {
-            case GrabTransformType.Hand: {
-                if (secondaryInteractor) {
-                    const objectRotation = this.object.getRotationWorld(TempQuat.get());
-                    this.transformDualHand(
-                        this._relativeGrabTransform,
-                        secondaryInteractor,
-                        sourcePosWorld,
-                        targetPosWorld
-                    );
-                    computeRelativeRotation(
-                        this._relativeGrabTransform as quat,
-                        objectRotation,
-                        this._relativeGrabTransform as quat
-                    );
-                    TempDualQuat.free();
-                    TempQuat.free();
-                } else {
-                    computeRelativeTransform(
-                        this._relativeGrabTransform,
-                        this.object,
-                        source
-                    );
-                }
-                break;
-            }
-            case GrabTransformType.AroundPivot: {
-                const rot = this.object.getRotationLocal();
-                const pivotRot = quat.create();
+        /* Do not use `_relativeGrabTransform` and `_pivotGrabTransform` directly.
+         * The inner computation relies on those variables, we want them to be identity at this point. */
 
-                const pos = TempVec3.get();
-                vec3.lerp(pos, sourcePosWorld, targetPosWorld, 0.5);
+        const transform = TempDualQuat.get();
+        const pivotTransform = TempQuat.get();
+        this.computeTransform(transform, pivotTransform, source, target);
 
-                this.secondaryPivot?.getRotationLocal(pivotRot);
-                this.rotationAroundPivot(
-                    this._relativeGrabTransform,
-                    this._pivotGrabTransform,
-                    pos
-                );
-                computeRelativeRotation(
-                    this._relativeGrabTransform,
-                    rot,
-                    this._relativeGrabTransform
-                );
-                computeRelativeRotation(
-                    this._pivotGrabTransform,
-                    pivotRot,
-                    this._pivotGrabTransform
-                );
-
-                TempVec3.free(1);
-                break;
-            }
-            default:
-                console.warn(
-                    componentError(this, `Unrecognized type ${this.transformType}`)
-                );
-                break;
+        const current = quat2.create();
+        if (this._computeWorldSpace) {
+            this.object.getTransformWorld(current);
+        } else {
+            this.object.getTransformLocal(current);
         }
 
-        TempVec3.free(2);
+        if (this.transformType === GrabTransformType.Hand && !secondaryInteractor) {
+            computeRelativeTransform(
+                this._relativeGrabTransform as quat,
+                current,
+                source.getTransformWorld()
+            );
+        } else {
+            quat2.identity(this._relativeGrabTransform);
+            computeRelativeRotation(this._relativeGrabTransform, current, transform);
+        }
+
+        const pivotRot = quat.create();
+        this.secondaryPivot?.getRotationLocal(pivotRot);
+        computeRelativeRotation(this._pivotGrabTransform, pivotRot, pivotTransform);
+
+        TempDualQuat.free();
+        TempQuat.free();
     }
 
     private _setKinematicState(enable: boolean) {
