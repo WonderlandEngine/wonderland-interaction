@@ -1,4 +1,3 @@
-import {Object3D} from '@wonderlandengine/api';
 import {quat, quat2, vec3} from 'gl-matrix';
 
 /**
@@ -71,18 +70,3 @@ export const computeRelativeTransform = (function () {
         return quat2.fromRotationTranslation(out, out, position);
     };
 })();
-
-/**
- * Compute the relative rotation from source to target.
- *
- * @param out The destination.
- * @param source The source rotation.
- * @param target The target rotation.
- * @returns The `out` parameter.
- */
-export function computeRelativeRotation(out: quat, source: quat, target: quat) {
-    quat.copy(out, target);
-    quat.invert(out, out);
-    quat.multiply(out, out, source);
-    return quat.normalize(out, out);
-}

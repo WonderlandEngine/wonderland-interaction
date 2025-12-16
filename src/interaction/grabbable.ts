@@ -12,12 +12,7 @@ import {property} from '@wonderlandengine/api/decorators.js';
 
 import {Interactor} from './interactor.js';
 import {HistoryTracker} from '../history-tracker.js';
-import {
-    computeRelativeRotation,
-    computeRelativeTransform,
-    isPointEqual,
-    toRad,
-} from '../utils/math.js';
+import {computeRelativeTransform, isPointEqual, toRad} from '../utils/math.js';
 import {
     GrabPoint,
     GrabSnapMode,
@@ -236,7 +231,7 @@ export class Grabbable extends Component {
      * Relative pivot's grab transform to apply every update, used
      * to maintain the object transform when grab starts.
      */
-    private _pivotGrabTransform = quat.create();
+    private _pivotGrabTransform = quat2.create();
 
     private _useUpOrientation: boolean = false;
 
@@ -569,7 +564,7 @@ export class Grabbable extends Component {
         const objectToPivot = quat2.fromTranslation(out, objectToPivotVec);
         quat2.multiply(objectToPivot, objectToPivot, pivotToWorld);
 
-        TempVec3.free(4);
+        TempVec3.free(2);
         TempDualQuat.free();
         TempQuat.free();
 
@@ -652,7 +647,7 @@ export class Grabbable extends Component {
          * The inner computation relies on those variables, we want them to be identity at this point. */
 
         const transform = TempDualQuat.get();
-        const pivotTransform = TempQuat.get();
+        const pivotTransform = TempDualQuat.get();
         this.computeTransform(transform, pivotTransform, source, target);
 
         const current = quat2.create();
@@ -661,23 +656,13 @@ export class Grabbable extends Component {
         } else {
             this.object.getTransformLocal(current);
         }
+        computeRelativeTransform(this._relativeGrabTransform as quat, current, transform);
 
-        if (this.transformType === GrabTransformType.Hand && !secondaryInteractor) {
-            computeRelativeTransform(
-                this._relativeGrabTransform as quat,
-                current,
-                source.getTransformWorld()
-            );
-        } else {
-            computeRelativeRotation(this._relativeGrabTransform, current, transform);
-        }
+        const pivotCurrent = quat2.create();
+        this.secondaryPivot?.getRotationLocal(pivotCurrent);
+        computeRelativeTransform(this._pivotGrabTransform, pivotCurrent, pivotTransform);
 
-        const pivotRot = quat.create();
-        this.secondaryPivot?.getRotationLocal(pivotRot);
-        computeRelativeRotation(this._pivotGrabTransform, pivotRot, pivotTransform);
-
-        TempDualQuat.free();
-        TempQuat.free();
+        TempDualQuat.free(2);
     }
 
     private _setKinematicState(enable: boolean) {
