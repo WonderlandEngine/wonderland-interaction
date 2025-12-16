@@ -83,7 +83,7 @@ export class PlayerController extends Component {
     /* Rotation properties */
 
     @property.enum(RotationTypeNames, RotationType.Snap)
-    rotationType = RotationType.Snap;
+    transformType = RotationType.Snap;
 
     /**
      * The number of degrees at which the player rotates when snap-rotating
@@ -94,7 +94,7 @@ export class PlayerController extends Component {
     /**
      * Rotation speed multiplier.
      *
-     * @note Only used when {@link rotationType} is {@link RotationType.Smooth}.
+     * @note Only used when {@link transformType} is {@link RotationType.Smooth}.
      */
     @property.float(1)
     rotationSpeed = 1;
@@ -244,7 +244,7 @@ export class PlayerController extends Component {
         this.input.getRotationAxis(inputRotation);
 
         let rotation = 0.0;
-        switch (this.rotationType) {
+        switch (this.transformType) {
             case RotationType.Snap: {
                 const value = inputRotation[0];
                 if (Math.abs(value) < SNAP_LOW_THRESHOLD) {

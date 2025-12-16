@@ -39,12 +39,12 @@ const MAX_GRABS = 2;
 const GRAB_EPSILON_DIST = 0.005; /* Half centimeter. */
 const GRAB_EPSILON_ANGLE = toRad(0.5); /* Half a degree */
 
-export enum GrabRotationType {
+export enum GrabTransformType {
     Hand = 0,
     AroundPivot,
 }
-/** List of string keys for {@link GrabRotationType}. */
-const GrabRotationTypeNames = enumStringKeys(GrabRotationType);
+/** List of string keys for {@link GrabTransformType}. */
+const GrabTransformTypeNames = enumStringKeys(GrabTransformType);
 
 export enum PivotAxis {
     X = 0,
@@ -93,13 +93,10 @@ export class Grabbable extends Component {
     /** Properties */
 
     /**
-     * Main handle.
+     * List of objects to use as grab points.
      *
-     * @remarks
-     * If no handle is provided, this component will treat the component
-     * it's attached to as the {@link Interactable}.
-     *
-     * This is an Object3D containing an {@link Interactable} component.
+     * @note If no object is provided, the grabbable is treated as its own grab point.
+     * @note Objects with no {@link GrabPoint} component will have a default one created.
      */
     @property.array(Property.object())
     public handleObjects: Object3D[] = [];
@@ -165,17 +162,17 @@ export class Grabbable extends Component {
     @property.int(0)
     public distanceHandle = 0;
 
-    @property.enum(GrabRotationTypeNames, GrabRotationType.Hand)
-    public rotationType = GrabRotationType.Hand;
+    @property.enum(GrabTransformTypeNames, GrabTransformType.Hand)
+    public transformType = GrabTransformType.Hand;
 
-    /** Pivot axis used when {@link rotationType} is set to {@link GrabRotationType.AroundPivot} */
+    /** Pivot axis used when {@link transformType} is set to {@link GrabRotationType.AroundPivot} */
     @property.enum(PivotAxisNames, PivotAxis.Y)
     public pivotAxis: PivotAxis = PivotAxis.Y;
 
     @property.object()
     public secondaryPivot: Object3D | null = null;
 
-    /** Pivot axis used when {@link rotationType} is set to {@link GrabRotationType.AroundPivot} */
+    /** Pivot axis used when {@link transformType} is set to {@link GrabRotationType.AroundPivot} */
     @property.enum(PivotAxisNames, PivotAxis.Y)
     public secondaryPivotAxis: PivotAxis = PivotAxis.Y;
 
@@ -192,7 +189,7 @@ export class Grabbable extends Component {
 
     /** Public Attributes */
 
-    handles: GrabPoint[] = [];
+    grabPoints: GrabPoint[] = [];
 
     /** Notifies once a grab point is selected for interaction. */
     onGrabPointSelect: Emitter<[this, GrabPoint]> = new Emitter();
@@ -250,13 +247,13 @@ export class Grabbable extends Component {
     private _lerp = false;
 
     init() {
-        this.handles = this.handleObjects.map((o) => {
+        this.grabPoints = this.handleObjects.map((o) => {
             return o.getComponent(GrabPoint) ?? o.addComponent(GrabPoint)!;
         });
-        if (this.handles.length === 0) {
+        if (this.grabPoints.length === 0) {
             const handle =
                 this.object.getComponent(GrabPoint) ?? this.object.addComponent(GrabPoint)!;
-            this.handles.push(handle);
+            this.grabPoints.push(handle);
         }
     }
 
@@ -265,7 +262,7 @@ export class Grabbable extends Component {
     }
 
     onActivate(): void {
-        this._computeWorldSpace = this.rotationType === GrabRotationType.Hand;
+        this._computeWorldSpace = this.transformType === GrabTransformType.Hand;
     }
 
     update(dt: number): void {
@@ -301,8 +298,8 @@ export class Grabbable extends Component {
         const position = vec3.create();
         vec3.copy(position, currentPos);
 
-        switch (this.rotationType) {
-            case GrabRotationType.Hand: {
+        switch (this.transformType) {
+            case GrabTransformType.Hand: {
                 const transform = TempDualQuat.get();
                 if (this.secondaryGrab) {
                     const source = this.primaryGrab!.interactor.object.getPositionWorld();
@@ -321,7 +318,7 @@ export class Grabbable extends Component {
                 TempDualQuat.free();
                 break;
             }
-            case GrabRotationType.AroundPivot: {
+            case GrabTransformType.AroundPivot: {
                 const pos = this.computeInteractorsCenterPosition(TempVec3.get());
                 const pivotRot = TempQuat.get();
                 this.rotationAroundPivot(rotation, pivotRot, pos);
@@ -338,17 +335,17 @@ export class Grabbable extends Component {
             }
             default:
                 console.warn(
-                    componentError(this, `Unrecognized type ${this.rotationType}`)
+                    componentError(this, `Unrecognized type ${this.transformType}`)
                 );
                 break;
         }
         quat.normalize(rotation, rotation);
 
         if (this._lerp) {
-            const primaryHandle = this.handles[this.primaryGrab!.handleId];
+            const primaryHandle = this.grabPoints[this.primaryGrab!.handleId];
             let lerp = primaryHandle.snapLerp;
             if (this.secondaryGrab) {
-                const secondaryHandle = this.handles[this.secondaryGrab.handleId];
+                const secondaryHandle = this.grabPoints[this.secondaryGrab.handleId];
                 lerp = Math.max(lerp, secondaryHandle.snapLerp);
             }
             lerp = clamp(lerp, 0, 1);
@@ -444,7 +441,7 @@ export class Grabbable extends Component {
             this._grabData[1] = second;
         }
 
-        const handle = this.handles[handleId];
+        const handle = this.grabPoints[handleId];
         const source = handle.snap != GrabSnapMode.None ? handle.object : interactor.object;
         this.object.transformPointInverseWorld(grab.localAnchor, source.getPositionWorld());
 
@@ -476,7 +473,7 @@ export class Grabbable extends Component {
         const grab = this._grabData[index];
         if (!grab) return;
 
-        const handle = this.handles[grab.handleId];
+        const handle = this.grabPoints[grab.handleId];
         handle._interactor = null;
 
         this._grabData.splice(index, 1);
@@ -530,7 +527,7 @@ export class Grabbable extends Component {
         source: vec3,
         target: vec3
     ) {
-        const primaryHandle = this.handles[this.primaryGrab!.handleId];
+        const primaryHandle = this.grabPoints[this.primaryGrab!.handleId];
 
         /* Pivot */
         const up = TempVec3.get();
@@ -621,7 +618,7 @@ export class Grabbable extends Component {
         quat2.identity(this._relativeGrabTransform);
         quat.identity(this._pivotGrabTransform);
 
-        const primaryHandle = this.handles[this._grabData[0].handleId];
+        const primaryHandle = this.grabPoints[this._grabData[0].handleId];
         const primaryInteractor = this._grabData[0].interactor.object;
 
         /* Switch between handle or interactor for snapping */
@@ -635,7 +632,7 @@ export class Grabbable extends Component {
 
         let secondaryInteractor: Object3D | null = null;
         if (this._grabData.length > 1) {
-            const secondaryHandle = this.handles[this._grabData[1].handleId];
+            const secondaryHandle = this.grabPoints[this._grabData[1].handleId];
             secondaryInteractor = this._grabData[1].interactor.object;
 
             const target =
@@ -650,8 +647,8 @@ export class Grabbable extends Component {
             TempVec3.free();
         }
 
-        switch (this.rotationType) {
-            case GrabRotationType.Hand: {
+        switch (this.transformType) {
+            case GrabTransformType.Hand: {
                 if (secondaryInteractor) {
                     const objectRotation = this.object.getRotationWorld(TempQuat.get());
                     this.transformDualHand(
@@ -676,7 +673,7 @@ export class Grabbable extends Component {
                 }
                 break;
             }
-            case GrabRotationType.AroundPivot: {
+            case GrabTransformType.AroundPivot: {
                 const rot = this.object.getRotationLocal();
                 const pivotRot = quat.create();
 
@@ -705,7 +702,7 @@ export class Grabbable extends Component {
             }
             default:
                 console.warn(
-                    componentError(this, `Unrecognized type ${this.rotationType}`)
+                    componentError(this, `Unrecognized type ${this.transformType}`)
                 );
                 break;
         }
