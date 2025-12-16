@@ -3,9 +3,9 @@
         "14": {
             "name": "Player",
             "scaling": [
-                0.9999482,
+                0.9999476,
                 1.0,
-                0.9999482
+                0.9999477
             ],
             "components": [
                 {
@@ -29,16 +29,16 @@
                     }
                 }
             ],
-            "rotation": [
-                0.0000023,
-                0.0293924,
-                0.0000015,
-                0.9995679
-            ],
             "translation": [
-                1.266269,
-                0.053289,
-                -2.2022097
+                0.1154934,
+                0.0532887,
+                2.0781853
+            ],
+            "rotation": [
+                -2.3305641150273004e-7,
+                1.0,
+                -4.986453632227494e-7,
+                5.750515015279234e-7
             ]
         },
         "15": {
@@ -1764,7 +1764,7 @@
                 0.0000085
             ],
             "rotation": [
-                1.1749622785828255e-7,
+                1.1749622785828258e-7,
                 0.0,
                 -0.0,
                 1.0
@@ -2733,10 +2733,10 @@
                 0.9999958
             ],
             "rotation": [
-                4.179013615157601e-7,
-                -0.0346959,
-                2.979419662096916e-7,
-                0.9993979
+                4.0829542058418156e-7,
+                0.0,
+                2.8394680384735693e-7,
+                1.0
             ]
         },
         "360": {
@@ -5415,12 +5415,13 @@
     },
     "settings": {
         "project": {
-            "name": "SimpleInteraction",
+            "name": "Playground",
             "version": [
                 1,
                 5,
                 0
-            ]
+            ],
+            "description": "Interaction library playground"
         },
         "xr": {
             "leftEyeObject": "18",
@@ -5437,10 +5438,10 @@
                     "js/"
                 ],
                 "bundling": "esbuild",
-                "output": "Interaction-bundle.js"
+                "output": "Playground-bundle.js"
             },
             "application": {
-                "output": "Interaction-app.js",
+                "output": "Playground-app.js",
                 "bundling": "esbuild",
                 "esbuildFlags": "--format=esm --target=es2022",
                 "entryPoint": "app.js"
