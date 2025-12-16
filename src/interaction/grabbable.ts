@@ -620,6 +620,9 @@ export class Grabbable extends Component {
         this._setKinematicState(true);
         this._lerp = true;
 
+        quat2.identity(this._relativeGrabTransform);
+        quat.identity(this._pivotGrabTransform);
+
         const primaryHandle = this.grabPoints[this._grabData[0].handleId];
         const primaryInteractor = this._grabData[0].interactor.object;
 
@@ -666,7 +669,6 @@ export class Grabbable extends Component {
                 source.getTransformWorld()
             );
         } else {
-            quat2.identity(this._relativeGrabTransform);
             computeRelativeRotation(this._relativeGrabTransform, current, transform);
         }
 
