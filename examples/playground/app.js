@@ -13,7 +13,7 @@ import {loadRuntime} from '@wonderlandengine/api';
 
 /* wle:auto-constants:start */
 const Constants = {
-    ProjectName: 'SimpleInteraction',
+    ProjectName: 'Playground',
     RuntimeBaseName: 'WonderlandRuntime',
     WebXRRequiredFeatures: ['local',],
     WebXROptionalFeatures: ['local','local-floor','hand-tracking','hit-test',],
