@@ -35,7 +35,7 @@ class StaticStack<T> {
  *
  * @hidden
  */
-export const TempVec3 = new StaticStack<vec3>(3);
+export const TempVec3 = new StaticStack<vec3>(3, 16);
 /**
  * Stack of quaternion temporaries.
  *
