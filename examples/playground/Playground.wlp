@@ -12,7 +12,7 @@
                     "type": "player-controller",
                     "player-controller": {
                         "speed": 1.0,
-                        "rotationType": "Smooth",
+                        "transformType": "Smooth",
                         "rotationSpeed": 1.0,
                         "trackedSpace": "205"
                     }
@@ -35,7 +35,7 @@
                 2.0781853
             ],
             "rotation": [
-                -2.3305641150273004e-7,
+                -2.330564115027301e-7,
                 1.0,
                 -4.986453632227494e-7,
                 5.750515015279234e-7
@@ -1764,7 +1764,7 @@
                 0.0000085
             ],
             "rotation": [
-                1.1749622785828258e-7,
+                1.1749622785828265e-7,
                 0.0,
                 -0.0,
                 1.0
@@ -2030,7 +2030,7 @@
                             "lockX": true,
                             "lockZ": true
                         },
-                        "rotationType": "AroundPivot",
+                        "transformType": "AroundPivot",
                         "interactorVisualState": "Hidden"
                     }
                 }
@@ -2688,7 +2688,7 @@
                 {
                     "type": "grabbable",
                     "grabbable": {
-                        "rotationType": "AroundPivot",
+                        "transformType": "AroundPivot",
                         "handleObjects": [
                             "360"
                         ],
@@ -2733,7 +2733,7 @@
                 0.9999958
             ],
             "rotation": [
-                4.0829542058418156e-7,
+                4.082954205841816e-7,
                 0.0,
                 2.8394680384735693e-7,
                 1.0
@@ -2896,7 +2896,7 @@
                             "372",
                             "373"
                         ],
-                        "rotationType": "AroundPivot",
+                        "transformType": "AroundPivot",
                         "translationConstraints": {
                             "lockX": true,
                             "lockY": true,
@@ -3745,7 +3745,7 @@
                         ],
                         "invertRotation": true,
                         "pivotAxis": "Z",
-                        "rotationType": "AroundPivot",
+                        "transformType": "AroundPivot",
                         "secondaryPivotAxis": "Y",
                         "secondaryPivot": "408"
                     }
@@ -4031,7 +4031,7 @@
                         ],
                         "invertRotation": false,
                         "pivotAxis": "Y",
-                        "rotationType": "Hand",
+                        "transformType": "Hand",
                         "secondaryPivot": null,
                         "secondaryPivotAxis": "Y"
                     }

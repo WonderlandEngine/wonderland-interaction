@@ -43,17 +43,17 @@ The grabbable responds to the the interactor based on which [grab point](#grab-p
 
 The grabbable can be transformed in two ways:
 * Using the interactor's position and rotation
-    * Achieved using `GrabRotationType.Hand`
+    * Achieved using `GrabTransformType.Hand`
     * Used for a ball, a weapon, any object that should follow the hand
 * Using the interactor's position, but computing a rotation from it around the grabbable origin
-  * Achieved using `GrabRotationType.Hand`
+  * Achieved using `GrabTransformType.Hand`
   * Used for for doors, levers, basically interactables that have a fixed origin
 
-Example of a grabbable using `GrabRotationType.Hand`:
+Example of a grabbable using `GrabTransformType.Hand`:
 
 https://github.com/user-attachments/assets/3867e909-9bfe-4b7c-9bea-c44b3e7bb1d5
 
-Example of a grabbable using `GrabRotationType.AroundPivot`:
+Example of a grabbable using `GrabTransformType.AroundPivot`:
 
 https://github.com/user-attachments/assets/ea50025c-96c6-4846-9695-38327a218bd2
 

@@ -147,7 +147,7 @@ export class Interactor extends Component {
      * @param interactable The interactable to process.
      */
     public startInteraction(interactable: Grabbable, handleId: number) {
-        const handle = interactable.handles[handleId];
+        const handle = interactable.grabPoints[handleId];
         if (handle.interactor) {
             if (!handle.transferable) return;
             interactable.release(handle.interactor);
@@ -207,8 +207,8 @@ export class Interactor extends Component {
         const grabbables = this.scene.getActiveComponents(Grabbable);
         for (let i = 0; i < grabbables.length; ++i) {
             const grabbable = grabbables[i];
-            for (let h = 0; h < grabbable.handles.length; ++h) {
-                const handle = grabbable.handles[h];
+            for (let h = 0; h < grabbable.grabPoints.length; ++h) {
+                const handle = grabbable.grabPoints[h];
                 let dist = Number.POSITIVE_INFINITY;
                 switch (handle.searchMode) {
                     case GrabSearchMode.Distance: {

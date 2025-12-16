@@ -1,4 +1,3 @@
-import {Object3D} from '@wonderlandengine/api';
 import {quat, quat2, vec3} from 'gl-matrix';
 
 /**
@@ -53,38 +52,21 @@ export const computeRelativeTransform = (function () {
     const _pointA = vec3.create();
     const _pointB = vec3.create();
 
-    return function (out: quat2, source: Object3D, target: Object3D) {
-        const handToLocal = target.getRotationWorld(_rotation);
+    return function (out: quat2, source: quat2, target: quat2) {
+        const handToLocal = quat2.getReal(_rotation, target);
         quat.invert(handToLocal, handToLocal);
 
         /* Transform rotation into target's space */
-        source.getRotationWorld(out as quat);
+        quat2.getReal(out, source);
         quat.multiply(out as quat, handToLocal, out as quat);
         quat.normalize(out, out);
 
         /* Transform position into target's space */
-        const position = source.getPositionWorld(_pointA);
-        const handPosition = target.getPositionWorld(_pointB);
+        const position = quat2.getTranslation(_pointA, source);
+        const handPosition = quat2.getTranslation(_pointB, target);
         vec3.sub(position, position, handPosition);
         vec3.transformQuat(position, position, handToLocal);
 
         return quat2.fromRotationTranslation(out, out, position);
-    };
-})();
-
-/**
- * Compute the relative rotation from source to target.
- *
- * @param out The destination.
- * @param source The source rotation.
- * @param target The target rotation.
- * @returns The `out` parameter.
- */
-export const computeRelativeRotation = (function () {
-    return function (out: quat, source: quat, target: quat) {
-        quat.copy(out, target);
-        quat.invert(out, out);
-        quat.multiply(out, out, source);
-        return quat.normalize(out, out);
     };
 })();
