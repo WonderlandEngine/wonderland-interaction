@@ -16,7 +16,7 @@ import {
     PlayerControllerInput,
 } from './player-controller-input.js';
 import {EPSILON, UP, ZERO_VEC3} from '../constants.js';
-import {componentError} from '../utils/wle.js';
+import {componentError, enumStringKeys} from '../utils/wle.js';
 import {TempVec3} from '../internal-constants.js';
 
 /* Constants */
@@ -44,7 +44,7 @@ export enum RotationType {
     Smooth = 2,
 }
 /** List of string keys for {@link RotationType}. */
-export const RotationTypeNames = ['None', 'Snap', 'Smooth'];
+export const RotationTypeNames = enumStringKeys(RotationType);
 
 /**
  * Simpler character controller for smooth locomotin.

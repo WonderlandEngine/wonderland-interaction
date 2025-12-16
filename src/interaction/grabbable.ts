@@ -31,7 +31,7 @@ import {
 } from './providers.js';
 import {FORWARD, RIGHT, UP} from '../constants.js';
 import {TempDualQuat, TempQuat, TempVec3} from '../internal-constants.js';
-import {componentError} from '../utils/wle.js';
+import {componentError, enumStringKeys} from '../utils/wle.js';
 
 /* Constants */
 
@@ -43,14 +43,16 @@ export enum GrabRotationType {
     Hand = 0,
     AroundPivot,
 }
-const GrabRotationTypeNames = ['Hand', 'AroundPivot'];
+/** List of string keys for {@link GrabRotationType}. */
+const GrabRotationTypeNames = enumStringKeys(GrabRotationType);
 
 export enum PivotAxis {
     X = 0,
     Y,
     Z,
 }
-export const PivotAxisNames = ['X', 'Y', 'Z'];
+/** List of string keys for {@link PivotAxis}. */
+export const PivotAxisNames = enumStringKeys(PivotAxis);
 
 function axis(axis: PivotAxis.X | PivotAxis.Y | PivotAxis.Z) {
     switch (axis) {
@@ -83,6 +85,7 @@ interface GrabData {
 export class Grabbable extends Component {
     static TypeName = 'grabbable';
 
+    /** @override */
     static onRegister(engine: WonderlandEngine) {
         engine.registerComponent(GrabPoint);
     }
@@ -191,6 +194,26 @@ export class Grabbable extends Component {
 
     handles: GrabPoint[] = [];
 
+    /** Notifies once a grab point is selected for interaction. */
+    onGrabPointSelect: Emitter<[this, GrabPoint]> = new Emitter();
+
+    /** Notifies once a grab point is released. */
+    onGrabPointRelease: Emitter<[this, GrabPoint]> = new Emitter();
+
+    /**
+     * Notifies once this object is grabbed.
+     *
+     * @note The notification only occurs when first grabbed.
+     */
+    onGrabStart: Emitter<[this]> = new Emitter();
+
+    /**
+     * Notifies once this object is released.
+     *
+     * @note The notification only occurs when both grip point are free.
+     */
+    onGrabEnd: Emitter<[this]> = new Emitter();
+
     /** Private Attributes. */
 
     /** Cached currently grabbed data. */
@@ -205,12 +228,17 @@ export class Grabbable extends Component {
     private _physx: PhysXComponent | null = null;
 
     /**
-     * Default relative grab transform to apply when updating
-     * the grabable transform every frame.
-     * @hidden
+     * Relative grab transform to apply every update, used
+     * to maintain the object transform when grab starts.
+     *
+     * @note Can be local or world based on the transformation type.
      */
-    private _defaultGrabTransform: quat2 = quat2.create();
+    private _relativeGrabTransform: quat2 = quat2.create();
 
+    /**
+     * Relative pivot's grab transform to apply every update, used
+     * to maintain the object transform when grab starts.
+     */
     private _pivotGrabTransform = quat.create();
 
     private _useUpOrientation: boolean = false;
@@ -220,26 +248,6 @@ export class Grabbable extends Component {
 
     /** `true` if the grabbable should continue lerping to the target rotation / position. */
     private _lerp = false;
-
-    /**
-     * Emitter for the grab start event.
-     * This event is triggered when an interactable object is grabbed.
-     *
-     * This property is a readonly backing field for {@link onGrabStart}.
-     *
-     * @remarks
-     * The notification occurs if any of the two interactables is grabbed
-     */
-    private readonly _onGrabStart: Emitter<[this]> = new Emitter();
-
-    /**
-     * Emitter for the grab end event.
-     * This event is triggered when an interactable object is released, thus the grabbing ended.
-     *
-     * This property is a readonly backing field for {@link onGrabEnd}.
-     *
-     */
-    private readonly _onGrabEnd: Emitter<[this]> = new Emitter();
 
     init() {
         this.handles = this.handleObjects.map((o) => {
@@ -317,7 +325,7 @@ export class Grabbable extends Component {
                 const pos = this.computeInteractorsCenterPosition(TempVec3.get());
                 const pivotRot = TempQuat.get();
                 this.rotationAroundPivot(rotation, pivotRot, pos);
-                quat.multiply(rotation, rotation, this._defaultGrabTransform as quat);
+                quat.multiply(rotation, rotation, this._relativeGrabTransform as quat);
 
                 if (this.secondaryPivot) {
                     quat.multiply(pivotRot, pivotRot, this._pivotGrabTransform as quat);
@@ -428,22 +436,25 @@ export class Grabbable extends Component {
         };
         this._grabData.push(grab);
 
-        const handle = this.handles[handleId];
-        const source = handle.snap != GrabSnapMode.None ? handle.object : interactor.object;
-        this.object.transformPointInverseWorld(grab.localAnchor, source.getPositionWorld());
-
-        this._history.reset(this.object);
-        this._setKinematicState(true);
-
-        if (this._grabData.length > 1 && handleId === 0) {
+        const dual = this._grabData.length > 1;
+        if (dual && handleId === 0) {
             /* Ensure primary grab is always first */
             const second = this._grabData[0];
             this._grabData[0] = this._grabData[1];
             this._grabData[1] = second;
         }
 
+        const handle = this.handles[handleId];
+        const source = handle.snap != GrabSnapMode.None ? handle.object : interactor.object;
+        this.object.transformPointInverseWorld(grab.localAnchor, source.getPositionWorld());
+
+        this._history.reset(this.object);
         this.initializeGrab();
-        this._onGrabStart.notify(this);
+
+        this.onGrabPointSelect.notify(this, handle);
+        if (!dual) {
+            this.onGrabStart.notify(this);
+        }
     }
 
     /**
@@ -469,12 +480,17 @@ export class Grabbable extends Component {
         handle._interactor = null;
 
         this._grabData.splice(index, 1);
+        const released = !this._grabData.length;
 
-        if (this._grabData.length) {
+        if (!released) {
             this.initializeGrab();
         } else if (this.canThrow) {
             this.throw(interactor);
-            this._onGrabEnd.notify(this);
+        }
+
+        this.onGrabPointRelease.notify(this, handle);
+        if (released) {
+            this.onGrabEnd.notify(this);
         }
     }
 
@@ -493,25 +509,15 @@ export class Grabbable extends Component {
         return this._grabData[1];
     }
 
-    /** Notified on a select start. */
-    get onGrabStart(): Emitter<[this]> {
-        return this._onGrabStart;
-    }
-
-    /** Notified on a select end. */
-    get onGrabEnd(): Emitter<[this]> {
-        return this._onGrabEnd;
-    }
-
     protected transformHand(out: quat2, index: number) {
         const grab = this._grabData[index]!;
         const hand = grab.interactor.object;
 
-        /* `_defaultGrabTransform` is in the hand space, thus multiplyig
+        /* `_relativeGrabTransform` is in the hand space, thus multiplyig
          * the hand transform by the object's transform leads to
          * its world space transform. */
         hand.getTransformWorld(out);
-        quat2.multiply(out, out, this._defaultGrabTransform);
+        quat2.multiply(out, out, this._relativeGrabTransform);
         return out;
     }
 
@@ -535,7 +541,7 @@ export class Grabbable extends Component {
         }
 
         const pivotRotation = rotateFreeDual(TempQuat.get(), source, target, up);
-        quat.multiply(pivotRotation, pivotRotation, this._defaultGrabTransform as quat);
+        quat.multiply(pivotRotation, pivotRotation, this._relativeGrabTransform as quat);
         const pivotToWorld = quat2.fromRotationTranslation(
             TempDualQuat.get(),
             pivotRotation,
@@ -609,9 +615,10 @@ export class Grabbable extends Component {
      * @note Triggered when single grab occurs, or when second hand is released.
      */
     protected initializeGrab() {
+        this._setKinematicState(true);
         this._lerp = true;
 
-        quat2.identity(this._defaultGrabTransform);
+        quat2.identity(this._relativeGrabTransform);
         quat.identity(this._pivotGrabTransform);
 
         const primaryHandle = this.handles[this._grabData[0].handleId];
@@ -648,21 +655,21 @@ export class Grabbable extends Component {
                 if (secondaryInteractor) {
                     const objectRotation = this.object.getRotationWorld(TempQuat.get());
                     this.transformDualHand(
-                        this._defaultGrabTransform,
+                        this._relativeGrabTransform,
                         secondaryInteractor,
                         sourcePosWorld,
                         targetPosWorld
                     );
                     computeRelativeRotation(
-                        this._defaultGrabTransform as quat,
+                        this._relativeGrabTransform as quat,
                         objectRotation,
-                        this._defaultGrabTransform as quat
+                        this._relativeGrabTransform as quat
                     );
                     TempDualQuat.free();
                     TempQuat.free();
                 } else {
                     computeRelativeTransform(
-                        this._defaultGrabTransform,
+                        this._relativeGrabTransform,
                         this.object,
                         source
                     );
@@ -678,14 +685,14 @@ export class Grabbable extends Component {
 
                 this.secondaryPivot?.getRotationLocal(pivotRot);
                 this.rotationAroundPivot(
-                    this._defaultGrabTransform,
+                    this._relativeGrabTransform,
                     this._pivotGrabTransform,
                     pos
                 );
                 computeRelativeRotation(
-                    this._defaultGrabTransform,
+                    this._relativeGrabTransform,
                     rot,
-                    this._defaultGrabTransform
+                    this._relativeGrabTransform
                 );
                 computeRelativeRotation(
                     this._pivotGrabTransform,

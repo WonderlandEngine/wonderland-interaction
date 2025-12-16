@@ -1,12 +1,20 @@
 import {Component, property} from '@wonderlandengine/api';
 import {Interactor} from './interactor.js';
+import {enumStringKeys} from '../utils/wle.js';
 
+/**
+ * Visual state to apply to an interactor.
+ */
 export enum InteractorVisualState {
+    /** Unspecified. */
     None = 0,
+    /** Interactor mesh should be set to visible. */
     Visible,
+    /** Interactor mesh should be hidden. */
     Hidden,
 }
-export const InteractorVisualStateNames = ['None', 'Visible', 'Hidden'];
+/** List of string keys for {@link InteractorVisualState}. */
+export const InteractorVisualStateNames = enumStringKeys(InteractorVisualState);
 
 /**
  * Describe how the {@link Interactor} interacts with a {@link GrabPoint}.
@@ -24,7 +32,7 @@ export enum GrabSearchMode {
     Overlap = 1,
 }
 /** List of string keys for {@link GrabSearchMode}. */
-export const GrabSearchModeNames = ['Distance', 'Overlap'];
+export const GrabSearchModeNames = enumStringKeys(GrabSearchMode);
 
 /**
  * Describe how the {@link Grabbable} behave once the interaction starts
@@ -43,7 +51,7 @@ export enum GrabSnapMode {
     PositionRotation = 1,
 }
 /** List of string keys for {@link GrabSnapMode}. */
-export const GrabSnapModeNames = ['None', 'PositionRotation'];
+export const GrabSnapModeNames = enumStringKeys(GrabSnapMode);
 
 /**
  * Link used to specify how / where a {@link Grabbable} is grabbed.
