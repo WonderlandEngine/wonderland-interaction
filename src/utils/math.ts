@@ -48,18 +48,19 @@ export function isPointEqual(a: vec3, b: vec3, epsilon: number) {
  * @returns The `out` parameter.
  */
 export const computeRelativeTransform = (function () {
-    const _rotation = quat.create();
+    const _rotationA = quat.create();
+    const _rotationB = quat.create();
     const _pointA = vec3.create();
     const _pointB = vec3.create();
 
     return function (out: quat2, source: quat2, target: quat2) {
-        const handToLocal = quat2.getReal(_rotation, target);
+        const handToLocal = quat2.getReal(_rotationA, target);
         quat.invert(handToLocal, handToLocal);
 
         /* Transform rotation into target's space */
-        quat2.getReal(out, source);
-        quat.multiply(out as quat, handToLocal, out as quat);
-        quat.normalize(out, out);
+        const rot = quat2.getReal(_rotationB, source);
+        quat.multiply(rot, handToLocal, rot);
+        quat.normalize(rot, rot);
 
         /* Transform position into target's space */
         const position = quat2.getTranslation(_pointA, source);
@@ -67,6 +68,6 @@ export const computeRelativeTransform = (function () {
         vec3.sub(position, position, handPosition);
         vec3.transformQuat(position, position, handToLocal);
 
-        return quat2.fromRotationTranslation(out, out, position);
+        return quat2.fromRotationTranslation(out, rot, position);
     };
 })();
