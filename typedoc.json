@@ -7,5 +7,7 @@
     "excludeExternals": true,
     "excludeInternal": true,
     "githubPages": true,
-    "visibilityFilters": {}
+    "visibilityFilters": {},
+    "includes": ".",
+    "logLevel": "Error"
 }
