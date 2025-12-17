@@ -6,5 +6,6 @@
     "excludeProtected": true,
     "excludeExternals": true,
     "excludeInternal": true,
+    "githubPages": true,
     "visibilityFilters": {}
 }
