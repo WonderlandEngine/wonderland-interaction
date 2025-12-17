@@ -17,7 +17,7 @@ import {
 } from './player-controller-input.js';
 import {EPSILON, FORWARD, UP, ZERO_VEC3} from '../constants.js';
 import {componentError, enumStringKeys} from '../utils/wle.js';
-import {TempVec3} from '../internal-constants.js';
+import {TempDualQuat, TempVec3} from '../internal-constants.js';
 import {toRad} from '../utils/math.js';
 
 /* Constants */
@@ -302,33 +302,38 @@ export class PlayerController extends Component {
     }
 
     rotate(angle: number) {
-        const source_world = quat2.create();
-        {
-            const forward = this._activeCamera.getForwardWorld(vec3.create());
-            forward[1] = 0;
-            vec3.normalize(forward, forward);
+        /* Retrieve eye world transform.
+         *
+         * We do not directly read it from the active camera in order
+         * to remove any tilt rotation from the VR headset.
+         */
+        const source = TempDualQuat.get();
 
-            const r = quat.rotationTo(quat.create(), FORWARD, forward);
-            /* Do not take into account eyes rotation directly to avoid tilt */
-            const p = this._activeCamera.getPositionWorld(vec3.create());
+        const forward = this._activeCamera.getForwardWorld(TempVec3.get());
+        forward[1] = 0;
+        vec3.normalize(forward, forward);
+        quat.rotationTo(source, FORWARD, forward);
+        quat2.fromRotationTranslation(
+            source,
+            source,
+            this._activeCamera.getPositionWorld(forward)
+        );
 
-            quat2.fromRotationTranslation(source_world, r, p);
-        }
+        /* Eye target world transform */
+        const target = quat2.rotateY(TempDualQuat.get(), source, toRad(angle));
 
-        const target_world = quat2.copy(quat2.create(), source_world);
-        quat2.rotateY(target_world, target_world, toRad(angle));
-
-        quat2.invert(source_world, source_world);
-        const delta = quat2.multiply(quat2.create(), target_world, source_world);
+        /* World space delta between source and target */
+        const inverse = quat2.invert(source, source);
+        const delta = quat2.multiply(target, target, inverse);
         quat2.normalize(delta, delta);
 
-        const transform = quat2.multiply(
-            quat2.create(),
-            delta,
-            this.trackedSpace.getTransformWorld()
-        );
+        /* Apply delta to parent tracked space */
+        const transform = this.trackedSpace.getTransformWorld(TempDualQuat.get());
+        quat2.multiply(transform, delta, transform);
         quat2.normalize(transform, transform);
-
         this.trackedSpace.setTransformWorld(transform);
+
+        TempDualQuat.free(3);
+        TempVec3.free();
     }
 }
