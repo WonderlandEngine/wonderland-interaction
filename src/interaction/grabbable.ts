@@ -1,6 +1,7 @@
 import {vec3, quat2, quat} from 'gl-matrix';
 import {
     clamp,
+    property,
     Component,
     Emitter,
     Object3D,
@@ -8,7 +9,6 @@ import {
     Property,
     WonderlandEngine,
 } from '@wonderlandengine/api';
-import {property} from '@wonderlandengine/api/decorators.js';
 
 import {Interactor} from './interactor.js';
 import {HistoryTracker} from '../history-tracker.js';
@@ -263,14 +263,16 @@ export class Grabbable extends Component {
     update(dt: number): void {
         for (let i = this._grabData.length - 1; i >= 0; --i) {
             const grab = this._grabData[i];
-            // TODO: Remove alloc.
-            const handlePosition = this.object.transformPointWorld(
-                vec3.create(),
+            const target = this.object.transformPointWorld(
+                TempVec3.get(),
                 grab.localAnchor
             );
-            const handPosition = grab.interactor.object.getPositionWorld();
-            const squaredDistance = vec3.squaredDistance(handPosition, handlePosition);
+            const source = grab.interactor.object.getPositionWorld(TempVec3.get());
+            const squaredDistance = vec3.squaredDistance(source, target);
+            TempVec3.free(2);
+
             if (squaredDistance <= this.releaseDistance * this.releaseDistance) continue;
+
             /* Hands are too far apart, release the second handle. */
             this.release(grab.interactor);
         }
@@ -280,8 +282,8 @@ export class Grabbable extends Component {
         const primaryInteractor = this.primaryGrab!.interactor.object;
         const secondaryInteractor = this.secondaryGrab?.interactor.object ?? null;
 
-        const currentPos = vec3.create();
-        const currentRot = quat.create();
+        const currentPos = TempVec3.get();
+        const currentRot = TempQuat.get();
         if (this._computeWorldSpace) {
             this.object.getPositionWorld(currentPos);
             this.object.getRotationWorld(currentRot);
@@ -290,10 +292,10 @@ export class Grabbable extends Component {
             this.object.getRotationLocal(currentRot);
         }
 
-        const rotation = quat.create();
+        const rotation = TempQuat.get();
         vec3.copy(rotation, currentRot);
 
-        const position = vec3.create();
+        const position = TempVec3.get();
         vec3.copy(position, currentPos);
 
         const transform = TempDualQuat.get();
@@ -334,7 +336,8 @@ export class Grabbable extends Component {
             this.secondaryPivot.setRotationLocal(pivotRot);
         }
 
-        TempQuat.free();
+        TempVec3.free(2);
+        TempQuat.free(3);
         TempDualQuat.free();
 
         const xrPose = this.primaryGrab!.interactor.input.xrPose;
@@ -413,7 +416,9 @@ export class Grabbable extends Component {
 
         const handle = this.grabPoints[handleId];
         const source = handle.snap != GrabSnapMode.None ? handle.object : interactor.object;
-        this.object.transformPointInverseWorld(grab.localAnchor, source.getPositionWorld());
+
+        source.getPositionWorld(grab.localAnchor);
+        this.object.transformPointInverseWorld(grab.localAnchor);
 
         this._history.reset(this.object);
         this.initializeGrab();
@@ -485,7 +490,7 @@ export class Grabbable extends Component {
         quat2.identity(out);
         quat.identity(pivotOut);
 
-        const source = primary.getPositionWorld();
+        const source = primary.getPositionWorld(TempVec3.get());
         const target = vec3.copy(TempVec3.get(), source);
         if (secondary) {
             secondary.getPositionWorld(target);
@@ -504,7 +509,7 @@ export class Grabbable extends Component {
             case GrabTransformType.AroundPivot: {
                 const pos = vec3.lerp(TempVec3.get(), source, target, 0.5);
                 this.rotationAroundPivot(out, pivotOut, pos);
-                quat2.fromRotationTranslation(out, out, this.object.getPositionLocal());
+                quat2.fromRotationTranslation(out, out, this.object.getPositionLocal(pos));
                 TempVec3.free();
                 break;
             }
@@ -515,7 +520,7 @@ export class Grabbable extends Component {
                 break;
         }
 
-        TempVec3.free();
+        TempVec3.free(2);
     }
 
     protected transformHand(out: quat2, source: Object3D) {
@@ -607,7 +612,7 @@ export class Grabbable extends Component {
     }
 
     /**
-     * Initialize single hand grab
+     * Initializes grab state.
      *
      * @note Triggered when single grab occurs, or when second hand is released.
      */
@@ -645,12 +650,11 @@ export class Grabbable extends Component {
 
         /* Do not use `_relativeGrabTransform` and `_pivotGrabTransform` directly.
          * The inner computation relies on those variables, we want them to be identity at this point. */
-
         const transform = TempDualQuat.get();
         const pivotTransform = TempDualQuat.get();
         this.computeTransform(transform, pivotTransform, source, target);
 
-        const current = quat2.create();
+        const current = this._relativeGrabTransform;
         if (this._computeWorldSpace) {
             this.object.getTransformWorld(current);
         } else {
@@ -658,7 +662,7 @@ export class Grabbable extends Component {
         }
         computeRelativeTransform(this._relativeGrabTransform as quat, current, transform);
 
-        const pivotCurrent = quat2.create();
+        const pivotCurrent = this._pivotGrabTransform;
         this.secondaryPivot?.getRotationLocal(pivotCurrent);
         computeRelativeTransform(this._pivotGrabTransform, pivotCurrent, pivotTransform);
 
