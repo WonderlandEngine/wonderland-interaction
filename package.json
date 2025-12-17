@@ -1,7 +1,7 @@
 {
-    "name": "wle-interaction",
-    "version": "1.0.0-alpha.0",
-    "description": "Interaction library",
+    "name": "@wonderlandengine/interaction",
+    "version": "1.0.0-rc.0",
+    "description": "Wonderland Engine interaction and locomotion library",
     "type": "module",
     "main": "dist/index.js",
     "module": "dist/index.js",
