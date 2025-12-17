@@ -4,17 +4,44 @@ on:
         branches:
             - '*'
         #- [main]
+    release:
+    workflow_dispatch:
+
+permissions:
+    contents: read
+    pages: write
+    id-token: write
+
 jobs:
     docs:
+        name: Deploy Documentation
+
+        # Specify runner + deployment step
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v6
-            - uses: erikyo/tsdoc-action@v1
+            - name: Checkout code
+              uses: actions/checkout@v3
+            - name: Setup Node
+              uses: actions/setup-node@v3
               with:
-                  source_dir: ./src
+                  node-version: 16
+                  cache: 'npm'
+
+            - name: TSDoc Action
+              uses: erikyo/tsdoc-action@v1
+              with:
+                  source_dir: ./src/*
+                  githubPages: true
                   output_dir: ./docs
+                  front_page: README.md
+
             - name: Deploy
-              uses: peaceiris/actions-gh-pages@v4
+              uses:
+                  peaceiris/actions-gh-pages@v4
+                  # If you're changing the branch from main,
+                  # also change the `main` in `refs/heads/main`
+                  # below accordingly.
+                  #i f: github.ref == 'refs/heads/main'
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }}
                   publish_dir: ./docs
