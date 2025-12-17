@@ -9,15 +9,16 @@ import {
     ViewComponent,
     WonderlandEngine,
 } from '@wonderlandengine/api';
-import {vec3} from 'gl-matrix';
+import {quat, quat2, vec3} from 'gl-matrix';
 import {ActiveCamera} from '../helpers/active-camera.js';
 import {
     DefaultPlayerControllerInput,
     PlayerControllerInput,
 } from './player-controller-input.js';
-import {EPSILON, UP, ZERO_VEC3} from '../constants.js';
+import {EPSILON, FORWARD, UP, ZERO_VEC3} from '../constants.js';
 import {componentError, enumStringKeys} from '../utils/wle.js';
 import {TempVec3} from '../internal-constants.js';
+import {toRad} from '../utils/math.js';
 
 /* Constants */
 
@@ -268,7 +269,7 @@ export class PlayerController extends Component {
             }
         }
         if (Math.abs(rotation) > EPSILON) {
-            this.trackedSpace.rotateAxisAngleDegLocal(UP, -rotation);
+            this.rotate(-rotation);
         }
 
         /* Position update */
@@ -298,5 +299,36 @@ export class PlayerController extends Component {
         this._physx.linearVelocity = direction;
 
         TempVec3.free();
+    }
+
+    rotate(angle: number) {
+        const source_world = quat2.create();
+        {
+            const forward = this._activeCamera.getForwardWorld(vec3.create());
+            forward[1] = 0;
+            vec3.normalize(forward, forward);
+
+            const r = quat.rotationTo(quat.create(), FORWARD, forward);
+            /* Do not take into account eyes rotation directly to avoid tilt */
+            const p = this._activeCamera.getPositionWorld(vec3.create());
+
+            quat2.fromRotationTranslation(source_world, r, p);
+        }
+
+        const target_world = quat2.copy(quat2.create(), source_world);
+        quat2.rotateY(target_world, target_world, toRad(angle));
+
+        quat2.invert(source_world, source_world);
+        const delta = quat2.multiply(quat2.create(), target_world, source_world);
+        quat2.normalize(delta, delta);
+
+        const transform = quat2.multiply(
+            quat2.create(),
+            delta,
+            this.trackedSpace.getTransformWorld()
+        );
+        quat2.normalize(transform, transform);
+
+        this.trackedSpace.setTransformWorld(transform);
     }
 }
