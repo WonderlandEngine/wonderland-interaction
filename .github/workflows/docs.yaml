@@ -1,76 +1,59 @@
+# GitHub Actions workflow for building and deploying documentation
+# This workflow is triggered on pushes to main, releases, or manual dispatch
 name: Build and Deploy Docs
 on:
     push:
-        branches:
-            - '*'
-        #- [main]
+        branches: [main]
     release:
     workflow_dispatch:
 
+# Required permissions for GitHub Pages deployment
 permissions:
-    contents: write
-    pages: write
-    id-token: write
+    pages: write # to deploy to Pages
+    id-token: write # to verify the deployment originates from an appropriate source
 
 jobs:
     docs:
         name: Deploy Documentation
 
+        # GitHub Pages deployment environment
         environment:
             name: github-pages
             url: ${{steps.deployment.outputs.page_url}}
 
+        # Run on Ubuntu Linux
         runs-on: ubuntu-latest
         steps:
+            # Checkout the repository code
             - name: Checkout code
               uses: actions/checkout@v6
 
+            # Set up Node.js environment
             - name: Setup Node
               uses: actions/setup-node@v6
               with:
                   node-version: 16
                   cache: 'npm'
 
+            # Install project dependencies
             - name: Install dependencies
               run: npm install
 
+            # Build the documentation using the docs script
             - name: Build Docs
               run: npm run docs
 
+            # Configure GitHub Pages
             - name: Setup Pages
               uses: actions/configure-pages@v5
+
+            # Upload built documentation as artifact
             - name: Upload Artifact
               uses: actions/upload-pages-artifact@v4
               with:
-                  # upload entire directory
                   path: './docs'
+
+            # Deploy the artifact to GitHub Pages
             - name: Deploy to GitHub Pages
               id: deployment
               uses: actions/deploy-pages@v4
-
-            # - name: TSDoc Action
-            #   uses: erikyo/tsdoc-action@v1
-            #   with:
-            #         source_dir: ./src/*
-            #         entryPoints: ./src/index.ts
-            #         entryPointStrategy: expand
-            #         excludePrivate: true
-            #         excludeProtected: true
-            #         excludeExternals: true
-            #         excludeInternal: true
-            # with:
-            #   source_dir: ./src/*
-            #   githubPages: true
-            #   output_dir: ./docs
-            #   front_page: README.md
-
-            # - name: Deploy
-            #   uses:
-            #       peaceiris/actions-gh-pages@v4
-            #       # If you're changing the branch from main,
-            #       # also change the `main` in `refs/heads/main`
-            #       # below accordingly.
-            #       #i f: github.ref == 'refs/heads/main'
-            #   with:
-            #       github_token: ${{ secrets.GITHUB_TOKEN }}
-            #       publish_dir: ./docs
