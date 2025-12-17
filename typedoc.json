@@ -6,6 +6,9 @@
     "excludeProtected": true,
     "excludeExternals": true,
     "excludeInternal": true,
-    "visibilityFilters": {
-    }
+    "githubPages": true,
+    "visibilityFilters": {},
+    "includes": ".",
+    "logLevel": "Error",
+    "hideGenerator": true
 }

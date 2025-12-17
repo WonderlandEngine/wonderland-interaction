@@ -4,6 +4,7 @@ deploy/
 cache/
 .editor/
 dist/
+docs/
 
 # Dependency directories
 node_modules/
