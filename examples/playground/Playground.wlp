@@ -1106,7 +1106,7 @@
                     "type": "mesh",
                     "mesh": {
                         "mesh": "8",
-                        "material": "22"
+                        "material": "26"
                     }
                 }
             ],
@@ -1221,7 +1221,7 @@
                     "type": "mesh",
                     "mesh": {
                         "mesh": "8",
-                        "material": "26"
+                        "material": "22"
                     }
                 }
             ],
@@ -1240,7 +1240,7 @@
                     "type": "mesh",
                     "mesh": {
                         "mesh": "8",
-                        "material": "26"
+                        "material": "22"
                     }
                 }
             ],
@@ -4280,7 +4280,7 @@
                 {
                     "type": "mesh",
                     "mesh": {
-                        "material": "22",
+                        "material": "26",
                         "mesh": "8"
                     }
                 }
@@ -4356,7 +4356,7 @@
                 {
                     "type": "mesh",
                     "mesh": {
-                        "material": "26",
+                        "material": "22",
                         "mesh": "8"
                     }
                 }
@@ -4365,8 +4365,8 @@
         "298": {
             "name": "Mesh",
             "rotation": [
-                -0.7071068,
-                0.0,
+                -0.7071066,
+                -0.0,
                 0.0,
                 0.7071068
             ],
@@ -4375,10 +4375,20 @@
                 {
                     "type": "mesh",
                     "mesh": {
-                        "material": "26",
+                        "material": "22",
                         "mesh": "8"
                     }
                 }
+            ],
+            "translation": [
+                0.0000076,
+                -0.0000152,
+                0.0
+            ],
+            "scaling": [
+                1.0,
+                0.9999996,
+                0.9999996
             ]
         },
         "440": {

@@ -171,9 +171,6 @@ export class Grabbable extends Component {
     @property.enum(PivotAxisNames, PivotAxis.Y)
     public secondaryPivotAxis: PivotAxis = PivotAxis.Y;
 
-    @property.bool(false)
-    public invertRotation = false;
-
     /**
      * Visual state to apply to the interactor once interaction occurs.
      *
@@ -589,7 +586,6 @@ export class Grabbable extends Component {
             positionWorld
         );
         vec3.normalize(localPos, localPos);
-        vec3.scale(localPos, localPos, this.invertRotation ? -1 : 1);
         rotateAroundPivot(out, axis(this.pivotAxis), localPos);
         quat.multiply(out, out, this._relativeGrabTransform as quat);
         TempVec3.free();
@@ -605,7 +601,6 @@ export class Grabbable extends Component {
             positionWorld
         );
         vec3.normalize(pos, pos);
-        vec3.scale(pos, pos, this.invertRotation ? -1 : 1);
         rotateAroundPivot(pivotOut, axis(this.secondaryPivotAxis), pos);
         quat.multiply(pivotOut, pivotOut, this._pivotGrabTransform as quat);
         TempVec3.free();

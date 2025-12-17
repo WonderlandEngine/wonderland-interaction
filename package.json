@@ -1,13 +1,18 @@
 {
-    "name": "wle-interaction",
-    "version": "1.0.0-alpha.0",
-    "description": "Interaction library",
+    "name": "@wonderlandengine/interaction",
+    "version": "1.0.0-rc.0",
+    "description": "Wonderland Engine interaction and locomotion library",
     "type": "module",
     "main": "dist/index.js",
     "module": "dist/index.js",
     "types": "dist/index.d.ts",
+    "author": "Wonderland GmbH",
     "license": "MIT",
     "wonderlandengine": {},
+    "contributors": [
+        {"name": "David Peicho", "email": "david.peicho@createworlds.com"},
+        {"name": "Timmy Kokke", "email": "timmy.kokke@createworlds.com"}
+    ],
     "prettier": "@wonderlandengine/prettier-config",
     "scripts": {
         "build": "tsc",
