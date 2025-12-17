@@ -16,16 +16,19 @@ jobs:
     docs:
         name: Deploy Documentation
 
-        # Specify runner + deployment step
         runs-on: ubuntu-latest
         steps:
             - name: Checkout code
-              uses: actions/checkout@v3
+              uses: actions/checkout@v6
+
             - name: Setup Node
-              uses: actions/setup-node@v3
+              uses: actions/setup-node@v6
               with:
                   node-version: 16
                   cache: 'npm'
+
+            - name: Install dependencies
+              run: npm install
 
             - name: TSDoc Action
               uses: erikyo/tsdoc-action@v1
