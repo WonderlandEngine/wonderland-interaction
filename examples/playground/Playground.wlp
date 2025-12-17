@@ -30,16 +30,16 @@
                     "active": true
                 }
             ],
-            "translation": [
-                0.1154934,
-                0.0532886,
-                1.5264135
-            ],
             "rotation": [
                 0.0,
                 0.0,
                 0.0,
                 1.0
+            ],
+            "translation": [
+                0.0,
+                0.1,
+                0.0
             ]
         },
         "15": {
@@ -84,9 +84,9 @@
                 0.7069638
             ],
             "scaling": [
-                5.0,
-                4.9999995,
-                4.9999995
+                3.5,
+                3.5,
+                3.5
             ],
             "parent": "241"
         },
@@ -205,34 +205,6 @@
                 -0.8296068,
                 1.931138,
                 1.0258713
-            ],
-            "rotation": [
-                0.0,
-                0.0,
-                0.0,
-                1.0
-            ],
-            "scaling": [
-                1.0,
-                1.0,
-                1.0
-            ],
-            "parent": "241"
-        },
-        "23": {
-            "name": "Light.000",
-            "components": [
-                {
-                    "type": "light",
-                    "light": {
-                        "intensity": 3.3329999
-                    }
-                }
-            ],
-            "translation": [
-                -1.0,
-                3.0,
-                -1.0
             ],
             "rotation": [
                 0.0,
@@ -886,28 +858,6 @@
                 1.0
             ]
         },
-        "208": {
-            "link": {
-                "name": "TeleportIndicator",
-                "file": "models\\teleport-indicator.glb"
-            },
-            "translation": [
-                0.0,
-                0.0099999,
-                1.156635
-            ],
-            "rotation": [
-                0.0,
-                0.0,
-                0.0,
-                1.0
-            ],
-            "scaling": [
-                1.0000001,
-                1.0,
-                1.0
-            ]
-        },
         "215": {
             "name": "3DCursorHitRight",
             "components": [
@@ -1067,7 +1017,7 @@
                             "extents": [
                                 1.75,
                                 0.5,
-                                0.75
+                                0.5
                             ]
                         },
                         "bounciness": 0.0
@@ -1076,24 +1026,24 @@
                 }
             ],
             "rotation": [
-                0.0,
-                0.0,
-                0.0,
+                -3.3068522498069797e-7,
+                -0.0,
+                -0.0,
                 1.0
             ],
             "scaling": [
                 1.75,
                 0.5,
-                0.75
+                0.5
+            ],
+            "translation": [
+                2.7303553906676825e-7,
+                0.5,
+                -1.9939140827318624e-7
             ]
         },
         "243": {
-            "name": "Weapon Double Hand",
-            "translation": [
-                -0.9450463,
-                0.1490566,
-                0.3617769
-            ],
+            "name": "Grabbable",
             "components": [
                 {
                     "type": "grabbable",
@@ -1135,17 +1085,17 @@
                 }
             ],
             "scaling": [
-                0.9999134,
-                0.9999133,
-                1.0
+                0.9999125,
+                0.9999132,
+                0.9999994
             ],
             "rotation": [
-                0.0,
-                0.0,
+                -1.0768044234055196e-8,
+                -1.0218044188547992e-8,
                 0.7071033,
-                0.7071101
+                0.7071102
             ],
-            "parent": "438"
+            "parent": "442"
         },
         "244": {
             "name": "Base",
@@ -1209,7 +1159,7 @@
             "name": "GrabFront",
             "parent": "243",
             "rotation": [
-                -0.7071068,
+                0.7071068,
                 0.0,
                 0.0,
                 0.7071068
@@ -1619,247 +1569,22 @@
             ]
         },
         "293": {
-            "name": "SingleHand Objects",
+            "name": "SingleHandObjects",
             "rotation": [
-                0.0,
-                0.0,
-                0.0,
-                1.0
+                7.176203098424594e-7,
+                0.7072608,
+                -2.3619838884769706e-7,
+                0.7069527
             ],
             "scaling": [
+                1.0000001,
                 1.0,
-                1.0,
-                1.0
+                1.0000001
             ],
             "translation": [
-                -2.0,
-                0.5,
-                0.0
-            ]
-        },
-        "294": {
-            "link": {
-                "name": "Sketchfab_model",
-                "file": "models\\shotgun.glb"
-            },
-            "parent": "308",
-            "rotation": [
-                0.0,
-                0.0,
-                0.0,
-                1.0
-            ],
-            "scaling": [
-                0.0074999,
-                0.0074999,
-                0.0074999
-            ]
-        },
-        "295": {
-            "link": {
-                "name": "1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
-                "file": "models\\shotgun.glb"
-            },
-            "parent": "294"
-        },
-        "296": {
-            "link": {
-                "name": "RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
-                "file": "models\\shotgun.glb"
-            },
-            "parent": "295"
-        },
-        "297": {
-            "link": {
-                "name": "shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
-                "file": "models\\shotgun.glb"
-            },
-            "parent": "296"
-        },
-        "298": {
-            "link": {
-                "name": "base<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
-                "file": "models\\shotgun.glb"
-            },
-            "parent": "297"
-        },
-        "299": {
-            "link": {
-                "name": "base_shotgun_0<base<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
-                "file": "models\\shotgun.glb"
-            },
-            "parent": "298",
-            "translation": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "rotation": [
+                -2.75,
                 -0.0,
-                0.0,
-                0.0,
-                1.0
-            ],
-            "scaling": [
-                1.0,
-                1.0,
-                1.0
-            ],
-            "components": [
-                {
-                    "originalIndex": 0,
-                    "active": true
-                }
-            ]
-        },
-        "300": {
-            "link": {
-                "name": "loader<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
-                "file": "models\\shotgun.glb"
-            },
-            "parent": "297"
-        },
-        "301": {
-            "link": {
-                "name": "loader_shotgun_0<loader<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
-                "file": "models\\shotgun.glb"
-            },
-            "parent": "300"
-        },
-        "302": {
-            "link": {
-                "name": "trigger<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
-                "file": "models\\shotgun.glb"
-            },
-            "parent": "297"
-        },
-        "303": {
-            "link": {
-                "name": "trigger_shotgun_0<trigger<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
-                "file": "models\\shotgun.glb"
-            },
-            "parent": "302"
-        },
-        "304": {
-            "link": {
-                "name": "pump<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
-                "file": "models\\shotgun.glb"
-            },
-            "parent": "297"
-        },
-        "305": {
-            "link": {
-                "name": "pump_shotgun_0<pump<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
-                "file": "models\\shotgun.glb"
-            },
-            "parent": "304",
-            "components": [
-                {
-                    "originalIndex": 0,
-                    "active": true
-                }
-            ],
-            "translation": [
-                -0.0002441,
-                -0.000122,
-                0.0000085
-            ],
-            "rotation": [
-                1.1749622785828265e-7,
-                0.0,
-                -0.0,
-                1.0
-            ],
-            "scaling": [
-                1.0,
-                1.0,
-                1.0
-            ]
-        },
-        "306": {
-            "link": {
-                "name": "slug<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
-                "file": "models\\shotgun.glb"
-            },
-            "parent": "297"
-        },
-        "307": {
-            "link": {
-                "name": "slug_shotgun_0<slug<shotgun<RootNode<1ff130709db24cd69f68874d2363995b.fbx<Sketchfab_model",
-                "file": "models\\shotgun.glb"
-            },
-            "parent": "306"
-        },
-        "308": {
-            "name": "Shotgun",
-            "parent": "438",
-            "translation": [
-                0.8365294,
-                0.2089627,
-                0.584504
-            ],
-            "components": [
-                {
-                    "type": "grabbable",
-                    "grabbable": {
-                        "handleObjects": [
-                            "309",
-                            "310"
-                        ]
-                    }
-                }
-            ],
-            "scaling": [
-                0.9999981,
-                0.9999969,
-                0.9999978
-            ],
-            "rotation": [
-                0.0002439,
-                0.7071093,
-                0.707104,
-                -0.0002437
-            ]
-        },
-        "309": {
-            "name": "GrabMain",
-            "parent": "308",
-            "translation": [
-                -0.0052176,
-                0.0185649,
-                -0.0436809
-            ],
-            "scaling": [
-                0.9999968,
-                0.9999956,
-                0.9999935
-            ],
-            "components": [],
-            "rotation": [
-                0.0,
-                0.994836,
-                0.1014943,
-                -9.573309256438733e-8
-            ]
-        },
-        "310": {
-            "name": "GrabFront",
-            "parent": "308",
-            "scaling": [
-                0.9999989,
-                0.9999979,
-                0.9999983
-            ],
-            "rotation": [
-                0.9999997,
-                -0.0006899,
-                -4.222204665893514e-7,
-                -0.000002
-            ],
-            "translation": [
-                0.0028634,
-                -0.4736166,
-                0.0612937
+                -1.1920928955078125e-7
             ]
         },
         "328": {
@@ -1919,8 +1644,8 @@
                 }
             ],
             "translation": [
-                0.0,
-                0.138157,
+                0.7071342,
+                0.1381569,
                 0.2763951
             ]
         },
@@ -1985,10 +1710,21 @@
         "333": {
             "name": "ConstrainedObjects",
             "components": [],
-            "translation": [
-                -2.5,
+            "rotation": [
                 0.0,
-                -4.0
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "translation": [
+                0.0,
+                0.0,
+                -3.0
             ]
         },
         "332": {
@@ -2232,11 +1968,11 @@
         "343": {
             "name": "Table",
             "scaling": [
-                1.0,
+                0.3499999,
                 0.5,
-                0.4
+                0.2
             ],
-            "parent": "345",
+            "parent": "346",
             "components": [
                 {
                     "type": "mesh",
@@ -2250,7 +1986,7 @@
                     "active": true,
                     "physx": {
                         "static": true,
-                        "shape": "box",
+                        "shape": "sphere",
                         "box": {
                             "extents": [
                                 1.0,
@@ -2258,25 +1994,28 @@
                                 0.4
                             ]
                         },
-                        "bounciness": 0.0
+                        "bounciness": 0.0,
+                        "sphere": {
+                            "radius": 0.3
+                        }
                     }
                 }
-            ],
-            "translation": [
-                0.0,
-                0.5,
-                0.0
             ],
             "rotation": [
                 0.0,
                 0.0,
                 0.0,
                 1.0
+            ],
+            "translation": [
+                0.0,
+                0.5,
+                0.0
             ]
         },
         "344": {
             "name": "Text",
-            "parent": "345",
+            "parent": "346",
             "components": [
                 {
                     "type": "text",
@@ -2299,22 +2038,7 @@
             "translation": [
                 0.0,
                 1.75,
-                -0.2937731
-            ]
-        },
-        "345": {
-            "name": "Environment",
-            "parent": "333",
-            "rotation": [
-                0.0,
-                0.0,
-                0.0,
-                1.0
-            ],
-            "scaling": [
-                1.0,
-                1.0,
-                1.0
+                0.0
             ]
         },
         "346": {
@@ -2332,9 +2056,9 @@
                 1.0
             ],
             "translation": [
+                -1.5,
                 0.0,
-                1.2586146,
-                0.2868053
+                0.0
             ]
         },
         "347": {
@@ -2362,8 +2086,8 @@
             ],
             "translation": [
                 0.0000133,
-                0.00345,
-                -0.0002365
+                1.1319226,
+                -0.0002364
             ]
         },
         "348": {
@@ -2414,7 +2138,7 @@
             ],
             "translation": [
                 0.0,
-                0.0,
+                1.1284724,
                 0.0
             ],
             "rotation": [
@@ -2430,7 +2154,23 @@
             ]
         },
         "349": {
-            "name": "StaticInteractables"
+            "name": "StaticInteractables",
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "translation": [
+                0.0,
+                0.0,
+                2.75
+            ]
         },
         "350": {
             "name": "Table",
@@ -2448,7 +2188,7 @@
             "scaling": [
                 1.0,
                 0.5,
-                0.4
+                0.5
             ],
             "parent": "352",
             "components": [
@@ -2469,7 +2209,7 @@
                             "extents": [
                                 1.0,
                                 0.5,
-                                0.4
+                                0.5
                             ]
                         },
                         "bounciness": 0.0
@@ -2507,13 +2247,8 @@
             ]
         },
         "352": {
-            "name": "Environment",
+            "name": "Wheels",
             "parent": "349",
-            "translation": [
-                -2.5,
-                0.0,
-                3.2550001
-            ],
             "rotation": [
                 0.0,
                 0.0,
@@ -2524,16 +2259,16 @@
                 1.0,
                 1.0,
                 1.0
+            ],
+            "translation": [
+                -1.0,
+                0.0,
+                0.0
             ]
         },
         "342": {
             "name": "Door",
             "parent": "349",
-            "translation": [
-                -0.0696017,
-                1.0,
-                2.9212217
-            ],
             "rotation": [
                 0.0,
                 0.0,
@@ -2544,6 +2279,11 @@
                 1.0,
                 1.0,
                 1.0
+            ],
+            "translation": [
+                1.25,
+                0.0,
+                -0.3499999
             ]
         },
         "354": {
@@ -2580,7 +2320,7 @@
             "parent": "342",
             "translation": [
                 0.0,
-                -1.0,
+                0.0,
                 0.0
             ],
             "rotation": [
@@ -2725,8 +2465,8 @@
             ],
             "translation": [
                 -0.5000029,
-                -1.0,
-                0.0000011
+                -0.0,
+                0.000001
             ],
             "scaling": [
                 0.9999961,
@@ -2734,8 +2474,8 @@
                 0.9999958
             ],
             "rotation": [
-                4.082954205841816e-7,
-                0.0,
+                4.0828655301083927e-7,
+                -0.0,
                 2.8394680384735693e-7,
                 1.0
             ]
@@ -2797,16 +2537,16 @@
         },
         "363": {
             "name": "SteeringWheel",
-            "parent": "349",
+            "parent": "352",
             "translation": [
-                -1.7484874,
-                0.9308454,
-                2.7110042
+                0.7515126,
+                0.9308453,
+                -0.5439958
             ],
             "scaling": [
                 1.0,
-                0.9999957,
-                0.9999957
+                0.9999956,
+                0.9999956
             ],
             "rotation": [
                 0.7071066,
@@ -3110,21 +2850,21 @@
         "374": {
             "name": "SteeringWheel",
             "translation": [
-                -3.2484884,
+                -0.7484886,
                 0.9308452,
-                2.7110054
+                -0.5439944
             ],
             "scaling": [
                 0.9999994,
-                0.9999805,
-                0.9999814
+                0.9999806,
+                0.9999815
             ],
-            "parent": "349",
+            "parent": "352",
             "rotation": [
                 0.7071068,
                 0.0,
                 0.0,
-                0.7071067
+                0.7071066
             ]
         },
         "375": {
@@ -3188,13 +2928,13 @@
             "name": "Weapon Single Hand Snap Lerp",
             "parent": "293",
             "translation": [
-                0.8,
-                0.625,
-                0.1993118
+                0.8000034,
+                1.0511637,
+                0.1418987
             ],
             "rotation": [
-                0.0,
-                0.0,
+                -0.0000028,
+                -0.0,
                 0.0,
                 1.0
             ],
@@ -3205,24 +2945,19 @@
             ]
         },
         "378": {
-            "name": "Advanced Interactables",
-            "translation": [
-                1.9999994,
-                2.87962,
-                -0.2937717
-            ],
+            "name": "Description",
             "rotation": [
-                5.411454395698456e-8,
+                5.7313702228611874e-8,
                 0.9999999,
-                -2.455217611441185e-7,
+                0.0000132,
                 -0.0002439
             ],
             "scaling": [
-                2.0,
+                1.9999995,
                 2.0000154,
-                1.9999995
+                1.999999
             ],
-            "parent": "352",
+            "parent": "349",
             "components": [
                 {
                     "type": "text",
@@ -3230,20 +2965,25 @@
                         "text": "Pivot Transform"
                     }
                 }
+            ],
+            "translation": [
+                0.0,
+                2.4999997,
+                2.384185791015625e-7
             ]
         },
         "379": {
             "name": "Weapon Single Hand Snap",
             "parent": "293",
             "translation": [
-                0.1,
-                0.6247258,
-                0.2107153
+                0.100027,
+                1.0468004,
+                0.1451946
             ],
             "rotation": [
-                0.0,
-                0.0,
-                0.0,
+                1.754958702804288e-7,
+                -0.0,
+                -0.0,
                 1.0
             ],
             "scaling": [
@@ -3285,14 +3025,14 @@
             "name": "Weapon Single Hand Bar",
             "parent": "293",
             "translation": [
-                -0.6,
-                0.625,
-                0.2307724
+                -0.5999532,
+                1.0303635,
+                0.1322055
             ],
             "rotation": [
-                0.0,
-                0.0,
-                0.0,
+                2.074418858910576e-7,
+                -0.0,
+                -0.0,
                 1.0
             ],
             "scaling": [
@@ -3422,14 +3162,14 @@
         "327": {
             "name": "Transferable Weapon Single Hand Bar",
             "translation": [
-                -1.2999999,
-                0.625,
-                0.2307724
+                -1.3499786,
+                1.0277431,
+                0.127352
             ],
             "rotation": [
-                0.0,
-                0.0,
-                0.0,
+                -4.0387828903476475e-7,
+                -0.0,
+                -0.0,
                 1.0
             ],
             "scaling": [
@@ -3472,13 +3212,13 @@
             "name": "Ball",
             "parent": "293",
             "translation": [
-                1.5,
-                0.6075261,
-                0.1959186
+                1.4999932,
+                1.0442218,
+                0.1383866
             ],
             "rotation": [
-                0.0,
-                0.0,
+                0.0000016,
+                -0.0,
                 0.0,
                 1.0
             ],
@@ -3517,15 +3257,10 @@
                 0.05,
                 0.05
             ],
-            "translation": [
-                0.0,
-                0.0073751,
-                0.0
-            ],
             "rotation": [
-                0.0,
-                0.0,
-                0.0,
+                0.0000013,
+                -0.0,
+                -0.0,
                 1.0
             ]
         },
@@ -3587,35 +3322,6 @@
                 }
             ]
         },
-        "331": {
-            "name": "Mesh.000",
-            "components": [
-                {
-                    "type": "mesh",
-                    "mesh": {
-                        "mesh": "9",
-                        "material": "22"
-                    },
-                    "active": false
-                }
-            ],
-            "scaling": [
-                0.2,
-                0.2,
-                0.2
-            ],
-            "translation": [
-                0.0,
-                1.75,
-                2.7196087
-            ],
-            "rotation": [
-                0.0,
-                0.0,
-                0.0,
-                1.0
-            ]
-        },
         "397": {
             "name": "Description",
             "scaling": [
@@ -3623,7 +3329,7 @@
                 2.0000154,
                 2.0000007
             ],
-            "parent": "345",
+            "parent": "333",
             "components": [
                 {
                     "type": "text",
@@ -3632,37 +3338,37 @@
                     }
                 }
             ],
-            "translation": [
-                2.5000002,
-                2.5000002,
-                0.0
-            ],
             "rotation": [
                 0.0,
                 0.0,
                 0.0,
                 1.0
+            ],
+            "translation": [
+                0.0,
+                2.5,
+                0.0
             ]
         },
         "399": {
             "name": "Turret",
-            "translation": [
-                3.7171654,
-                0.0,
-                -0.0640922
-            ],
             "rotation": [
-                -7.3567787239881e-7,
-                -0.7071053,
                 -0.0000013,
-                0.7071081
+                -0.707102,
+                -0.0000037,
+                0.7071114
             ],
             "scaling": [
-                0.9999946,
+                0.9999765,
                 1.0,
-                0.9999947
+                0.9999766
             ],
-            "parent": "333"
+            "parent": "333",
+            "translation": [
+                1.5,
+                0.0,
+                0.0
+            ]
         },
         "400": {
             "name": "Platform",
@@ -3689,6 +3395,13 @@
                     "mesh": {
                         "material": "25",
                         "mesh": "8"
+                    }
+                },
+                {
+                    "type": "physx",
+                    "physx": {
+                        "gravity": false,
+                        "static": true
                     }
                 }
             ]
@@ -3956,21 +3669,16 @@
         },
         "409": {
             "name": "Arrow",
-            "translation": [
-                2.2171649,
-                0.0,
-                -0.0640922
-            ],
             "rotation": [
-                -0.0000012,
-                -0.7071028,
-                -0.000002,
-                0.7071106
+                -0.0000016,
+                -0.7071004,
+                -0.0000022,
+                0.707113
             ],
             "scaling": [
-                0.9999865,
+                0.9999762,
                 1.0,
-                0.9999865
+                0.9999762
             ],
             "parent": "333"
         },
@@ -3999,6 +3707,14 @@
                     "mesh": {
                         "material": "25",
                         "mesh": "8"
+                    }
+                },
+                {
+                    "type": "physx",
+                    "physx": {
+                        "shape": "sphere",
+                        "gravity": false,
+                        "static": true
                     }
                 }
             ]
@@ -4221,7 +3937,7 @@
                             "extents": [
                                 0.1,
                                 0.5,
-                                5.0
+                                3.5
                             ]
                         },
                         "bounciness": 0.0
@@ -4229,14 +3945,14 @@
                 }
             ],
             "translation": [
-                5.0,
+                3.5,
                 0.5,
                 0.0
             ],
             "scaling": [
                 0.1,
                 0.5,
-                5.0
+                3.5
             ]
         },
         "414": {
@@ -4281,7 +3997,7 @@
         "419": {
             "name": "WallNegativeX",
             "translation": [
-                -5.0,
+                -3.5,
                 0.5,
                 0.0
             ],
@@ -4294,7 +4010,7 @@
             "scaling": [
                 0.1,
                 0.5,
-                5.0
+                3.5
             ],
             "parent": "437",
             "components": [
@@ -4315,7 +4031,7 @@
                             "extents": [
                                 0.1,
                                 0.5,
-                                5.0
+                                3.5
                             ]
                         },
                         "bounciness": 0.0
@@ -4328,18 +4044,18 @@
             "translation": [
                 -2.384185791015625e-7,
                 0.4999999,
-                5.0000009
+                3.5000009
             ],
             "rotation": [
-                0.000074,
-                0.7071014,
-                -0.0000719,
-                0.7071121
+                0.0000819,
+                0.7070997,
+                -0.0000787,
+                0.7071138
             ],
             "scaling": [
-                0.0999962,
+                0.0999955,
                 0.5,
-                4.9998073
+                3.4999966
             ],
             "parent": "437",
             "components": [
@@ -4360,7 +4076,7 @@
                             "extents": [
                                 0.1,
                                 0.5,
-                                5.0
+                                3.5
                             ]
                         },
                         "bounciness": 0.0
@@ -4371,20 +4087,20 @@
         "436": {
             "name": "WallNegativeZ",
             "translation": [
-                -7.152557373046875e-7,
-                0.4999999,
-                -5.0
+                -0.000001,
+                0.4999997,
+                -3.4999988
             ],
             "rotation": [
-                0.00006,
-                0.7071042,
-                -0.0000577,
-                0.7071092
+                0.0000758,
+                0.7071013,
+                -0.0000712,
+                0.7071121
             ],
             "scaling": [
-                0.0999974,
+                0.0999964,
                 0.5,
-                4.9998416
+                3.4999883
             ],
             "parent": "437",
             "components": [
@@ -4405,7 +4121,7 @@
                             "extents": [
                                 0.1,
                                 0.5,
-                                5.0
+                                3.5
                             ]
                         },
                         "bounciness": 0.0
@@ -4418,36 +4134,36 @@
             "parent": "241"
         },
         "438": {
-            "name": "DualHand Objects",
+            "name": "DualHandObjects",
             "translation": [
-                2.5,
-                1.0,
-                0.0
+                2.75,
+                0.9999999,
+                -9.5367431640625e-7
             ],
             "rotation": [
-                0.0,
-                0.0,
-                0.0,
-                1.0
+                5.954031507826585e-7,
+                -0.7069344,
+                6.2597109717899e-7,
+                0.707279
             ],
             "scaling": [
+                0.9999992,
                 1.0,
-                1.0,
-                1.0
+                0.9999994
             ]
         },
         "439": {
             "name": "Table",
             "rotation": [
-                0.0,
-                0.0,
+                1.8495850184763185e-8,
+                -0.0,
                 0.0,
                 1.0
             ],
             "scaling": [
                 1.25,
                 0.5,
-                0.75
+                0.5
             ],
             "parent": "438",
             "components": [
@@ -4468,7 +4184,7 @@
                             "extents": [
                                 1.25,
                                 0.5,
-                                0.75
+                                0.5
                             ]
                         },
                         "bounciness": 0.0
@@ -4479,6 +4195,409 @@
                 0.0,
                 -0.5,
                 0.0
+            ]
+        },
+        "308": {
+            "name": "Grabbable",
+            "rotation": [
+                5.3544621181345065e-8,
+                -3.244860735662769e-8,
+                0.707101,
+                0.7071124
+            ],
+            "scaling": [
+                0.9999026,
+                0.9999035,
+                0.9999996
+            ],
+            "parent": "443",
+            "components": [
+                {
+                    "type": "grabbable",
+                    "grabbable": {
+                        "distanceMarker": "249",
+                        "handleObjects": [
+                            "295",
+                            "296"
+                        ]
+                    }
+                },
+                {
+                    "type": "physx",
+                    "active": true,
+                    "physx": {
+                        "allowQuery": false,
+                        "mass": 15.0,
+                        "shape": "box",
+                        "box": {
+                            "extents": [
+                                0.05,
+                                0.1,
+                                0.25
+                            ]
+                        },
+                        "translationOffset": [
+                            0.0,
+                            -0.05,
+                            0.0
+                        ],
+                        "linearDamping": 1.0,
+                        "angularDamping": 1.0,
+                        "staticFriction": 1.0,
+                        "dynamicFriction": 1.0,
+                        "bounciness": 0.0
+                    }
+                }
+            ]
+        },
+        "294": {
+            "name": "Base",
+            "translation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                0.05,
+                0.05,
+                0.25
+            ],
+            "parent": "308",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "material": "22",
+                        "mesh": "8"
+                    }
+                }
+            ]
+        },
+        "295": {
+            "name": "GrabBack",
+            "translation": [
+                2.2351741790771484e-8,
+                -0.0928863,
+                0.2157722
+            ],
+            "rotation": [
+                0.7071068,
+                0.0000014,
+                0.0000014,
+                0.7071068
+            ],
+            "scaling": [
+                0.0249996,
+                0.05,
+                0.0249996
+            ],
+            "parent": "308",
+            "components": [
+                {
+                    "type": "grab-point",
+                    "grab-point": {
+                        "maxDistance": 0.1
+                    }
+                }
+            ]
+        },
+        "296": {
+            "name": "GrabFront",
+            "translation": [
+                0.000003,
+                -0.092888,
+                -0.0484889
+            ],
+            "rotation": [
+                0.7071068,
+                0.0,
+                0.0,
+                0.7071068
+            ],
+            "scaling": [
+                0.025,
+                0.05,
+                0.025
+            ],
+            "parent": "308",
+            "components": [
+                {
+                    "type": "grab-point",
+                    "grab-point": {
+                        "maxDistance": 0.1,
+                        "interactorVisualState": "Hidden"
+                    }
+                }
+            ]
+        },
+        "297": {
+            "name": "Mesh",
+            "rotation": [
+                -0.7071068,
+                0.0,
+                0.0,
+                0.7071068
+            ],
+            "parent": "295",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "material": "26",
+                        "mesh": "8"
+                    }
+                }
+            ]
+        },
+        "298": {
+            "name": "Mesh",
+            "rotation": [
+                -0.7071068,
+                0.0,
+                0.0,
+                0.7071068
+            ],
+            "parent": "296",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "material": "26",
+                        "mesh": "8"
+                    }
+                }
+            ]
+        },
+        "440": {
+            "name": "Description",
+            "scaling": [
+                2.0000023,
+                2.0000154,
+                2.0000023
+            ],
+            "parent": "438",
+            "components": [
+                {
+                    "type": "text",
+                    "text": {
+                        "text": "Double Hand Grab"
+                    }
+                }
+            ],
+            "translation": [
+                -6.878977956148447e-7,
+                1.5,
+                -4.768377266373136e-7
+            ],
+            "rotation": [
+                1.9845896304104826e-7,
+                -0.0,
+                0.0,
+                1.0
+            ]
+        },
+        "208": {
+            "name": "Text",
+            "scaling": [
+                0.9999125,
+                1.0000016,
+                1.0000864
+            ],
+            "parent": "442",
+            "components": [
+                {
+                    "originalIndex": 0,
+                    "type": "text",
+                    "text": {
+                        "text": "Double Grab"
+                    }
+                }
+            ],
+            "translation": [
+                -5.9603728175261494e-8,
+                0.75,
+                -2.3841926122258883e-7
+            ],
+            "rotation": [
+                0.000004,
+                -0.0,
+                0.0,
+                1.0
+            ]
+        },
+        "442": {
+            "name": "MachineGun",
+            "parent": "438",
+            "translation": [
+                -0.9449816,
+                0.0586596,
+                0.25
+            ],
+            "rotation": [
+                0.0000012,
+                -0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "443": {
+            "name": "MachineGun",
+            "parent": "438",
+            "translation": [
+                -0.0002153,
+                0.0686798,
+                0.25
+            ],
+            "rotation": [
+                0.0000046,
+                -0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "444": {
+            "name": "Text",
+            "rotation": [
+                0.0000049,
+                -0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                0.9999125,
+                1.0000015,
+                1.0000864
+            ],
+            "parent": "443",
+            "components": [
+                {
+                    "type": "text",
+                    "text": {
+                        "text": "Double Grab\n+\nHide Hand"
+                    }
+                }
+            ],
+            "translation": [
+                -4.3655538206621713e-7,
+                0.75,
+                -0.0
+            ]
+        },
+        "345": {
+            "name": "Description",
+            "scaling": [
+                2.0000021,
+                2.0000154,
+                2.0000021
+            ],
+            "parent": "293",
+            "components": [
+                {
+                    "type": "text",
+                    "text": {
+                        "text": "Hand Grab"
+                    }
+                }
+            ],
+            "translation": [
+                0.0000021,
+                2.5,
+                -0.0000028
+            ],
+            "rotation": [
+                -5.836474201714736e-7,
+                -0.0,
+                0.0,
+                1.0
+            ]
+        },
+        "331": {
+            "name": "WallZ",
+            "translation": [
+                -2.384185791015625e-7,
+                0.4999999,
+                3.5000009
+            ],
+            "rotation": [
+                0.0000819,
+                0.7070997,
+                -0.0000787,
+                0.7071138
+            ],
+            "scaling": [
+                0.0999955,
+                0.5,
+                3.4999966
+            ],
+            "parent": "437",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "material": "25",
+                        "mesh": "8"
+                    }
+                },
+                {
+                    "type": "physx",
+                    "active": true,
+                    "physx": {
+                        "static": true,
+                        "shape": "box",
+                        "box": {
+                            "extents": [
+                                0.1,
+                                0.5,
+                                3.5
+                            ]
+                        },
+                        "bounciness": 0.0
+                    }
+                }
+            ]
+        },
+        "23": {
+            "name": "Text",
+            "translation": [
+                -4.3655538206621713e-7,
+                0.75,
+                -0.0
+            ],
+            "rotation": [
+                0.0000049,
+                -0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                0.9999125,
+                1.0000015,
+                1.0000864
+            ],
+            "parent": "443",
+            "components": [
+                {
+                    "type": "text",
+                    "text": {
+                        "text": "Double Grab\n+\nHide Hand"
+                    }
+                }
             ]
         }
     },
@@ -4981,7 +5100,7 @@
             "pipeline": "37"
         },
         "25": {
-            "name": "Yellow",
+            "name": "Black",
             "Phong": {
                 "diffuseColor": [
                     0.2745097,
@@ -5472,7 +5591,8 @@
             "environment": {
                 "bakingMode": "sky",
                 "material": "234",
-                "enabled": true
+                "enabled": true,
+                "intensity": 0.2
             }
         },
         "editor": {
@@ -5533,7 +5653,8 @@
             },
             "features": {
                 "DEPRECATED_LIGHT_ATTENUATION": true,
-                "WITH_EMISSIVE": true
+                "WITH_EMISSIVE": true,
+                "GLOBAL_ILLUMINATION": true
             }
         },
         "38": {
@@ -5680,22 +5801,6 @@
         "275": {
             "fileName": "models/button.glb",
             "importerName": "",
-            "colorSpace": "srgb"
-        },
-        "276": {
-            "fileName": "models/teleport-indicator.glb",
-            "importerName": "",
-            "colorSpace": "srgb"
-        },
-        "277": {
-            "fileName": "models/marker.glb",
-            "importerName": "",
-            "colorSpace": "srgb"
-        },
-        "280": {
-            "fileName": "models/shotgun.glb",
-            "importerName": "",
-            "importPhysicalAsPhongMaterials": true,
             "colorSpace": "srgb"
         }
     },
