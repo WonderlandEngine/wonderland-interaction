@@ -14,7 +14,8 @@
                         "speed": 1.0,
                         "transformType": "Snap",
                         "rotationSpeed": 1.0,
-                        "trackedSpace": "205"
+                        "trackedSpace": "205",
+                        "walkSpeed": 1.5
                     }
                 },
                 {
@@ -2117,7 +2118,8 @@
                                 -1.0,
                                 -1.0
                             ]
-                        }
+                        },
+                        "canThrow": false
                     }
                 },
                 {
@@ -2125,12 +2127,12 @@
                     "translation-constraint": {
                         "min": [
                             -0.3499999,
-                            0.0,
+                            1.125,
                             0.0
                         ],
                         "max": [
                             0.3499999,
-                            0.0,
+                            1.125,
                             0.0
                         ]
                     }
@@ -2138,7 +2140,7 @@
             ],
             "translation": [
                 0.0,
-                1.1284724,
+                1.125,
                 0.0
             ],
             "rotation": [
@@ -2474,7 +2476,7 @@
                 0.9999958
             ],
             "rotation": [
-                4.0828655301083927e-7,
+                4.082865530108393e-7,
                 -0.0,
                 2.8394680384735693e-7,
                 1.0
@@ -3258,10 +3260,15 @@
                 0.05
             ],
             "rotation": [
-                0.0000013,
-                -0.0,
-                -0.0,
+                0.0000019,
+                0.0,
+                0.0,
                 1.0
+            ],
+            "translation": [
+                -0.1262809,
+                4.76830820161922e-7,
+                0.1599181
             ]
         },
         "315": {
@@ -4422,7 +4429,7 @@
             "translation": [
                 -5.9603728175261494e-8,
                 0.75,
-                -2.3841926122258883e-7
+                -2.384192612225889e-7
             ],
             "rotation": [
                 0.000004,
@@ -4599,6 +4606,111 @@
                     }
                 }
             ]
+        },
+        "445": {
+            "name": "Grabbable",
+            "rotation": [
+                0.0000013,
+                -0.0,
+                -0.0,
+                1.0
+            ],
+            "scaling": [
+                0.05,
+                0.05,
+                0.05
+            ],
+            "parent": "313",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "material": "22",
+                        "mesh": "9"
+                    }
+                },
+                {
+                    "type": "physx",
+                    "active": true,
+                    "physx": {
+                        "sphere": {
+                            "radius": 0.05
+                        }
+                    }
+                },
+                {
+                    "type": "grabbable"
+                }
+            ]
+        },
+        "446": {
+            "name": "Text",
+            "translation": [
+                -4.3655538206621713e-7,
+                0.75,
+                -0.0
+            ],
+            "rotation": [
+                0.0000049,
+                -0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                0.9999125,
+                1.0000015,
+                1.0000864
+            ],
+            "parent": "443",
+            "components": [
+                {
+                    "type": "text",
+                    "text": {
+                        "text": "Double Grab\n+\nHide Hand"
+                    }
+                }
+            ]
+        },
+        "447": {
+            "name": "Grabbable",
+            "translation": [
+                0.1097176,
+                4.768237999996927e-7,
+                0.1600193
+            ],
+            "rotation": [
+                0.0000032,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "scaling": [
+                0.05,
+                0.05,
+                0.05
+            ],
+            "parent": "313",
+            "components": [
+                {
+                    "type": "mesh",
+                    "mesh": {
+                        "material": "22",
+                        "mesh": "9"
+                    }
+                },
+                {
+                    "type": "physx",
+                    "active": true,
+                    "physx": {
+                        "sphere": {
+                            "radius": 0.05
+                        }
+                    }
+                },
+                {
+                    "type": "grabbable"
+                }
+            ]
         }
     },
     "meshes": {
@@ -4742,128 +4854,6 @@
                 "name": "Circle",
                 "file": "models\\marker.glb"
             }
-        },
-        "251": {
-            "link": {
-                "name": "base_shotgun_0",
-                "file": "models\\shotgun.glb"
-            },
-            "simplifyTarget": 0.5,
-            "simplify": false
-        },
-        "252": {
-            "link": {
-                "name": "base_shotgun_0-uv1",
-                "file": "models\\shotgun.glb"
-            }
-        },
-        "253": {
-            "link": {
-                "name": "loader_shotgun_0",
-                "file": "models\\shotgun.glb"
-            }
-        },
-        "254": {
-            "link": {
-                "name": "loader_shotgun_0-uv1",
-                "file": "models\\shotgun.glb"
-            }
-        },
-        "255": {
-            "link": {
-                "name": "trigger_shotgun_0",
-                "file": "models\\shotgun.glb"
-            }
-        },
-        "256": {
-            "link": {
-                "name": "trigger_shotgun_0-uv1",
-                "file": "models\\shotgun.glb"
-            }
-        },
-        "257": {
-            "link": {
-                "name": "pump_shotgun_0",
-                "file": "models\\shotgun.glb"
-            }
-        },
-        "258": {
-            "link": {
-                "name": "pump_shotgun_0-uv1",
-                "file": "models\\shotgun.glb"
-            }
-        },
-        "259": {
-            "link": {
-                "name": "slug_shotgun_0",
-                "file": "models\\shotgun.glb"
-            }
-        },
-        "260": {
-            "link": {
-                "name": "slug_shotgun_0-uv1",
-                "file": "models\\shotgun.glb"
-            }
-        },
-        "261": {
-            "link": {
-                "name": "base_shotgun_0",
-                "file": "models\\shotgun-test.glb"
-            }
-        },
-        "262": {
-            "link": {
-                "name": "base_shotgun_0-uv1",
-                "file": "models\\shotgun-test.glb"
-            }
-        },
-        "263": {
-            "link": {
-                "name": "loader_shotgun_0",
-                "file": "models\\shotgun-test.glb"
-            }
-        },
-        "264": {
-            "link": {
-                "name": "loader_shotgun_0-uv1",
-                "file": "models\\shotgun-test.glb"
-            }
-        },
-        "265": {
-            "link": {
-                "name": "pump_shotgun_0",
-                "file": "models\\shotgun-test.glb"
-            }
-        },
-        "266": {
-            "link": {
-                "name": "pump_shotgun_0-uv1",
-                "file": "models\\shotgun-test.glb"
-            }
-        },
-        "267": {
-            "link": {
-                "name": "slug_shotgun_0",
-                "file": "models\\shotgun-test.glb"
-            }
-        },
-        "268": {
-            "link": {
-                "name": "slug_shotgun_0-uv1",
-                "file": "models\\shotgun-test.glb"
-            }
-        },
-        "269": {
-            "link": {
-                "name": "trigger_shotgun_0",
-                "file": "models\\shotgun-test.glb"
-            }
-        },
-        "270": {
-            "link": {
-                "name": "trigger_shotgun_0-uv1",
-                "file": "models\\shotgun-test.glb"
-            }
         }
     },
     "textures": {
@@ -4895,42 +4885,6 @@
             "link": {
                 "name": "skybox.png",
                 "file": "textures\\skybox.png"
-            }
-        },
-        "237": {
-            "link": {
-                "name": "texture_0",
-                "file": "models\\shotgun.glb"
-            }
-        },
-        "238": {
-            "link": {
-                "name": "texture_1",
-                "file": "models\\shotgun.glb"
-            }
-        },
-        "239": {
-            "link": {
-                "name": "texture_2",
-                "file": "models\\shotgun.glb"
-            }
-        },
-        "240": {
-            "link": {
-                "name": "texture_0",
-                "file": "models\\shotgun-test.glb"
-            }
-        },
-        "241": {
-            "link": {
-                "name": "texture_1",
-                "file": "models\\shotgun-test.glb"
-            }
-        },
-        "242": {
-            "link": {
-                "name": "texture_2",
-                "file": "models\\shotgun-test.glb"
             }
         }
     },
@@ -4974,44 +4928,6 @@
                 256,
                 256
             ]
-        },
-        "86": {
-            "link": {
-                "name": "image_0",
-                "file": "models\\shotgun.glb"
-            },
-            "compression": "none"
-        },
-        "87": {
-            "link": {
-                "name": "image_1",
-                "file": "models\\shotgun.glb"
-            },
-            "compression": "none"
-        },
-        "88": {
-            "link": {
-                "name": "image_2",
-                "file": "models\\shotgun.glb"
-            }
-        },
-        "89": {
-            "link": {
-                "name": "Image_2",
-                "file": "models\\shotgun-test.glb"
-            }
-        },
-        "90": {
-            "link": {
-                "name": "Image_1",
-                "file": "models\\shotgun-test.glb"
-            }
-        },
-        "91": {
-            "link": {
-                "name": "Image_0",
-                "file": "models\\shotgun-test.glb"
-            }
         }
     },
     "materials": {
@@ -5410,23 +5326,6 @@
                 ]
             },
             "name": "GrabMarker"
-        },
-        "253": {
-            "link": {
-                "name": "shotgun",
-                "file": "models\\shotgun.glb"
-            },
-            "pipeline": "223",
-            "Phong": {
-                "normalTexture": "239",
-                "diffuseTexture": "237"
-            }
-        },
-        "254": {
-            "link": {
-                "name": "shotgun",
-                "file": "models\\shotgun-test.glb"
-            }
         }
     },
     "shaders": {
