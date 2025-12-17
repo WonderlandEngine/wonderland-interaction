@@ -1,6 +1,7 @@
 import {Component, NumberArray, Object3D} from '@wonderlandengine/api';
 import {property} from '@wonderlandengine/api/decorators.js';
-import {vec3} from 'gl-matrix';
+import {quat, quat2, vec3} from 'gl-matrix';
+import {TempQuat} from '../internal-constants.js';
 
 const tempVec1 = vec3.create();
 const tempVec2 = vec3.create();
@@ -25,7 +26,12 @@ export class ActiveCamera extends Component {
      * @returns The active camera.
      */
     get current(): Object3D {
-        return this.engine.xr?.session ? this.leftEye : this.nonVrCamera;
+        return this.engine.xr ? this.leftEye : this.nonVrCamera;
+    }
+
+    getForwardWorld(out: vec3) {
+        const object = this.engine.xr ? this.leftEye : this.nonVrCamera;
+        return object.getForwardWorld(out);
     }
 
     /**
@@ -35,21 +41,17 @@ export class ActiveCamera extends Component {
      * @param position The position to write the result to.
      * @returns The world position of the active camera.
      */
-    getPositionWorld(out: vec3 = new Float32Array(3)): NumberArray {
-        const cameraPosition = tempVec1;
-
-        if (this.engine.xr?.session) {
-            const rightEyePosition = tempVec2;
-
-            this.leftEye.getPositionWorld(cameraPosition);
-            this.rightEye.getPositionWorld(rightEyePosition);
-
-            vec3.add(cameraPosition, cameraPosition, rightEyePosition);
-            vec3.scale(cameraPosition, cameraPosition, 0.5);
-        } else {
-            this.nonVrCamera.getPositionWorld(cameraPosition);
+    getPositionWorld(out: vec3 = vec3.create()): vec3 {
+        if (!this.engine.xr) {
+            return this.nonVrCamera.getPositionWorld(out);
         }
+        const cameraPosition = tempVec1;
+        const rightEyePosition = tempVec2;
 
-        return vec3.copy(out, cameraPosition);
+        this.leftEye.getPositionWorld(cameraPosition);
+        this.rightEye.getPositionWorld(rightEyePosition);
+
+        vec3.add(cameraPosition, cameraPosition, rightEyePosition);
+        return vec3.scale(out, cameraPosition, 0.5);
     }
 }
