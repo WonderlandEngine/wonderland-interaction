@@ -6,8 +6,13 @@
     "main": "dist/index.js",
     "module": "dist/index.js",
     "types": "dist/index.d.ts",
+    "author": "Wonderland GmbH",
     "license": "MIT",
     "wonderlandengine": {},
+    "contributors": [
+        {"name": "David Peicho", "email": "david.peicho@createworlds.com"},
+        {"name": "Timmy Kokke", "email": "timmy.kokke@createworlds.com"}
+    ],
     "prettier": "@wonderlandengine/prettier-config",
     "scripts": {
         "build": "tsc",
