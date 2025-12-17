@@ -11,38 +11,27 @@
 
 ## Features
 
-* Generic interactor / interactable
 * Single-hand grabbing
 * Double-hand grabbing
+* Door and lever-like behavior
 * Event system
 * Throwing
-* Constraints
+* Non-physx constraints
 
 For more information, have a look at the [documentation](./DOC.md).
 
 ## Install
 
-The library is in development mode and not already available on `npm`. However, you can already use it locally either with [npm link](https://docs.npmjs.com/cli/v8/commands/npm-link), or using a local installation:
-
-First, install and build the library:
+In your project root, run:
 
 ```sh
-cd path/to/weil
-npm i
-npm run build
-```
-
-Then, link it to your project:
-
-```sh
-cd path/to/my/project
-npm i path/to/weil
+npm i @wonderlandengine/interaction
 ```
 
 ## Examples
 
 1. Clone the repository
-2. Open any examples under `examples/*`
+2. Open examples under `examples/*`
 
 ![Wonderland Engine interaction example](img/example.png)
 
