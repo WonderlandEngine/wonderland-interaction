@@ -30,13 +30,24 @@ jobs:
             - name: Install dependencies
               run: npm install
 
-            - name: TSDoc Action
-              uses: erikyo/tsdoc-action@v1
-              with:
-                  source_dir: ./src/*
-                  githubPages: true
-                  output_dir: ./docs
-                  front_page: README.md
+            - name: Build Docs
+              run: npm docs
+
+            # - name: TSDoc Action
+            #   uses: erikyo/tsdoc-action@v1
+            #   with:
+            #         source_dir: ./src/*
+            #         entryPoints: ./src/index.ts
+            #         entryPointStrategy: expand
+            #         excludePrivate: true
+            #         excludeProtected: true
+            #         excludeExternals: true
+            #         excludeInternal: true
+            # with:
+            #   source_dir: ./src/*
+            #   githubPages: true
+            #   output_dir: ./docs
+            #   front_page: README.md
 
             - name: Deploy
               uses:
