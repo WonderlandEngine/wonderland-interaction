@@ -9,5 +9,6 @@
     "githubPages": true,
     "visibilityFilters": {},
     "includes": ".",
-    "logLevel": "Error"
+    "logLevel": "Error",
+    "hideGenerator": true
 }
