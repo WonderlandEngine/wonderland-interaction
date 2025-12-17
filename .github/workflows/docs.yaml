@@ -1,0 +1,20 @@
+name: Build and Deploy Docs
+on:
+    push:
+        branches:
+            - '*'
+        #- [main]
+jobs:
+    docs:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v6
+            - uses: erikyo/tsdoc-action@v1
+              with:
+                  source_dir: ./src
+                  output_dir: ./docs
+            - name: Deploy
+              uses: peaceiris/actions-gh-pages@v4
+              with:
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
+                  publish_dir: ./docs

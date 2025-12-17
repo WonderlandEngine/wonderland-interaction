@@ -6,6 +6,5 @@
     "excludeProtected": true,
     "excludeExternals": true,
     "excludeInternal": true,
-    "visibilityFilters": {
-    }
+    "visibilityFilters": {}
 }
