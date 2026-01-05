@@ -19,9 +19,9 @@ import {MouseLookComponent} from '@wonderlandengine/components';
 import {PlayerHeight} from '@wonderlandengine/components';
 import {TeleportComponent} from '@wonderlandengine/components';
 import {VrModeActiveSwitch} from '@wonderlandengine/components';
-import {GrabPoint} from 'wle-interaction';
-import {Grabbable} from 'wle-interaction';
-import {Interactor} from 'wle-interaction';
+import {GrabPoint} from '@wonderlandengine/interaction';
+import {Grabbable} from '@wonderlandengine/interaction';
+import {Interactor} from '@wonderlandengine/interaction';
 import {ButtonComponent} from './button.js';
 import {GameMananger} from './game-manager.js';
 /* wle:auto-imports:end */
