@@ -1,7 +1,7 @@
 {
-    "name": "Throw.wlp",
+    "name": "throw",
     "version": "1.0.0",
-    "description": "My Wonderland project",
+    "description": "Throw example",
     "main": "js/index.js",
     "type": "module",
     "module": "js/index.js",
@@ -19,7 +19,7 @@
         "@wonderlandengine/api": ">=1.5.0 <1.6.0",
         "@wonderlandengine/components": "^1.0.6",
         "gl-matrix": "^3.4.3",
-        "wle-interaction": "file:../.."
+        "@wonderlandengine/interaction": "file:../.."
     },
     "overrides": {
         "@wonderlandengine/api": "$@wonderlandengine/api"

@@ -13,13 +13,13 @@ import {Cursor} from '@wonderlandengine/components';
 import {HowlerAudioListener} from '@wonderlandengine/components';
 import {MouseLookComponent} from '@wonderlandengine/components';
 import {PlayerHeight} from '@wonderlandengine/components';
-import {DefaultInteractorInput} from 'wle-interaction';
-import {GrabPoint} from 'wle-interaction';
-import {Grabbable} from 'wle-interaction';
-import {Interactor} from 'wle-interaction';
-import {PlayerController} from 'wle-interaction';
-import {RotationConstraint} from 'wle-interaction';
-import {TranslationConstraint} from 'wle-interaction';
+import {DefaultInteractorInput} from '@wonderlandengine/interaction';
+import {GrabPoint} from '@wonderlandengine/interaction';
+import {Grabbable} from '@wonderlandengine/interaction';
+import {Interactor} from '@wonderlandengine/interaction';
+import {PlayerController} from '@wonderlandengine/interaction';
+import {RotationConstraint} from '@wonderlandengine/interaction';
+import {TranslationConstraint} from '@wonderlandengine/interaction';
 /* wle:auto-imports:end */
 
 export default function(engine) {
