@@ -3,6 +3,7 @@ import {
     CollisionComponent,
     CollisionEventType,
     Component,
+    Emitter,
     InputComponent,
     MeshComponent,
     Object3D,
@@ -47,6 +48,22 @@ export class Interactor extends Component {
 
     @property.object({required: true})
     trackedSpace: Object3D = null!;
+
+    /** Public Attributes */
+
+    /**
+     * Notifies once a grabbable is grabbed.
+     *
+     * @note The notification occurs **after** the grabbable one.
+     */
+    onGrabStart: Emitter<[this, Grabbable]> = new Emitter();
+
+    /**
+     * Notifies once a grabbable is released.
+     *
+     * @note The notification occurs **after** the grabbable one.
+     */
+    onGrabEnd: Emitter<[this, Grabbable]> = new Emitter();
 
     /** Private Attributes. */
 
@@ -156,18 +173,6 @@ export class Interactor extends Component {
 
         this._grabbable = interactable;
         interactable.grab(this, handleId);
-
-        let hidden = this.visualStateOnGrab === InteractorVisualState.Hidden;
-        if (interactable.interactorVisualState !== InteractorVisualState.None) {
-            hidden = interactable.interactorVisualState === InteractorVisualState.Hidden;
-        }
-        if (handle.interactorVisualState !== InteractorVisualState.None) {
-            hidden = handle.interactorVisualState === InteractorVisualState.Hidden;
-        }
-
-        if (this.meshRoot && hidden) {
-            setComponentsActive(this.meshRoot, false, MeshComponent);
-        }
     }
 
     /**
@@ -252,15 +257,11 @@ export class Interactor extends Component {
      * Force this interactor to stop interacting with the
      * currently bound interactable.
      */
-    public stopInteraction() {
+    stopInteraction() {
         if (this._grabbable && !this._grabbable.isDestroyed) {
             this._grabbable.release(this);
         }
         this._grabbable = null;
-
-        if (this.meshRoot && !this.meshRoot.isDestroyed) {
-            setComponentsActive(this.meshRoot, true, MeshComponent);
-        }
     }
 
     /**
