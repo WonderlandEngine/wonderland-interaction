@@ -8,6 +8,7 @@ import {
     PhysXComponent,
     Property,
     WonderlandEngine,
+    MeshComponent,
 } from '@wonderlandengine/api';
 
 import {Interactor} from './interactor.js';
@@ -26,7 +27,7 @@ import {
 } from './providers.js';
 import {FORWARD, RIGHT, UP} from '../constants.js';
 import {TempDualQuat, TempQuat, TempVec3} from '../internal-constants.js';
-import {componentError, enumStringKeys} from '../utils/wle.js';
+import {componentError, enumStringKeys, setComponentsActive} from '../utils/wle.js';
 
 /* Constants */
 
@@ -424,6 +425,21 @@ export class Grabbable extends Component {
         if (!dual) {
             this.onGrabStart.notify(this);
         }
+
+        /* Interactor visual state modification */
+
+        let hidden = interactor.visualStateOnGrab === InteractorVisualState.Hidden;
+        if (handle.interactorVisualState !== InteractorVisualState.None) {
+            hidden = handle.interactorVisualState === InteractorVisualState.Hidden;
+        }
+        if (handle.interactorVisualState !== InteractorVisualState.None) {
+            hidden = handle.interactorVisualState === InteractorVisualState.Hidden;
+        }
+        if (interactor.meshRoot && hidden) {
+            setComponentsActive(interactor.meshRoot, false, MeshComponent);
+        }
+
+        interactor.onGrabStart.notify(interactor, this);
     }
 
     /**
@@ -458,9 +474,14 @@ export class Grabbable extends Component {
         }
 
         this.onGrabPointRelease.notify(this, handle);
-        if (released) {
-            this.onGrabEnd.notify(this);
+        if (!released) return;
+
+        if (interactor.meshRoot && !interactor.meshRoot.isDestroyed) {
+            setComponentsActive(interactor.meshRoot, true, MeshComponent);
         }
+
+        this.onGrabEnd.notify(this);
+        interactor.onGrabEnd.notify(interactor, this);
     }
 
     /** `true` is any of the two handles is currently grabbed. */
@@ -476,6 +497,10 @@ export class Grabbable extends Component {
     /** `true` if the secondary handle is grabbed, the object pointer by {@link handleSecondary}. */
     get secondaryGrab(): GrabData | null {
         return this._grabData[1];
+    }
+
+    get physx(): PhysXComponent | null {
+        return this._physx;
     }
 
     protected computeTransform(
