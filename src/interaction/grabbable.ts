@@ -429,8 +429,8 @@ export class Grabbable extends Component {
         /* Interactor visual state modification */
 
         let hidden = interactor.visualStateOnGrab === InteractorVisualState.Hidden;
-        if (handle.interactorVisualState !== InteractorVisualState.None) {
-            hidden = handle.interactorVisualState === InteractorVisualState.Hidden;
+        if (this.interactorVisualState !== InteractorVisualState.None) {
+            hidden = this.interactorVisualState === InteractorVisualState.Hidden;
         }
         if (handle.interactorVisualState !== InteractorVisualState.None) {
             hidden = handle.interactorVisualState === InteractorVisualState.Hidden;
